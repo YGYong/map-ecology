@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from './views/HomePage.vue'
-import ExampleDetailPage from './views/ExampleDetailPage.vue'
-import ErrorPanelDemo from './components/ErrorPanelDemo.vue'
+import HomePage from '@/views/HomePage.vue'
+import ExampleDetailPage from '@/views/ExampleDetailPage.vue'
+import ErrorPanelDemo from '@/components/ErrorPanelDemo.vue'
 
 const routes = [
   {
