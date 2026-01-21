@@ -9,7 +9,7 @@ const cesiumContainer = ref(null);
 let viewer = null;
 
 // 天地图TOKEN
-const token = "05be06461004055923091de7f3e51aa6";
+const token = "2b34f6afbcd235c2bc4bed3f7735f1f5";
 
 onMounted(() => {
   // 初始化Viewer

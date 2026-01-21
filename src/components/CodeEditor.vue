@@ -106,8 +106,28 @@ export default {
     }
     
     if (this.editor) {
-      this.editor.toTextArea();
-      this.editor = null;
+      try {
+        // 移除所有事件监听器
+        this.editor.off('change');
+        this.editor.off('inputRead');
+        this.editor.off('blur');
+        
+        // 清除所有标记
+        const marks = this.editor.getAllMarks();
+        marks.forEach(mark => {
+          try {
+            mark.clear();
+          } catch (e) {
+            // 忽略清除标记时的错误
+          }
+        });
+        
+        // 销毁编辑器
+        this.editor.toTextArea();
+        this.editor = null;
+      } catch (error) {
+        console.warn('清理 CodeMirror 编辑器时出错:', error);
+      }
     }
   },
   methods: {
@@ -118,7 +138,7 @@ export default {
         lineNumbers: true,
         lineWrapping: true,
         autoCloseBrackets: true,
-        matchBrackets: true,
+        matchBrackets: false, // 禁用括号匹配以避免错误
         foldGutter: true,
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         tabSize: 2,

@@ -1,41 +1,46 @@
-import { parse } from '@vue/compiler-sfc'
-
-/**
- * Parse a Vue Single File Component (SFC) into its constituent parts
- * 
- * @param {string} code - The Vue SFC code to parse
- * @returns {ParsedSFC} Object containing template, script, scriptSetup, style, and errors
- * 
- * @typedef {Object} ParsedSFC
- * @property {string|null} template - The template section content
- * @property {string|null} script - The script section content
- * @property {string|null} scriptSetup - The script setup section content
- * @property {string|null} style - The style section content
- * @property {Array<{message: string, line: number}>} errors - Array of parsing errors
- */
+// Vue SFC 解析器
 export function parseSFC(code) {
+  const errors = []
+  
   try {
-    const { descriptor, errors } = parse(code, {
-      filename: 'example.vue'
+    // 提取 <script setup> 内容
+    const scriptSetupMatch = code.match(/<script\s+setup[^>]*>([\s\S]*?)<\/script>/i)
+    const scriptMatch = code.match(/<script[^>]*>([\s\S]*?)<\/script>/i)
+    
+    let scriptContent = ''
+    
+    if (scriptSetupMatch) {
+      scriptContent = scriptSetupMatch[1]
+    } else if (scriptMatch) {
+      scriptContent = scriptMatch[1]
+    }
+    
+    // 提取 <template> 内容
+    const templateMatch = code.match(/<template[^>]*>([\s\S]*?)<\/template>/i)
+    const templateContent = templateMatch ? templateMatch[1] : ''
+    
+    // 提取 <style> 内容
+    const styleMatch = code.match(/<style[^>]*>([\s\S]*?)<\/style>/i)
+    const styleContent = styleMatch ? styleMatch[1] : ''
+    
+    return {
+      script: scriptContent.trim(),
+      template: templateContent.trim(),
+      style: styleContent.trim(),
+      errors
+    }
+  } catch (error) {
+    errors.push({
+      type: 'parse',
+      message: `解析 SFC 失败: ${error.message}`,
+      line: 0
     })
     
     return {
-      template: descriptor.template?.content || null,
-      script: descriptor.script?.content || null,
-      scriptSetup: descriptor.scriptSetup?.content || null,
-      style: descriptor.styles[0]?.content || null,
-      errors: errors.map(err => ({
-        message: err.message,
-        line: err.loc?.start.line || 0
-      }))
-    }
-  } catch (error) {
-    return {
-      template: null,
-      script: null,
-      scriptSetup: null,
-      style: null,
-      errors: [{ message: error.message, line: 0 }]
+      script: '',
+      template: '',
+      style: '',
+      errors
     }
   }
 }

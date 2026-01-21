@@ -4,25 +4,14 @@
     <header class="top-navbar">
       <div class="navbar-container">
         <div class="navbar-left">
-          <el-button 
-            class="back-button" 
-            @click="goBack"
-            :icon="ArrowLeft"
-            circle
-          />
+          <button class="back-button" @click="goBack">← 返回</button>
           <h1 class="page-title">{{ currentExample?.name || '示例详情' }}</h1>
         </div>
         <div class="navbar-right">
-          <el-button size="default" @click="resetCode">重置</el-button>
-          <el-button 
-            size="default" 
-            type="primary" 
-            @click="runCode"
-            :disabled="isRunning"
-            :loading="isRunning"
-          >
-            运行
-          </el-button>
+          <button class="action-btn" @click="resetCode">重置</button>
+          <button class="action-btn primary" @click="runCode" :disabled="isRunning">
+            {{ isRunning ? '运行中...' : '运行' }}
+          </button>
         </div>
       </div>
     </header>
@@ -30,29 +19,28 @@
     <!-- 主体内容区：左侧代码编辑器，右侧 Cesium 查看器 -->
     <div class="main-container">
       <!-- 左侧代码编辑器 -->
-      <div class="code-editor-panel">
-        <div class="editor-tabs">
-          <div
-            class="tab-item"
-            :class="{ active: activeTab === 'script' }"
-            @click="activeTab = 'script'"
-          >
-            <el-icon><Document /></el-icon>
-            <span>JS 代码</span>
-          </div>
-          <div
-            class="tab-item"
-            :class="{ active: activeTab === 'source' }"
-            @click="activeTab = 'source'"
-          >
-            <el-icon><Tickets /></el-icon>
-            <span>完整源码</span>
+      <div 
+        class="code-editor-panel"
+        :style="{ width: `${codePanelWidth}%` }"
+      >
+        <div class="editor-header">
+          <div class="editor-tabs">
+            <div class="tab-item active">
+              <span>📄</span>
+              <span>代码编辑</span>
+            </div>
           </div>
         </div>
         <div class="editor-content">
           <code-editor v-model="code" @run="runCode" />
         </div>
       </div>
+
+      <!-- 调整大小的分隔条 -->
+      <div 
+        class="resize-handle" 
+        @mousedown="startResize"
+      ></div>
 
       <!-- 右侧 Cesium 查看器 -->
       <div class="cesium-viewer-panel">
@@ -69,13 +57,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft, Document, Tickets } from '@element-plus/icons-vue'
 import CodeEditor from '../components/CodeEditor.vue'
 import CesiumViewer from '../components/CesiumViewer.vue'
 import ErrorPanel from '../components/ErrorPanel.vue'
-import { examples } from '../utils/examplesData'
+import { getExampleById, loadExampleCode } from '../utils/examplesData'
 import { parseSFC } from '../utils/sfcParser'
 import { CodeExecutor } from '../utils/codeExecutor'
 import { useErrorHandler } from '../composables/useErrorHandler'
@@ -84,14 +71,15 @@ const router = useRouter()
 const route = useRoute()
 
 // 错误处理
-const { errors, addError, clearErrors, latestError } = useErrorHandler()
+const { addError, clearErrors, latestError } = useErrorHandler()
 
 // 状态管理
 const currentExample = ref(null)
 const code = ref('')
 const originalCode = ref('')
-const activeTab = ref('script')
 const isRunning = ref(false)
+const codePanelWidth = ref(45)
+const isResizing = ref(false)
 
 // Cesium Viewer 引用
 const cesiumViewer = ref(null)
@@ -102,6 +90,10 @@ let codeExecutor = null
 // 生命周期
 onMounted(() => {
   loadExample()
+  
+  // 监听全局鼠标事件
+  document.addEventListener('mousemove', handleGlobalMouseMove)
+  document.addEventListener('mouseup', stopResize)
 })
 
 // 监听路由变化
@@ -110,28 +102,58 @@ watch(() => route.params.id, () => {
 })
 
 // 方法
-function loadExample() {
+async function loadExample() {
   const exampleId = parseInt(route.params.id)
-  const example = examples.find(ex => ex.id === exampleId)
+  const example = getExampleById(exampleId)
   
   if (example) {
     currentExample.value = example
-    code.value = example.code
-    originalCode.value = example.code
     
-    // 等待 DOM 更新后自动运行代码
-    nextTick(async () => {
-      await waitForViewer()
-      runCode()
-    })
+    try {
+      const exampleCode = await loadExampleCode(example.fileName)
+      code.value = exampleCode
+      originalCode.value = exampleCode
+      
+      nextTick(async () => {
+        await waitForViewer()
+        runCode()
+      })
+    } catch (error) {
+      console.error('加载示例失败:', error)
+      addError({
+        type: 'load',
+        message: `加载示例失败: ${error.message}`
+      })
+    }
   } else {
-    // 示例不存在，返回首页
     router.push('/')
   }
 }
 
 function goBack() {
   router.push('/')
+}
+
+function startResize() {
+  isResizing.value = true
+}
+
+function handleGlobalMouseMove(event) {
+  if (!isResizing.value) return
+  
+  const mainContainer = document.querySelector('.main-container')
+  if (mainContainer) {
+    const rect = mainContainer.getBoundingClientRect()
+    const newWidth = ((event.clientX - rect.left) / rect.width) * 100
+    
+    if (newWidth >= 20 && newWidth <= 80) {
+      codePanelWidth.value = newWidth
+    }
+  }
+}
+
+function stopResize() {
+  isResizing.value = false
 }
 
 async function resetCode() {
@@ -147,17 +169,13 @@ async function resetCode() {
 }
 
 async function runCode() {
-  if (isRunning.value) {
-    return
-  }
+  if (isRunning.value) return
   
   isRunning.value = true
   
   try {
-    // 解析 Vue SFC
     const parsed = parseSFC(code.value)
     
-    // 检查解析错误
     if (parsed.errors && parsed.errors.length > 0) {
       const parseError = parsed.errors[0]
       addError({
@@ -168,11 +186,10 @@ async function runCode() {
       return
     }
     
-    // 获取 Viewer 实例
     if (!cesiumViewer.value || !cesiumViewer.value.getViewer) {
       addError({
         type: 'cesium',
-        message: 'Cesium Viewer 未初始化，请等待 Viewer 加载完成'
+        message: 'Cesium Viewer 未初始化'
       })
       return
     }
@@ -187,20 +204,16 @@ async function runCode() {
       return
     }
     
-    // 创建代码执行器
     if (!codeExecutor) {
       codeExecutor = new CodeExecutor(viewerInstance)
     }
     
-    // 清空场景
     if (cesiumViewer.value.clearScene) {
       cesiumViewer.value.clearScene()
     }
     
-    // 执行代码
     const result = await codeExecutor.execute(parsed)
     
-    // 处理执行结果
     if (result.success) {
       clearErrors()
     } else {
@@ -228,12 +241,8 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   while (Date.now() - startTime < maxWaitTime) {
     if (cesiumViewer.value && cesiumViewer.value.getViewer) {
       const viewerInstance = cesiumViewer.value.getViewer()
-      
-      if (viewerInstance) {
-        return true
-      }
+      if (viewerInstance) return true
     }
-    
     await new Promise(resolve => setTimeout(resolve, checkInterval))
   }
   
@@ -242,7 +251,6 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
 </script>
 
 <style scoped>
-/* 全局容器 */
 .example-detail-page {
   display: flex;
   flex-direction: column;
@@ -252,13 +260,12 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   background-color: #1e1e1e;
 }
 
-/* 顶部导航栏 */
 .top-navbar {
-  background-color: #252526;
+  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
   color: white;
   height: 50px;
   min-height: 50px;
-  border-bottom: 1px solid #3e3e42;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
   z-index: 100;
 }
@@ -276,26 +283,29 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .back-button {
-  background-color: transparent;
-  border-color: #3e3e42;
-  color: #cccccc;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .back-button:hover {
-  background-color: #2d2d30;
-  border-color: #1890ff;
-  color: #1890ff;
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 .page-title {
   font-size: 14px;
   font-weight: 500;
   margin: 0;
-  color: #cccccc;
+  color: white;
 }
 
 .navbar-right {
@@ -304,7 +314,35 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   gap: 8px;
 }
 
-/* 主体内容区 */
+.action-btn {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.action-btn.primary {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
+.action-btn.primary:hover {
+  background-color: #059669;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .main-container {
   flex: 1;
   display: flex;
@@ -312,22 +350,23 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   min-height: 0;
 }
 
-/* 左侧代码编辑器面板 */
 .code-editor-panel {
-  width: 50%;
-  min-width: 400px;
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #1e1e1e;
   border-right: 1px solid #3e3e42;
+  position: relative;
+}
+
+.editor-header {
+  background-color: #252526;
+  border-bottom: 1px solid #3e3e42;
+  flex-shrink: 0;
 }
 
 .editor-tabs {
   display: flex;
-  background-color: #252526;
-  border-bottom: 1px solid #3e3e42;
-  flex-shrink: 0;
   height: 36px;
 }
 
@@ -352,7 +391,7 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
 .tab-item.active {
   background-color: #1e1e1e;
   color: #ffffff;
-  border-bottom: 2px solid #1890ff;
+  border-bottom: 2px solid #3b82f6;
 }
 
 .editor-content {
@@ -361,39 +400,25 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   min-height: 0;
 }
 
-/* 右侧 Cesium 查看器面板 */
+.resize-handle {
+  width: 4px;
+  height: 100%;
+  background-color: #3e3e42;
+  cursor: col-resize;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.resize-handle:hover {
+  background-color: #3b82f6;
+}
+
 .cesium-viewer-panel {
   flex: 1;
   min-width: 0;
   height: 100%;
   background-color: #000;
   position: relative;
-}
-
-/* 响应式布局 */
-@media (max-width: 1024px) {
-  .code-editor-panel {
-    width: 45%;
-    min-width: 350px;
-  }
-}
-
-@media (max-width: 768px) {
-  .main-container {
-    flex-direction: column;
-  }
-  
-  .code-editor-panel {
-    width: 100%;
-    min-width: 0;
-    height: 50%;
-    border-right: none;
-    border-bottom: 1px solid #3e3e42;
-  }
-  
-  .cesium-viewer-panel {
-    width: 100%;
-    height: 50%;
-  }
 }
 </style>

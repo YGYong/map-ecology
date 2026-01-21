@@ -4,23 +4,22 @@
     <header class="top-navbar">
       <div class="navbar-container">
         <div class="navbar-left">
-          <h1 class="logo">Cesium 专栏</h1>
+          <div class="logo">
+            <span class="logo-icon">🌍</span>
+            <span class="logo-text">Mars3D平台</span>
+          </div>
           <nav class="main-nav">
-            <ul class="nav-list">
-              <li><a href="#" class="nav-item active">Cesium Examples</a></li>
-              <li><a href="#" class="nav-item">Three Examples</a></li>
-              <li><a href="#" class="nav-item">WebGL</a></li>
-              <li><a href="#" class="nav-item">WebGPU</a></li>
-              <li><a href="#" class="nav-item">Cesium 官网</a></li>
-            </ul>
+            <a href="#" class="nav-item">首页</a>
+            <a href="#" class="nav-item active">功能</a>
+            <a href="#" class="nav-item">项目</a>
+            <a href="#" class="nav-item">纸代码</a>
+            <a href="#" class="nav-item">开发</a>
+            <a href="#" class="nav-item">民宿</a>
           </nav>
         </div>
         <div class="navbar-right">
-          <div class="nav-tools">
-            <span class="tool-item">版权</span>
-            <span class="tool-item">贡献</span>
-            <span class="tool-item">源码</span>
-          </div>
+          <button class="nav-btn">新增案例</button>
+          <button class="nav-btn">全屏浏览</button>
         </div>
       </div>
     </header>
@@ -29,51 +28,36 @@
     <div class="main-container">
       <!-- 左侧分类导航 -->
       <aside class="sidebar">
+        <div class="search-box">
+          <input type="text" placeholder="请输入关键字搜索" class="search-input" />
+        </div>
+        
         <nav class="category-nav">
-          <ul class="category-list">
-            <li
-              v-for="category in categoriesData"
-              :key="category.id"
-              class="category-item"
+          <div
+            v-for="category in categoriesData"
+            :key="category.id"
+            class="category-item"
+          >
+            <div 
+              class="category-header" 
+              @click="toggleCategory(category.id)"
+              :class="{ active: selectedCategory === category.id }"
             >
-              <div 
-                class="category-header" 
-                @click="toggleCategory(category.id)"
-                :class="{ active: selectedCategory === category.id }"
-              >
-                <span class="category-index">{{ category.id }}、{{ category.name }}</span>
-                <span class="category-count">({{ category.count }})</span>
-                <el-icon
-                  class="toggle-icon"
-                  :class="{ expanded: expandedCategories.includes(category.id) }"
-                >
-                  <ArrowRight />
-                </el-icon>
-              </div>
-              <ul
-                v-if="expandedCategories.includes(category.id)"
-                class="subcategory-list"
-              >
-                <li
-                  v-for="subcategory in category.subcategories"
-                  :key="subcategory.id"
-                  class="subcategory-item"
-                  @click="selectSubcategory(subcategory.id)"
-                  :class="{ active: selectedSubcategory === subcategory.id }"
-                >
-                  {{ subcategory.name }}
-                </li>
-              </ul>
-            </li>
-          </ul>
+              <span class="category-icon">📁</span>
+              <span class="category-name">{{ category.name }}</span>
+              <span class="category-count">({{ category.count }})</span>
+            </div>
+          </div>
         </nav>
       </aside>
 
       <!-- 右侧示例网格 -->
       <main class="content-area">
         <div class="content-header">
-          <h2 class="content-title">{{ currentCategoryName }}</h2>
-          <div class="example-count">共 {{ filteredExamples.length }} 个示例</div>
+          <h2 class="content-title">
+            <span class="title-icon">📂</span>
+            {{ currentCategoryName }} ({{ filteredExamples.length }})
+          </h2>
         </div>
 
         <div class="examples-grid">
@@ -90,7 +74,7 @@
                 loading="lazy"
               />
               <div class="example-overlay">
-                <el-icon class="play-icon"><VideoPlay /></el-icon>
+                <div class="play-icon">▶</div>
               </div>
             </div>
             <div class="example-info">
@@ -106,15 +90,12 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, VideoPlay } from '@element-plus/icons-vue'
 import { examples, categories } from '../utils/examplesData'
 
 const router = useRouter()
 
 // 状态管理
-const expandedCategories = ref([1]) // 默认展开"基础"分类
 const selectedCategory = ref(1) // 默认选中"基础"分类
-const selectedSubcategory = ref(null)
 
 // 分类数据
 const categoriesData = categories
@@ -124,48 +105,17 @@ const examplesData = examples
 
 // 计算属性
 const currentCategoryName = computed(() => {
-  if (selectedSubcategory.value !== null) {
-    // 查找子分类名称
-    for (const category of categoriesData) {
-      const subcategory = category.subcategories.find(
-        sub => sub.id === selectedSubcategory.value
-      )
-      if (subcategory) {
-        return subcategory.name
-      }
-    }
-  }
-  
   const category = categoriesData.find(cat => cat.id === selectedCategory.value)
   return category ? category.name : '所有示例'
 })
 
 const filteredExamples = computed(() => {
-  if (selectedSubcategory.value !== null) {
-    // 根据子分类 ID 过滤示例
-    return examplesData.filter(ex => ex.id === selectedSubcategory.value)
-  }
-  
-  // 根据分类过滤示例
   return examplesData.filter(ex => ex.category === selectedCategory.value)
 })
 
 // 方法
 function toggleCategory(categoryId) {
-  const index = expandedCategories.value.indexOf(categoryId)
-  if (index > -1) {
-    expandedCategories.value.splice(index, 1)
-  } else {
-    expandedCategories.value.push(categoryId)
-  }
-  
-  // 选中该分类
   selectedCategory.value = categoryId
-  selectedSubcategory.value = null
-}
-
-function selectSubcategory(subcategoryId) {
-  selectedSubcategory.value = subcategoryId
 }
 
 function goToExample(exampleId) {
@@ -181,15 +131,16 @@ function goToExample(exampleId) {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background-color: #f0f2f5;
 }
 
 /* 顶部导航栏 */
 .top-navbar {
-  background-color: #002140;
+  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
   color: white;
-  height: 60px;
-  min-height: 60px;
-  border-bottom: 1px solid #1890ff;
+  height: 56px;
+  min-height: 56px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
   z-index: 100;
 }
@@ -201,37 +152,35 @@ function goToExample(exampleId) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 32px;
 }
 
 .logo {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1890ff;
-  margin: 0;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.logo-icon {
+  font-size: 24px;
 }
 
 .main-nav {
-  flex: 1;
-}
-
-.nav-list {
   display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 5px;
+  gap: 4px;
 }
 
 .nav-item {
-  color: white;
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   font-size: 14px;
   padding: 8px 16px;
@@ -240,32 +189,37 @@ function goToExample(exampleId) {
   white-space: nowrap;
 }
 
-.nav-item:hover,
-.nav-item.active {
-  background-color: #1890ff;
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
+}
+
+.nav-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 500;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
-.nav-tools {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.tool-item {
+.nav-btn {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
-  transition: color 0.3s ease;
-  white-space: nowrap;
+  transition: all 0.3s ease;
 }
 
-.tool-item:hover {
-  color: #1890ff;
+.nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* 主体内容区 */
@@ -278,53 +232,73 @@ function goToExample(exampleId) {
 
 /* 左侧分类导航 */
 .sidebar {
-  width: 220px;
-  min-width: 220px;
+  width: 260px;
+  min-width: 260px;
   height: 100%;
-  background-color: #f5f5f5;
-  border-right: 1px solid #e8e8e8;
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
 }
 
-.category-nav {
-  padding: 10px 0;
+.search-box {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.category-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.category-nav {
+  padding: 8px 0;
 }
 
 .category-item {
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
 .category-header {
   display: flex;
   align-items: center;
-  padding: 12px 15px;
+  padding: 12px 16px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   user-select: none;
+  gap: 8px;
 }
 
 .category-header:hover {
-  background-color: #e6f7ff;
+  background-color: #f3f4f6;
 }
 
 .category-header.active {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  font-weight: bold;
+  background-color: #eff6ff;
+  color: #3b82f6;
+  font-weight: 500;
+  border-left: 3px solid #3b82f6;
 }
 
-.category-index {
+.category-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.category-name {
   flex: 1;
-  font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -332,47 +306,8 @@ function goToExample(exampleId) {
 
 .category-count {
   font-size: 12px;
-  color: #666;
-  margin-right: 10px;
+  color: #9ca3af;
   flex-shrink: 0;
-}
-
-.toggle-icon {
-  font-size: 12px;
-  transition: transform 0.3s ease;
-  flex-shrink: 0;
-}
-
-.toggle-icon.expanded {
-  transform: rotate(90deg);
-}
-
-.subcategory-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  background-color: white;
-}
-
-.subcategory-item {
-  padding: 10px 30px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.subcategory-item:hover {
-  background-color: #e6f7ff;
-  color: #1890ff;
-}
-
-.subcategory-item.active {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  font-weight: bold;
 }
 
 /* 右侧内容区 */
@@ -383,65 +318,66 @@ function goToExample(exampleId) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: white;
+  background-color: #f9fafb;
 }
 
 .content-header {
-  height: 60px;
-  min-height: 60px;
-  border-bottom: 1px solid #e8e8e8;
+  height: 56px;
+  min-height: 56px;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 30px;
-  background-color: #fafafa;
+  padding: 0 24px;
+  background-color: white;
   flex-shrink: 0;
 }
 
 .content-title {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 600;
   margin: 0;
-  color: #333;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.example-count {
-  font-size: 14px;
-  color: #666;
+.title-icon {
+  font-size: 18px;
 }
 
 /* 示例网格 */
 .examples-grid {
   flex: 1;
-  padding: 30px;
+  padding: 24px;
   overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
   align-content: start;
 }
 
 .example-card {
-  border: 1px solid #e8e8e8;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .example-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px);
-  border-color: #1890ff;
+  transform: translateY(-2px);
+  border-color: #3b82f6;
 }
 
 .example-preview {
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background-color: #000;
+  background-color: #1f2937;
   position: relative;
 }
 
@@ -462,7 +398,7 @@ function goToExample(exampleId) {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -481,14 +417,13 @@ function goToExample(exampleId) {
 
 .example-info {
   padding: 16px;
-  background-color: #fafafa;
 }
 
 .example-name {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   margin: 0;
-  color: #333;
+  color: #374151;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -497,61 +432,23 @@ function goToExample(exampleId) {
 /* 滚动条样式 */
 .sidebar::-webkit-scrollbar,
 .examples-grid::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .sidebar::-webkit-scrollbar-track,
 .examples-grid::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f3f4f6;
 }
 
 .sidebar::-webkit-scrollbar-thumb,
 .examples-grid::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+  background: #d1d5db;
+  border-radius: 3px;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover,
 .examples-grid::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* 响应式布局 */
-@media (max-width: 1024px) {
-  .examples-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
-    padding: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar-left {
-    gap: 15px;
-  }
-  
-  .main-nav {
-    display: none;
-  }
-  
-  .navbar-right {
-    display: none;
-  }
-  
-  .sidebar {
-    width: 180px;
-    min-width: 180px;
-  }
-  
-  .examples-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
-    padding: 16px;
-  }
-  
-  .example-preview {
-    height: 150px;
-  }
+  background: #9ca3af;
 }
 </style>
