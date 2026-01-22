@@ -1,125 +1,152 @@
 <template>
   <div class="home-page">
     <!-- 顶部导航栏 -->
-    <header class="top-navbar">
-      <div class="navbar-container">
-        <div class="navbar-left">
-          <div class="logo">
-            <span class="logo-icon">🌍</span>
-            <span class="logo-text">Mars3D平台</span>
-          </div>
-          <nav class="main-nav">
-            <a href="#" class="nav-item">首页</a>
-            <a href="#" class="nav-item active">功能</a>
-            <a href="#" class="nav-item">项目</a>
-            <a href="#" class="nav-item">纸代码</a>
-            <a href="#" class="nav-item">开发</a>
-            <a href="#" class="nav-item">民宿</a>
-          </nav>
-        </div>
-        <div class="navbar-right">
-          <button class="nav-btn">新增案例</button>
-          <button class="nav-btn">全屏浏览</button>
-        </div>
-      </div>
-    </header>
+    <top-navbar />
 
     <!-- 主体内容区 -->
-    <div class="main-container">
-      <!-- 左侧分类导航 -->
-      <aside class="sidebar">
-        <div class="search-box">
-          <input type="text" placeholder="请输入关键字搜索" class="search-input" />
-        </div>
-        
-        <nav class="category-nav">
-          <div
-            v-for="category in categoriesData"
-            :key="category.id"
-            class="category-item"
-          >
-            <div 
-              class="category-header" 
-              @click="toggleCategory(category.id)"
-              :class="{ active: selectedCategory === category.id }"
+    <div class="hero-container">
+      <!-- 英雄区域 -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1 class="hero-title">二三维地图开发指南</h1>
+            <h2 class="hero-subtitle">从入门到精通</h2>
+            <p class="hero-description">
+              深入二三维地图开发 | 核心技术原理剖析 | 最佳实践分享
+            </p>
+            <el-button
+              type="primary"
+              size="large"
+              class="hero-btn"
+              @click="exploreExamples"
             >
-              <span class="category-icon">📁</span>
-              <span class="category-name">{{ category.name }}</span>
-              <span class="category-count">({{ category.count }})</span>
-            </div>
+              快速进入
+            </el-button>
           </div>
-        </nav>
-      </aside>
-
-      <!-- 右侧示例网格 -->
-      <main class="content-area">
-        <div class="content-header">
-          <h2 class="content-title">
-            <span class="title-icon">📂</span>
-            {{ currentCategoryName }} ({{ filteredExamples.length }})
-          </h2>
+          <div class="hero-icon">
+            <el-icon class="map-icon"><i class="el-icon-location"></i></el-icon>
+          </div>
         </div>
+      </section>
 
-        <div class="examples-grid">
-          <div
-            v-for="example in filteredExamples"
-            :key="example.id"
-            class="example-card"
-            @click="goToExample(example.id)"
-          >
-            <div class="example-preview">
-              <img 
-                :src="example.preview" 
-                :alt="example.name"
-                loading="lazy"
-              />
-              <div class="example-overlay">
-                <div class="play-icon">▶</div>
+      <!-- 核心内容区域 -->
+      <section class="core-section">
+        <div class="core-grid">
+          <el-card class="core-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <h3>基础概念</h3>
               </div>
-            </div>
-            <div class="example-info">
-              <h3 class="example-name">{{ example.name }}</h3>
-            </div>
-          </div>
+            </template>
+            <p class="card-content">
+              学习二三维地图开发的基本概念，如地图服务、图层、坐标系统、相机控制等核心知识点。
+            </p>
+            <el-button type="primary" size="small" class="card-btn">
+              了解更多
+            </el-button>
+          </el-card>
+
+          <el-card class="core-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <h3>实践指南</h3>
+              </div>
+            </template>
+            <p class="card-content">
+              通过实际案例，逐步掌握各地图库的使用技巧，打通各种地图开发场景的技术难点。
+            </p>
+            <el-button type="primary" size="small" class="card-btn">
+              查看案例
+            </el-button>
+          </el-card>
+
+          <el-card class="core-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <h3>持续学习</h3>
+              </div>
+            </template>
+            <p class="card-content">
+              不断学习前沿技术，掌握地图开发的最新趋势和最佳实践，提升开发技能水平。
+            </p>
+            <el-button type="primary" size="small" class="card-btn">
+              学习资源
+            </el-button>
+          </el-card>
         </div>
-      </main>
+      </section>
+
+      <!-- 热门技术区域 -->
+      <section class="tech-section">
+        <h2 class="section-title">热门地图技术</h2>
+        <div class="tech-grid">
+          <el-card
+            class="tech-card"
+            shadow="hover"
+            @click="goToTech('openlayers')"
+          >
+            <div class="tech-icon">
+              <i class="el-icon-picture-outline"></i>
+            </div>
+            <h3 class="tech-name">OpenLayers</h3>
+            <p class="tech-desc">
+              开源的JavaScript库，用于在网页上显示地图数据
+            </p>
+          </el-card>
+
+          <el-card
+            class="tech-card"
+            shadow="hover"
+            @click="goToTech('leaflet')"
+          >
+            <div class="tech-icon">
+              <i class="el-icon-location-outline"></i>
+            </div>
+            <h3 class="tech-name">Leaflet</h3>
+            <p class="tech-desc">
+              轻量级的开源JavaScript库，用于移动友好的交互式地图
+            </p>
+          </el-card>
+
+          <el-card class="tech-card" shadow="hover" @click="goToTech('cesium')">
+            <div class="tech-icon">
+              <i class="el-icon-video-camera"></i>
+            </div>
+            <h3 class="tech-name">Cesium</h3>
+            <p class="tech-desc">用于创建世界级3D地球和地图的JavaScript库</p>
+          </el-card>
+
+          <el-card class="tech-card" shadow="hover" @click="goToTech('three')">
+            <div class="tech-icon">
+              <i class="el-icon-s-platform"></i>
+            </div>
+            <h3 class="tech-name">Three.js</h3>
+            <p class="tech-desc">
+              JavaScript 3D库，用于在网页上创建和显示3D图形
+            </p>
+          </el-card>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { examples, categories } from '../utils/examplesData'
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import TopNavbar from "../components/TopNavbar.vue";
 
-const router = useRouter()
-
-// 状态管理
-const selectedCategory = ref(1) // 默认选中"基础"分类
-
-// 分类数据
-const categoriesData = categories
-
-// 示例数据
-const examplesData = examples
-
-// 计算属性
-const currentCategoryName = computed(() => {
-  const category = categoriesData.find(cat => cat.id === selectedCategory.value)
-  return category ? category.name : '所有示例'
-})
-
-const filteredExamples = computed(() => {
-  return examplesData.filter(ex => ex.category === selectedCategory.value)
-})
+const router = useRouter();
 
 // 方法
-function toggleCategory(categoryId) {
-  selectedCategory.value = categoryId
+function exploreExamples() {
+  // 跳转到示例页面或展开示例列表
+  router.push("/cesium/examples");
 }
 
-function goToExample(exampleId) {
-  router.push(`/examples/${exampleId}`)
+function goToTech(tech) {
+  // 跳转到对应技术的页面
+  router.push(`/${tech}/examples`);
 }
 </script>
 
@@ -131,95 +158,27 @@ function goToExample(exampleId) {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: #f0f2f5;
+  background-color: #f5f5f5;
 }
 
-/* 顶部导航栏 */
-.top-navbar {
-  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
-  color: white;
-  height: 56px;
-  min-height: 56px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  flex-shrink: 0;
-  z-index: 100;
+/* 主题切换样式 */
+:root {
+  --bg-color: #f5f5f5;
+  --text-color: #333;
+  --card-bg: #fff;
+  --border-color: #e8e8e8;
 }
 
-.navbar-container {
-  max-width: 100%;
-  height: 100%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
+.dark-theme {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --card-bg: #2d2d2d;
+  --border-color: #404040;
 }
 
-.navbar-left {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  color: white;
-}
-
-.logo-icon {
-  font-size: 24px;
-}
-
-.main-nav {
-  display: flex;
-  gap: 4px;
-}
-
-.nav-item {
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  font-size: 14px;
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.nav-item.active {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  font-weight: 500;
-}
-
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.nav-btn {
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 6px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.nav-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
+.home-page {
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 /* 主体内容区 */
@@ -236,7 +195,7 @@ function goToExample(exampleId) {
   min-width: 260px;
   height: 100%;
   background-color: white;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid #e8e8e8;
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
@@ -244,13 +203,13 @@ function goToExample(exampleId) {
 
 .search-box {
   padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .search-input {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #d9d9d9;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
@@ -258,8 +217,8 @@ function goToExample(exampleId) {
 }
 
 .search-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #1890ff;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
 }
 
 .category-nav {
@@ -279,17 +238,18 @@ function goToExample(exampleId) {
   transition: all 0.2s ease;
   user-select: none;
   gap: 8px;
+  position: relative;
 }
 
 .category-header:hover {
-  background-color: #f3f4f6;
+  background-color: #f0f8ff;
 }
 
 .category-header.active {
-  background-color: #eff6ff;
-  color: #3b82f6;
+  background-color: #e6f7ff;
+  color: #1890ff;
   font-weight: 500;
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid #1890ff;
 }
 
 .category-icon {
@@ -306,8 +266,16 @@ function goToExample(exampleId) {
 
 .category-count {
   font-size: 12px;
-  color: #9ca3af;
+  color: #999;
   flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.category-toggle {
+  font-size: 12px;
+  color: #999;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
 }
 
 /* 右侧内容区 */
@@ -318,13 +286,13 @@ function goToExample(exampleId) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: #f9fafb;
+  background-color: #fafafa;
 }
 
 .content-header {
   height: 56px;
   min-height: 56px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e8e8e8;
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -336,7 +304,7 @@ function goToExample(exampleId) {
   font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: #1f2937;
+  color: #333;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -352,32 +320,32 @@ function goToExample(exampleId) {
   padding: 24px;
   overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   align-content: start;
 }
 
 .example-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e8e8e8;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .example-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
-  border-color: #3b82f6;
+  border-color: #1890ff;
 }
 
 .example-preview {
   width: 100%;
-  height: 200px;
+  height: 180px;
   overflow: hidden;
-  background-color: #1f2937;
+  background-color: #f0f0f0;
   position: relative;
 }
 
@@ -413,17 +381,19 @@ function goToExample(exampleId) {
 .play-icon {
   font-size: 48px;
   color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .example-info {
   padding: 16px;
+  background-color: white;
 }
 
 .example-name {
   font-size: 14px;
   font-weight: 500;
   margin: 0;
-  color: #374151;
+  color: #333;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -438,17 +408,246 @@ function goToExample(exampleId) {
 
 .sidebar::-webkit-scrollbar-track,
 .examples-grid::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: #f5f5f5;
 }
 
 .sidebar::-webkit-scrollbar-thumb,
 .examples-grid::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #d9d9d9;
   border-radius: 3px;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover,
 .examples-grid::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #bfbfbf;
+}
+
+/* 英雄区域样式 */
+.hero-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-text {
+  flex: 1;
+  text-align: left;
+}
+
+.hero-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  background: linear-gradient(90deg, #63b3ed, #90cdf4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.hero-description {
+  font-size: 16px;
+  margin: 0 0 32px 0;
+  opacity: 0.9;
+}
+
+.hero-btn {
+  padding: 12px 32px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.hero-icon {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-icon {
+  font-size: 120px;
+  opacity: 0.8;
+}
+
+/* 核心内容区域样式 */
+.core-section {
+  padding: 60px 0;
+  background-color: var(--bg-color);
+}
+
+.core-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.core-card {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.core-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.card-content {
+  padding: 20px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.card-btn {
+  margin: 0 16px 16px 16px;
+}
+
+/* 热门技术区域样式 */
+.tech-section {
+  padding: 60px 0;
+  background-color: var(--bg-color);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 40px 0;
+  color: var(--text-color);
+}
+
+.tech-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.tech-card {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.tech-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #1890ff;
+}
+
+.tech-icon {
+  font-size: 48px;
+  margin: 0 0 16px 0;
+  color: #1890ff;
+}
+
+.tech-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--text-color);
+}
+
+.tech-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-text {
+    text-align: center;
+  }
+
+  .core-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .tech-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+  }
+
+  .hero-section {
+    padding: 60px 0;
+  }
+
+  .core-section,
+  .tech-section {
+    padding: 40px 0;
+  }
+
+  .core-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tech-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

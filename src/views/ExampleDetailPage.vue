@@ -47,12 +47,6 @@
         <cesium-viewer ref="cesiumViewer" />
       </div>
     </div>
-
-    <!-- 错误面板 -->
-    <error-panel 
-      :error="latestError" 
-      @close="clearErrors" 
-    />
   </div>
 </template>
 
