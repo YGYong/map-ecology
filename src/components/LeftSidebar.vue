@@ -4,30 +4,49 @@
       <h3 class="logo">Cesium 示例</h3>
     </div>
     <div class="sidebar-content">
-      <div class="category-section" v-for="category in categories" :key="category.id">
-        <div class="category-header" @click="toggleCategory(category.id)">
-          <span class="category-icon">{{ category.icon }}</span>
-          <span class="category-title">{{ category.name }}</span>
-          <span class="category-count">({{ category.examples.length }})</span>
-          <span class="category-icon">{{ category.expanded ? '▼' : '▶' }}</span>
-        </div>
-        <div class="category-items" v-if="category.expanded">
-          <div 
-            v-for="example in category.examples" 
-            :key="example.id"
-            class="example-item"
-            :class="{ active: selectedExampleId === example.id }"
-            @click="selectExample(example, category)"
+      <el-menu
+        :default-openeds="['1']"
+        class="sidebar-menu"
+        :collapse-transition="false"
+      >
+        <el-sub-menu
+          v-for="category in categories"
+          :key="category.id"
+          :index="category.id.toString()"
+        >
+          <template #title>
+            <span class="category-icon">{{ category.icon }}</span>
+            <span class="category-title">{{ category.name }}</span>
+            <span class="category-count">({{ category.count }})</span>
+          </template>
+          <el-sub-menu
+            v-for="subcategory in category.subcategories"
+            :key="subcategory.id"
+            :index="subcategory.id.toString()"
           >
-            <span class="example-title">{{ example.title }}</span>
-          </div>
-        </div>
-      </div>
+            <template #title>
+              <span class="subcategory-title">{{ subcategory.name }}</span>
+              <span class="subcategory-count">({{ subcategory.count }})</span>
+            </template>
+            <el-menu-item
+              v-for="example in getExamplesByCategory(subcategory.id)"
+              :key="example.id"
+              :index="example.id.toString()"
+              :class="{ active: selectedExampleId === example.id }"
+              @click="selectExample(example, subcategory, category)"
+            >
+              <span class="example-title">{{ example.name }}</span>
+            </el-menu-item>
+          </el-sub-menu>
+        </el-sub-menu>
+      </el-menu>
     </div>
   </div>
 </template>
 
 <script>
+import { categories, examples } from '../utils/examplesData.js'
+
 export default {
   name: 'LeftSidebar',
   props: {
@@ -38,115 +57,15 @@ export default {
   },
   data() {
     return {
-      categories: [
-        {
-          id: 'quickstart',
-          name: '快速开始',
-          icon: '⚡',
-          expanded: true,
-          examples: [
-            { id: 1, title: '快速开始(5)' }
-          ]
-        },
-        {
-          id: 'scene',
-          name: '三维场景',
-          icon: '🌍',
-          expanded: true,
-          examples: [
-            { id: 2, title: '三维场景(48)' },
-            { id: 3, title: '场景序列化(10)' },
-            { id: 4, title: '场景基础控制(5)' },
-            { id: 5, title: '球场景管理(7)' },
-            { id: 6, title: '相机视角控制(13)' },
-            { id: 7, title: '场景切换对比(5)' },
-            { id: 8, title: '其他(4)' }
-          ]
-        },
-        {
-          id: 'terrain',
-          name: '三维地形',
-          icon: '⛰️',
-          expanded: false,
-          examples: [
-            { id: 9, title: '三维地形(12)' }
-          ]
-        },
-        {
-          id: 'imagery',
-          name: '瓦片图层',
-          icon: '🗺️',
-          expanded: false,
-          examples: [
-            { id: 10, title: '瓦片图层(34)' }
-          ]
-        },
-        {
-          id: 'vector',
-          name: '矢量图层',
-          icon: '📊',
-          expanded: false,
-          examples: [
-            { id: 11, title: '矢量图层(33)' }
-          ]
-        },
-        {
-          id: '3dtiles',
-          name: '3DTiles三维模型',
-          icon: '🏗️',
-          expanded: false,
-          examples: [
-            { id: 12, title: '3DTiles三维模型(40)' }
-          ]
-        },
-        {
-          id: 'graphic',
-          name: '矢量对象',
-          icon: '🎯',
-          expanded: false,
-          examples: [
-            { id: 13, title: '矢量对象(205)' }
-          ]
-        },
-        {
-          id: 'tools',
-          name: '工具控件',
-          icon: '🛠️',
-          expanded: false,
-          examples: [
-            { id: 14, title: '工具控件(31)' }
-          ]
-        },
-        {
-          id: 'effect',
-          name: '环境特效',
-          icon: '✨',
-          expanded: false,
-          examples: [
-            { id: 15, title: '环境特效(16)' }
-          ]
-        },
-        {
-          id: 'analysis',
-          name: '管理分析',
-          icon: '📈',
-          expanded: false,
-          examples: [
-            { id: 16, title: '管理分析(27)' }
-          ]
-        }
-      ]
+      categories
     }
   },
   methods: {
-    toggleCategory(categoryId) {
-      const category = this.categories.find(c => c.id === categoryId)
-      if (category) {
-        category.expanded = !category.expanded
-      }
+    getExamplesByCategory(categoryId) {
+      return examples.filter(ex => ex.category === categoryId)
     },
-    selectExample(example, category) {
-      this.$emit('select', example, category)
+    selectExample(example, subcategory, category) {
+      this.$emit('select', example, subcategory, category)
     }
   }
 }
@@ -182,33 +101,74 @@ export default {
 
 .sidebar-content {
   flex: 1;
-  padding: 8px 0;
+  padding: 0;
 }
 
-.category-section {
-  margin-bottom: 2px;
+.sidebar-menu {
+  background-color: #f5f5f5;
+  border-right: none;
+  min-height: 100%;
 }
 
-.category-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-size: 14px;
+.sidebar-menu .el-menu-item {
+  height: 36px;
+  line-height: 36px;
+  margin: 0;
+  padding: 0 20px 0 40px;
+  font-size: 13px;
+  color: #666;
+  border-left: 3px solid transparent;
   transition: all 0.3s ease;
-  user-select: none;
-  gap: 8px;
+}
+
+.sidebar-menu .el-menu-item:hover {
+  background-color: #f0f8ff;
+  color: #1890ff;
+}
+
+.sidebar-menu .el-menu-item.is-active {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border-left-color: #1890ff;
+}
+
+.sidebar-menu .el-sub-menu__title {
+  height: 40px;
+  line-height: 40px;
+  margin: 0;
+  padding: 0 20px;
+  font-size: 14px;
+  color: #333;
   background-color: #fff;
   border-bottom: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
 }
 
-.category-header:hover {
+.sidebar-menu .el-sub-menu__title:hover {
   background-color: #f0f8ff;
+  color: #1890ff;
+}
+
+.sidebar-menu .el-sub-menu__title .el-sub-menu__icon-arrow {
+  font-size: 12px;
+  color: #999;
+}
+
+.sidebar-menu .el-sub-menu .el-sub-menu__title {
+  padding-left: 30px;
+  background-color: #fafafa;
+  font-size: 13px;
+  color: #666;
+}
+
+.sidebar-menu .el-sub-menu .el-sub-menu__title:hover {
+  background-color: #f0f8ff;
+  color: #1890ff;
 }
 
 .category-icon {
   font-size: 16px;
-  flex-shrink: 0;
+  margin-right: 8px;
   color: #666;
 }
 
@@ -224,34 +184,22 @@ export default {
 .category-count {
   font-size: 12px;
   color: #999;
-  flex-shrink: 0;
-  margin-right: 8px;
+  margin-left: 8px;
 }
 
-.category-items {
-  background-color: #fff;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.example-item {
-  padding: 8px 16px 8px 40px;
-  cursor: pointer;
-  font-size: 13px;
+.subcategory-title {
+  flex: 1;
+  font-weight: 400;
   color: #666;
-  transition: all 0.3s ease;
-  border-left: 3px solid transparent;
-  border-bottom: 1px solid #f9f9f9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.example-item:hover {
-  background-color: #f9f9f9;
-  color: #1890ff;
-}
-
-.example-item.active {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  border-left-color: #1890ff;
+.subcategory-count {
+  font-size: 12px;
+  color: #999;
+  margin-left: 8px;
 }
 
 .example-title {
@@ -286,13 +234,18 @@ export default {
     width: 200px;
   }
   
-  .category-header {
-    padding: 8px 12px;
+  .sidebar-menu .el-menu-item {
+    padding: 0 16px 0 32px;
+    font-size: 12px;
+  }
+  
+  .sidebar-menu .el-sub-menu__title {
+    padding: 0 16px;
     font-size: 13px;
   }
   
-  .example-item {
-    padding: 6px 12px 6px 32px;
+  .sidebar-menu .el-sub-menu .el-sub-menu__title {
+    padding-left: 24px;
     font-size: 12px;
   }
 }
@@ -303,23 +256,26 @@ export default {
   }
   
   .category-title,
-  .category-count {
+  .category-count,
+  .subcategory-title,
+  .subcategory-count,
+  .example-title {
     display: none;
   }
   
-  .category-header {
+  .sidebar-menu .el-sub-menu__title {
     justify-content: center;
-    padding: 12px 8px;
+    padding: 0 8px;
   }
   
-  .example-item {
-    padding: 8px 4px;
+  .sidebar-menu .el-menu-item {
+    padding: 0 4px;
     text-align: center;
     border-left: none;
   }
   
-  .example-title {
-    font-size: 10px;
+  .category-icon {
+    margin-right: 0;
   }
 }
 </style>

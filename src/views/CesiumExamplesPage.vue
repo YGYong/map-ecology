@@ -11,24 +11,33 @@
           <el-input placeholder="请输入关键字搜索" size="small" />
         </div>
         
-        <nav class="category-nav">
-          <div
+        <el-menu
+          :default-openeds="['1']"
+          class="category-menu"
+          :collapse-transition="false"
+        >
+          <el-sub-menu
             v-for="category in categoriesData"
             :key="category.id"
-            class="category-item"
+            :index="category.id.toString()"
           >
-            <div 
-              class="category-header" 
-              @click="toggleCategory(category.id)"
-              :class="{ active: selectedCategory === category.id }"
-            >
+            <template #title>
               <span class="category-icon">{{ category.icon }}</span>
               <span class="category-name">{{ category.name }}</span>
               <span class="category-count">({{ category.count }})</span>
-              <span class="category-toggle">{{ selectedCategory === category.id ? '▼' : '▶' }}</span>
-            </div>
-          </div>
-        </nav>
+            </template>
+            <el-menu-item
+              v-for="subcategory in category.subcategories"
+              :key="subcategory.id"
+              :index="subcategory.id.toString()"
+              :class="{ active: selectedSubcategory === subcategory.id }"
+              @click="selectSubcategory(subcategory, category)"
+            >
+              <span class="subcategory-name">{{ subcategory.name }}</span>
+              <span class="subcategory-count">({{ subcategory.count }})</span>
+            </el-menu-item>
+          </el-sub-menu>
+        </el-menu>
       </aside>
 
       <!-- 右侧示例网格 -->
@@ -36,31 +45,51 @@
         <div class="content-header">
           <h2 class="content-title">
             <span class="title-icon">{{ currentCategoryIcon }}</span>
-            {{ currentCategoryName }} ({{ filteredExamples.length }})
+            {{ currentCategoryName }} / {{ currentSubcategoryName }}
           </h2>
         </div>
 
-        <div class="examples-grid">
+        <div class="examples-container">
+          <!-- 按小专栏分组显示示例 -->
           <div
-            v-for="example in filteredExamples"
-            :key="example.id"
-            class="example-card"
-            @click="goToExample(example.id)"
+            v-for="category in categoriesData"
+            :key="category.id"
+            class="category-section"
           >
-            <div class="example-preview">
-              <img 
-                :src="example.preview" 
-                :alt="example.name"
-                loading="lazy"
-              />
-              <div class="example-overlay">
-                <el-button type="primary" circle icon="el-icon-video-camera" size="large" />
+            <div
+              v-for="subcategory in category.subcategories"
+              :key="subcategory.id"
+              class="subcategory-section"
+              :id="`subcategory-${subcategory.id}`"
+            >
+              <h3 class="subcategory-title">
+                <span class="subcategory-icon">{{ category.icon }}</span>
+                {{ subcategory.name }} ({{ getExamplesBySubcategory(subcategory.id).length }})
+              </h3>
+              <div class="examples-grid">
+                <div
+                  v-for="example in getExamplesBySubcategory(subcategory.id)"
+                  :key="example.id"
+                  class="example-card"
+                  @click="goToExample(example.id)"
+                >
+                  <div class="example-preview">
+                    <img 
+                      :src="example.preview" 
+                      :alt="example.name"
+                      loading="lazy"
+                    />
+                    <div class="example-overlay">
+                      <el-button type="primary" circle icon="el-icon-video-camera" size="large" />
+                    </div>
+                  </div>
+                  <div class="example-info">
+                    <el-descriptions size="small" :column="1" :border="false">
+                      <el-descriptions-item>{{ example.name }}</el-descriptions-item>
+                    </el-descriptions>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="example-info">
-              <el-descriptions size="small" :column="1" :border="false">
-                <el-descriptions-item>{{ example.name }}</el-descriptions-item>
-              </el-descriptions>
             </div>
           </div>
         </div>
@@ -78,7 +107,8 @@ import TopNavbar from '../components/TopNavbar.vue'
 const router = useRouter()
 
 // 状态管理
-const selectedCategory = ref(1) // 默认选中"基础"分类
+const selectedCategory = ref(1) // 默认选中"快速开始"分类
+const selectedSubcategory = ref(11) // 默认选中"快速开始示例"子分类
 
 // 分类数据
 const categoriesData = categories
@@ -97,13 +127,33 @@ const currentCategoryIcon = computed(() => {
   return category ? category.icon : '📂'
 })
 
-const filteredExamples = computed(() => {
-  return examplesData.filter(ex => ex.category === selectedCategory.value)
+const currentSubcategoryName = computed(() => {
+  let subcategoryName = '所有示例'
+  categoriesData.forEach(category => {
+    const subcategory = category.subcategories.find(sub => sub.id === selectedSubcategory.value)
+    if (subcategory) {
+      subcategoryName = subcategory.name
+    }
+  })
+  return subcategoryName
 })
 
 // 方法
-function toggleCategory(categoryId) {
-  selectedCategory.value = categoryId
+function getExamplesBySubcategory(subcategoryId) {
+  return examplesData.filter(ex => ex.category === subcategoryId)
+}
+
+function selectSubcategory(subcategory, category) {
+  selectedSubcategory.value = subcategory.id
+  selectedCategory.value = category.id
+  
+  // 滚动定位到对应的小专栏
+  setTimeout(() => {
+    const element = document.getElementById(`subcategory-${subcategory.id}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, 100)
 }
 
 function goToExample(exampleId) {
@@ -150,46 +200,67 @@ function goToExample(exampleId) {
   border-bottom: 1px solid var(--border-color);
 }
 
-.category-nav {
+.category-menu {
+  background-color: var(--card-bg);
+  border-right: none;
+  min-height: 100%;
   padding: 8px 0;
 }
 
-.category-item {
-  margin-bottom: 2px;
-}
-
-.category-header {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  user-select: none;
-  gap: 8px;
-  position: relative;
-  background-color: var(--card-bg);
+.category-menu .el-menu-item {
+  height: 36px;
+  line-height: 36px;
+  margin: 0;
+  padding: 0 20px 0 40px;
+  font-size: 13px;
   color: var(--text-color);
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
 }
 
-.category-header:hover {
+.category-menu .el-menu-item:hover {
   background-color: #f0f8ff;
+  color: #1890ff;
 }
 
-.category-header.active {
+.category-menu .el-menu-item.is-active {
   background-color: #e6f7ff;
   color: #1890ff;
-  font-weight: 500;
-  border-left: 3px solid #1890ff;
+  border-left-color: #1890ff;
+}
+
+.category-menu .el-sub-menu__title {
+  height: 40px;
+  line-height: 40px;
+  margin: 0;
+  padding: 0 20px;
+  font-size: 14px;
+  color: var(--text-color);
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.category-menu .el-sub-menu__title:hover {
+  background-color: #f0f8ff;
+  color: #1890ff;
+}
+
+.category-menu .el-sub-menu__title .el-sub-menu__icon-arrow {
+  font-size: 12px;
+  color: #999;
 }
 
 .category-icon {
   font-size: 16px;
-  flex-shrink: 0;
+  margin-right: 8px;
+  color: #666;
 }
 
 .category-name {
   flex: 1;
+  font-weight: 500;
+  color: var(--text-color);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -198,15 +269,22 @@ function goToExample(exampleId) {
 .category-count {
   font-size: 12px;
   color: #999;
-  flex-shrink: 0;
-  margin-right: 8px;
+  margin-left: 8px;
 }
 
-.category-toggle {
+.subcategory-name {
+  flex: 1;
+  font-weight: 400;
+  color: var(--text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subcategory-count {
   font-size: 12px;
   color: #999;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
+  margin-left: 8px;
 }
 
 /* 右侧内容区 */
@@ -245,11 +323,41 @@ function goToExample(exampleId) {
   font-size: 18px;
 }
 
-/* 示例网格 */
-.examples-grid {
+/* 示例容器 */
+.examples-container {
   flex: 1;
   padding: 24px;
   overflow-y: auto;
+}
+
+.category-section {
+  margin-bottom: 40px;
+}
+
+.subcategory-section {
+  margin-bottom: 32px;
+  padding-top: 8px;
+}
+
+.subcategory-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  padding-left: 12px;
+  border-left: 4px solid #1890ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color);
+}
+
+.subcategory-icon {
+  font-size: 16px;
+  color: #1890ff;
+}
+
+/* 示例网格 */
+.examples-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
