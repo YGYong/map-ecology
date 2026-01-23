@@ -1,10 +1,10 @@
 <template>
   <div class="code-editor">
-    <div class="editor-header flex justify-between items-center p-2 bg-gray-800 border-b border-gray-700">
+    <div v-if="showHeader" class="editor-header flex justify-between items-center p-2 bg-gray-800 border-b border-gray-700">
       <h3 class="font-semibold text-white">代码编辑器</h3>
       <el-button size="small" type="primary" @click="runCode">运行代码</el-button>
     </div>
-    <div class="editor-content h-full">
+    <div class="editor-content" :class="{ 'h-full': !showHeader }">
       <textarea ref="textarea" v-model="code"></textarea>
     </div>
   </div>
@@ -319,6 +319,10 @@ export default {
 
 .editor-content {
   height: calc(100% - 48px);
+}
+
+.editor-content.h-full {
+  height: 100%;
 }
 
 .editor-content :deep(.CodeMirror) {

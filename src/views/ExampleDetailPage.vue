@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="editor-content">
-          <code-editor v-model="code" @run="runCode" />
+          <code-editor v-model="code" @run="runCode" :show-header="false" />
         </div>
       </div>
 
@@ -357,6 +357,16 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   background-color: #252526;
   border-bottom: 1px solid #3e3e42;
   flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 12px;
 }
 
 .editor-tabs {

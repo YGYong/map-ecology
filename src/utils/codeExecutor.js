@@ -4,304 +4,132 @@ export class CodeExecutor {
   constructor(viewer) {
     this.viewer = viewer
     this.cleanupFunctions = []
-    this.createdElements = [] // 跟踪创建的 DOM 元素
+    this.styleElement = null
+    this.sandboxRoot = null
+    this.originalViewerParent = null
+    this.originalViewerNextSibling = null
   }
 
   async execute(parsed) {
     try {
-      // 清理之前的执行
+      // Clean up previous execution
       this.cleanup()
       
       let { script, template, style } = parsed
       
-      console.log('原始脚本:', script)
-      console.log('模板:', template)
-      
-      if (!script) {
-        return {
-          success: false,
-          error: {
-            type: 'parse',
-            message: '没有找到可执行的脚本代码'
-          }
+      // 1. Process Style
+      if (style) {
+        this.processStyle(style)
+      }
+
+      // 2. Prepare Context (Initial)
+      // Create a proxy for viewer to handle both ref usage (viewer.value) and direct usage (viewer.camera)
+      const viewerProxy = new Proxy(this.viewer, {
+        get(target, prop) {
+          if (prop === 'value') return target
+          return Reflect.get(target, prop)
+        },
+        set(target, prop, value) {
+          if (prop === 'value') return true // Ignore assignment to viewer.value
+          return Reflect.set(target, prop, value)
         }
-      }
-      
-      // 处理 template 中的 DOM 元素
-      let templateElements = {}
-      if (template) {
-        templateElements = this.processTemplate(template)
-      }
-      
-      // 移除 import 语句
-      script = script.replace(/import\s+.*?from\s+['"].*?['"];?\s*/g, '')
-      script = script.replace(/import\s+['"].*?['"];?\s*/g, '')
-      
-      // 移除 export 语句
-      script = script.replace(/export\s+(default\s+)?/g, '')
-      
-      // 移除 viewer 和 cesiumContainer 变量声明
-      script = script.replace(/\b(let|const|var)\s+viewer\s*=\s*null\s*;?\s*/g, '// viewer 已由系统提供\n')
-      script = script.replace(/\b(let|const|var)\s+cesiumContainer\s*=\s*ref\s*\(\s*null\s*\)\s*;?\s*/g, '// cesiumContainer 已由系统提供\n')
-      script = script.replace(/\b(let|const|var)\s+popup\s*=\s*ref\s*\(\s*null\s*\)\s*;?\s*/g, '// popup 已由系统提供\n')
-      
-      // 提取并应用 Viewer 配置
-      const viewerConfigMatch = script.match(/new\s+Cesium\.Viewer\s*\([^,)]*,\s*\{[\s\S]*?\}\s*\)/m)
-      if (viewerConfigMatch) {
-        const fullMatch = viewerConfigMatch[0]
-        const configMatch = fullMatch.match(/\{[\s\S]*?\}/)
-        
-        if (configMatch) {
-          const configStr = configMatch[0]
-          console.log('检测到 Viewer 配置:', configStr)
-          
-          try {
-            const config = eval(`(${configStr})`)
-            console.log('解析后的配置:', config)
-            
-            // 应用配置
-            const widgetMap = {
-              geocoder: 'geocoder',
-              homeButton: 'homeButton',
-              sceneModePicker: 'sceneModePicker',
-              baseLayerPicker: 'baseLayerPicker',
-              navigationHelpButton: 'navigationHelpButton',
-              animation: 'animation',
-              timeline: 'timeline',
-              fullscreenButton: 'fullscreenButton'
-            }
-            
-            Object.keys(widgetMap).forEach(key => {
-              if (config[key] === false) {
-                const widget = this.viewer[widgetMap[key]]
-                if (widget && widget.container) {
-                  widget.container.style.display = 'none'
-                }
-              }
-            })
-            
-            if (config.baseLayer === false) {
-              this.viewer.imageryLayers.removeAll()
-            }
-            
-            if (this.viewer.cesiumWidget && this.viewer.cesiumWidget.creditContainer) {
-              this.viewer.cesiumWidget.creditContainer.style.display = 'none'
-            }
-          } catch (error) {
-            console.warn('应用 Viewer 配置失败:', error)
-          }
-        }
-      }
-      
-      // 替换 new Cesium.Viewer
-      script = script.replace(
-        /viewer\s*=\s*new\s+Cesium\.Viewer\s*\([^)]*\)\s*;?/g,
-        '// viewer 已由系统提供，配置已应用'
-      )
-      
-      // 处理 creditContainer 隐藏
-      script = script.replace(
-        /viewer\.cesiumWidget\.creditContainer\.style\.display\s*=\s*['"]none['"]\s*;?/g,
-        '// logo 已隐藏'
-      )
-      
-      // 将 const/let 转换为 var
-      script = script.replace(/\bconst\s+/g, 'var ')
-      script = script.replace(/\blet\s+/g, 'var ')
-      
-      console.log('处理后的脚本:', script)
-      
-      // 创建执行上下文
+      })
+
       const context = {
         Cesium,
-        viewer: this.viewer,
+        viewer: viewerProxy,
         console: window.console,
         document: window.document,
-        // 提供 ref 函数，返回 template 中对应的元素
-        ref: (initialValue) => {
-          // 查找对应的 ref 元素
-          for (const [refName, element] of Object.entries(templateElements)) {
-            if (initialValue === null) {
-              // cesiumContainer 返回 viewer 容器
-              if (refName === 'cesiumContainer') {
-                return { value: this.viewer.container }
-              }
-              // 其他 ref 返回对应的元素
-              return { value: element }
-            }
-          }
-          return { value: initialValue }
-        },
+        window: window,
+        // Mock Vue reactivity
+        ref: (val) => ({ value: val }),
+        reactive: (obj) => obj,
         onMounted: (fn) => {
           setTimeout(() => {
             try {
-              console.log('执行 onMounted 回调')
               fn()
             } catch (error) {
-              console.error('onMounted 回调执行错误:', error)
-              throw error
+              console.error('onMounted error:', error)
             }
           }, 0)
         },
         onUnmounted: (fn) => {
           this.cleanupFunctions.push(fn)
         },
-        // 提供 template 中的元素引用
-        ...templateElements
+        // Storage for refs found in template
+        refs: {}
       }
-      
-      // 包装代码以便执行
-      const wrappedCode = `
-        (function() {
-          const { Cesium, viewer, console, document, ref, onMounted, onUnmounted, popup, cesiumContainer } = this;
-          console.log('开始执行用户代码');
-          try {
-            ${script}
-            console.log('用户代码执行完成');
-          } catch (error) {
-            console.error('代码执行错误:', error);
-            throw error;
-          }
-        }).call(context);
-      `
-      
-      console.log('准备执行代码')
-      
-      // 执行代码
-      const executor = new Function('context', wrappedCode)
-      executor(context)
-      
-      console.log('代码执行成功')
-      
-      return {
-        success: true
-      }
-    } catch (error) {
-      console.error('代码执行错误:', error)
-      
-      return {
-        success: false,
-        error: {
-          type: 'runtime',
-          message: error.message,
-          stack: error.stack
-        }
-      }
-    }
-  }
 
-  // 处理 template，创建对应的 DOM 元素
-  processTemplate(template) {
-    const elements = {}
-    
-    // 查找所有带 ref 的元素
-    const refPattern = /ref="(\w+)"/g
-    let match
-    
-    while ((match = refPattern.exec(template)) !== null) {
-      const refName = match[1]
-      
-      // 为每个 ref 创建对应的元素
-      if (refName === 'cesiumContainer') {
-        // cesiumContainer 使用 viewer 的容器
-        elements[refName] = { value: this.viewer.container }
-      } else if (refName === 'popup') {
-        // 创建气泡窗口元素
-        const popup = document.createElement('div')
-        popup.className = 'popup-window'
+      // 3. Render Template
+      if (template) {
+        this.renderTemplate(template, context)
+      }
+
+      // 4. Inject Refs into Context
+      // For every ref found in template, ensure it exists in context as a ref-like object
+      // This handles 'cesiumContainer', 'popup', etc.
+      Object.keys(context.refs).forEach(refName => {
+        // If the script relies on 'const cesiumContainer = ref(null)', we removed that line.
+        // So we need to provide 'cesiumContainer' in the context.
+        // We wrap the DOM element in a ref-like object.
+        context[refName] = { value: context.refs[refName] }
+      })
+
+      // 5. Process Script
+      if (script) {
+        // Remove imports/exports
+        script = script.replace(/import\s+.*?from\s+['"].*?['"];?\s*/g, '')
+        script = script.replace(/import\s+['"].*?['"];?\s*/g, '')
+        script = script.replace(/export\s+(default\s+)?/g, '')
         
-        // 从 template 中提取内容
-        const popupContentMatch = template.match(/<div[^>]*ref="popup"[^>]*>(.*?)<\/div>/s)
-        if (popupContentMatch) {
-          popup.innerHTML = popupContentMatch[1]
-        }
+        // Remove standard ref declarations for viewer and cesiumContainer
+        // This prevents them from shadowing our context variables
+        script = script.replace(/\b(let|const|var)\s+viewer\s*=\s*(?:ref\s*\(\s*null\s*\)|null)\s*;?\s*/g, '')
+        script = script.replace(/\b(let|const|var)\s+cesiumContainer\s*=\s*ref\s*\(\s*null\s*\)\s*;?\s*/g, '')
         
-        // 从 style 中提取样式（如果有）
-        popup.style.cssText = `
-          position: absolute;
-          padding: 12px 18px;
-          background-color: rgba(44, 62, 80, 0.85);
-          color: #ecf0f1;
-          border: 1px solid #3498db;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-          font-size: 14px;
-          text-align: center;
-          min-width: 120px;
-          pointer-events: none;
-          transform: translate(-50%, -100%);
-          z-index: 1000;
+        // Extract and Apply Viewer Configuration
+        this.applyViewerConfig(script)
+
+        // Replace Viewer Initialization
+        // Matches: viewer = new Cesium.Viewer(...) OR viewer.value = new Cesium.Viewer(...)
+        script = script.replace(
+          /(?:viewer|viewer\.value)\s*=\s*new\s+Cesium\.Viewer\s*\([^)]*\)(?:\s*,\s*\{[\s\S]*?\})?\s*;?/g,
+          '// viewer already provided'
+        )
+
+        // Transform top-level variables to context properties
+        // This ensures functions like 'switchMap' defined in script are available to template via context
+        script = script.replace(/^(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=/gm, 'this.$1 =')
+        script = script.replace(/^function\s+([a-zA-Z0-9_$]+)\s*\(/gm, 'this.$1 = function $1(')
+
+        // Wrap code
+        const wrappedCode = `
+          (function() {
+            with(this) {
+              try {
+                ${script}
+              } catch (error) {
+                console.error('Script execution error:', error);
+                throw error;
+              }
+            }
+          }).call(this);
         `
         
-        // 添加到 viewer 容器
-        this.viewer.container.appendChild(popup)
-        this.createdElements.push(popup)
+        // Execute
+        const executor = new Function(wrappedCode)
+        executor.call(context)
         
-        elements[refName] = { value: popup }
-      }
-    }
-    
-    return elements
-  }
-
-  async executeJs(script) {
-    try {
-      // 清理之前的执行
-      this.cleanup()
-      
-      console.log('执行纯 JS 代码:', script)
-      
-      if (!script || !script.trim()) {
-        return {
-          success: false,
-          error: {
-            type: 'parse',
-            message: '代码为空'
-          }
+        // 6. Bind Events
+        // We bind events AFTER script execution so that handler functions (like switchMap) are defined in context
+        if (this.sandboxRoot) {
+          this.bindEvents(this.sandboxRoot, context)
         }
       }
       
-      // 创建执行上下文
-      const context = {
-        Cesium,
-        viewer: this.viewer,
-        console: window.console,
-        document: window.document,
-        onUnmounted: (fn) => {
-          this.cleanupFunctions.push(fn)
-        }
-      }
-      
-      // 包装代码以便执行
-      const wrappedCode = `
-        (function() {
-          const { Cesium, viewer, console, document, onUnmounted } = this;
-          console.log('开始执行用户代码');
-          try {
-            ${script}
-            console.log('用户代码执行完成');
-          } catch (error) {
-            console.error('代码执行错误:', error);
-            throw error;
-          }
-        }).call(context);
-      `
-      
-      console.log('准备执行代码')
-      
-      // 执行代码
-      const executor = new Function('context', wrappedCode)
-      executor(context)
-      
-      console.log('代码执行成功')
-      
-      return {
-        success: true
-      }
+      return { success: true }
     } catch (error) {
-      console.error('代码执行错误:', error)
-      
+      console.error('Execution error:', error)
       return {
         success: false,
         error: {
@@ -311,44 +139,167 @@ export class CodeExecutor {
         }
       }
     }
+  }
+
+  applyViewerConfig(script) {
+    // Attempt to find new Cesium.Viewer(..., { config })
+    const match = script.match(/new\s+Cesium\.Viewer\s*\([^,]+,\s*(\{[\s\S]*?\})\)/)
+    if (match && match[1]) {
+      try {
+        // Evaluate the config object
+        // We need a safe way to eval object literal. 
+        // Using Function with 'return' is safer than raw eval, but still requires care.
+        // We assume the config object relies only on Cesium or basic literals.
+        const configFn = new Function('Cesium', `return ${match[1]}`)
+        const config = configFn(Cesium)
+        
+        console.log('Applying Viewer Config:', config)
+        
+        // Apply known configuration options to the existing viewer
+        const widgetMap = {
+          geocoder: 'geocoder',
+          homeButton: 'homeButton',
+          sceneModePicker: 'sceneModePicker',
+          baseLayerPicker: 'baseLayerPicker',
+          navigationHelpButton: 'navigationHelpButton',
+          animation: 'animation',
+          timeline: 'timeline',
+          fullscreenButton: 'fullscreenButton'
+        }
+        
+        Object.keys(widgetMap).forEach(key => {
+          if (config[key] === false) {
+            const widget = this.viewer[widgetMap[key]]
+            if (widget && widget.container) {
+              widget.container.style.display = 'none'
+            }
+          } else if (config[key] === true) {
+             const widget = this.viewer[widgetMap[key]]
+            if (widget && widget.container) {
+              widget.container.style.display = ''
+            }
+          }
+        })
+        
+        // Handle baseLayer
+        if (config.baseLayer === false) {
+          this.viewer.imageryLayers.removeAll()
+        }
+        
+      } catch (e) {
+        console.warn('Failed to apply viewer config:', e)
+      }
+    }
+  }
+
+  processStyle(style) {
+    const styleEl = document.createElement('style')
+    styleEl.textContent = style
+    document.head.appendChild(styleEl)
+    this.styleElement = styleEl
+  }
+
+  renderTemplate(template, context) {
+    if (!this.originalViewerParent) {
+      this.originalViewerParent = this.viewer.container.parentNode
+      this.originalViewerNextSibling = this.viewer.container.nextSibling
+    }
+
+    const sandbox = document.createElement('div')
+    sandbox.className = 'cesium-example-sandbox'
+    sandbox.style.width = '100%'
+    sandbox.style.height = '100%'
+    sandbox.style.position = 'relative'
+    
+    sandbox.innerHTML = template
+    
+    // Find refs
+    const allElements = sandbox.querySelectorAll('*')
+    allElements.forEach(el => {
+      if (el.hasAttribute('ref')) {
+        const refName = el.getAttribute('ref')
+        context.refs[refName] = el
+        
+        if (refName === 'cesiumContainer') {
+          el.innerHTML = ''
+          el.appendChild(this.viewer.container)
+        }
+      }
+    })
+
+    // Fallback if no cesiumContainer ref
+    if (!context.refs['cesiumContainer']) {
+       if (this.viewer.container.parentNode === this.originalViewerParent) {
+         sandbox.appendChild(this.viewer.container)
+       }
+    }
+
+    this.originalViewerParent.appendChild(sandbox)
+    this.sandboxRoot = sandbox
+  }
+
+  bindEvents(root, context) {
+    const allElements = root.querySelectorAll('*')
+    allElements.forEach(el => {
+      Array.from(el.attributes).forEach(attr => {
+        if (attr.name.startsWith('@') || attr.name.startsWith('v-on:')) {
+          const eventName = attr.name.startsWith('@') ? attr.name.slice(1) : attr.name.slice(5)
+          const handlerExpression = attr.value
+          
+          el.addEventListener(eventName, (event) => {
+            try {
+              // Execute handler in context
+              const handler = new Function('$event', `
+                with(this) {
+                  ${handlerExpression}
+                }
+              `)
+              handler.call(context, event)
+            } catch (err) {
+              console.error(`Event handler error (${eventName}):`, err)
+            }
+          })
+        }
+      })
+    })
   }
 
   cleanup() {
-    // 执行清理函数
+    if (this.styleElement) {
+      this.styleElement.remove()
+      this.styleElement = null
+    }
+
+    if (this.viewer && this.originalViewerParent) {
+      if (this.viewer.container.parentNode !== this.originalViewerParent) {
+        this.originalViewerParent.insertBefore(this.viewer.container, this.originalViewerNextSibling)
+      }
+    }
+
+    if (this.sandboxRoot) {
+      this.sandboxRoot.remove()
+      this.sandboxRoot = null
+    }
+
     this.cleanupFunctions.forEach(fn => {
-      try {
-        fn()
-      } catch (error) {
-        console.error('清理函数执行失败:', error)
-      }
+      try { fn() } catch (e) { console.error(e) }
     })
+    this.cleanupFunctions = []
     
-    // 移除创建的 DOM 元素
-    this.createdElements.forEach(element => {
-      if (element && element.parentNode) {
-        element.parentNode.removeChild(element)
-      }
-    })
-    
-    // 重置 viewer 控件显示
+    // Reset Viewer State
     if (this.viewer) {
       const widgets = [
         'geocoder', 'homeButton', 'sceneModePicker', 'baseLayerPicker',
         'navigationHelpButton', 'animation', 'timeline', 'fullscreenButton'
       ]
-      
-      widgets.forEach(widget => {
-        if (this.viewer[widget] && this.viewer[widget].container) {
-          this.viewer[widget].container.style.display = ''
+      widgets.forEach(w => {
+        if (this.viewer[w] && this.viewer[w].container) {
+          this.viewer[w].container.style.display = ''
         }
       })
-      
       if (this.viewer.cesiumWidget && this.viewer.cesiumWidget.creditContainer) {
         this.viewer.cesiumWidget.creditContainer.style.display = ''
       }
     }
-    
-    this.cleanupFunctions = []
-    this.createdElements = []
   }
 }
