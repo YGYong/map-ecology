@@ -4,150 +4,153 @@
     <top-navbar />
 
     <!-- 主体内容区 -->
-    <div class="hero-container">
+    <div class="scroll-container">
       <!-- 英雄区域 -->
       <section class="hero-section">
+        <div class="hero-background">
+          <div class="glow glow-1"></div>
+          <div class="glow glow-2"></div>
+        </div>
         <div class="hero-content">
-          <div class="hero-text">
-            <h1 class="hero-title">二三维地图开发指南</h1>
-            <h2 class="hero-subtitle">从入门到精通</h2>
-            <p class="hero-description">
-              深入二三维地图开发 | 核心技术原理剖析 | 最佳实践分享
-            </p>
-            <el-button
-              type="primary"
-              size="large"
-              class="hero-btn"
-              @click="exploreExamples"
-            >
-              快速进入
-            </el-button>
-          </div>
-          <div class="hero-icon">
-            <el-icon class="map-icon"><i class="el-icon-location"></i></el-icon>
+          <h1 class="hero-title">二三维地图开发 <span class="divider">&</span> 三维技术开发</h1>
+          <p class="hero-subtitle">
+            探索空间数据的无限可能 · 构建沉浸式三维世界
+          </p>
+          <div class="hero-decoration">
+            <div class="line"></div>
+            <span class="icon">🚀</span>
+            <div class="line"></div>
           </div>
         </div>
       </section>
 
-      <!-- 核心内容区域 -->
-      <section class="core-section">
-        <div class="core-grid">
-          <el-card class="core-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <h3>基础概念</h3>
+      <!-- 核心展示区域 -->
+      <section class="showcase-section">
+        <div class="showcase-container">
+          
+          <!-- 卡片1: OpenLayers -->
+          <div class="showcase-card">
+            <div class="card-icon-wrapper">
+              <span class="card-emoji">🗺️</span>
+            </div>
+            <div class="card-content">
+              <h3>OpenLayers</h3>
+              <p class="description">
+                企业级二维地图引擎。支持 WMS、WMTS 等标准 OGC 服务，提供强大的矢量切片渲染与复杂的几何分析能力，适用于高精度 GIS 业务系统。
+              </p>
+              <div class="tech-tags">
+                <span class="tag">OGC Standards</span>
+                <span class="tag">Vector Tiles</span>
+                <span class="tag">Professional GIS</span>
               </div>
-            </template>
-            <p class="card-content">
-              学习二三维地图开发的基本概念，如地图服务、图层、坐标系统、相机控制等核心知识点。
-            </p>
-            <el-button type="primary" size="small" class="card-btn">
-              了解更多
-            </el-button>
-          </el-card>
+            </div>
+          </div>
 
-          <el-card class="core-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <h3>实践指南</h3>
+          <!-- 卡片2: Leaflet -->
+          <div class="showcase-card">
+            <div class="card-icon-wrapper">
+              <span class="card-emoji">🍃</span>
+            </div>
+            <div class="card-content">
+              <h3>Leaflet</h3>
+              <p class="description">
+                轻量级移动端优先的地图库。体积小巧，插件生态丰富，专注于核心地图交互，是构建现代移动 Web GIS 应用的首选方案。
+              </p>
+              <div class="tech-tags">
+                <span class="tag">Mobile First</span>
+                <span class="tag">Lightweight</span>
+                <span class="tag">Plugins</span>
               </div>
-            </template>
-            <p class="card-content">
-              通过实际案例，逐步掌握各地图库的使用技巧，打通各种地图开发场景的技术难点。
-            </p>
-            <el-button type="primary" size="small" class="card-btn">
-              查看案例
-            </el-button>
-          </el-card>
+            </div>
+          </div>
 
-          <el-card class="core-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <h3>持续学习</h3>
+          <!-- 卡片3: Cesium -->
+          <div class="showcase-card featured">
+            <div class="card-icon-wrapper">
+              <span class="card-emoji">🌍</span>
+            </div>
+            <div class="card-content">
+              <h3>Cesium</h3>
+              <p class="description">
+                世界级 3D 地球引擎。支持海量 3D Tiles 倾斜摄影、BIM 模型加载，实现宏观地球与微观场景的无缝切换，构建数字孪生底座。
+              </p>
+              <div class="tech-tags">
+                <span class="tag">3D Tiles</span>
+                <span class="tag">Digital Twin</span>
+                <span class="tag">BIM/CAD</span>
               </div>
-            </template>
-            <p class="card-content">
-              不断学习前沿技术，掌握地图开发的最新趋势和最佳实践，提升开发技能水平。
-            </p>
-            <el-button type="primary" size="small" class="card-btn">
-              学习资源
-            </el-button>
-          </el-card>
+            </div>
+          </div>
+
+          <!-- 卡片4: Three.js -->
+          <div class="showcase-card featured">
+            <div class="card-icon-wrapper">
+              <span class="card-emoji">🧊</span>
+            </div>
+            <div class="card-content">
+              <h3>Three.js</h3>
+              <p class="description">
+                WebGL 三维图形渲染库。打造高保真的虚拟仿真场景，支持自定义着色器、物理引擎与粒子特效，突破浏览器图形渲染极限。
+              </p>
+              <div class="tech-tags">
+                <span class="tag">WebGL</span>
+                <span class="tag">Shaders</span>
+                <span class="tag">Physics</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片5: Spatial Analysis -->
+          <div class="showcase-card">
+            <div class="card-icon-wrapper">
+              <span class="card-emoji">📐</span>
+            </div>
+            <div class="card-content">
+              <h3>地理空间分析</h3>
+              <p class="description">
+                基于 Turf.js 等库实现的纯前端空间分析能力。支持缓冲区分析、叠加分析、空间测量与几何计算，赋予 Web 地图深度的业务逻辑。
+              </p>
+              <div class="tech-tags">
+                <span class="tag">Turf.js</span>
+                <span class="tag">Buffer</span>
+                <span class="tag">Intersection</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片6: Data Visualization -->
+          <div class="showcase-card">
+            <div class="card-icon-wrapper">
+              <span class="card-emoji">📊</span>
+            </div>
+            <div class="card-content">
+              <h3>时空数据可视化</h3>
+              <p class="description">
+                融合 ECharts 与 Mapbox 技术的时空大数据展示。通过热力图、飞线图、散点聚类等形式，直观呈现海量地理数据的时空分布规律。
+              </p>
+              <div class="tech-tags">
+                <span class="tag">ECharts</span>
+                <span class="tag">Heatmap</span>
+                <span class="tag">Big Data</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <!-- 热门技术区域 -->
-      <section class="tech-section">
-        <h2 class="section-title">热门地图技术</h2>
-        <div class="tech-grid">
-          <el-card
-            class="tech-card"
-            shadow="hover"
-            @click="goToTech('openlayers')"
-          >
-            <div class="tech-icon">
-              <i class="el-icon-picture-outline"></i>
-            </div>
-            <h3 class="tech-name">OpenLayers</h3>
-            <p class="tech-desc">
-              开源的JavaScript库，用于在网页上显示地图数据
-            </p>
-          </el-card>
-
-          <el-card
-            class="tech-card"
-            shadow="hover"
-            @click="goToTech('leaflet')"
-          >
-            <div class="tech-icon">
-              <i class="el-icon-location-outline"></i>
-            </div>
-            <h3 class="tech-name">Leaflet</h3>
-            <p class="tech-desc">
-              轻量级的开源JavaScript库，用于移动友好的交互式地图
-            </p>
-          </el-card>
-
-          <el-card class="tech-card" shadow="hover" @click="goToTech('cesium')">
-            <div class="tech-icon">
-              <i class="el-icon-video-camera"></i>
-            </div>
-            <h3 class="tech-name">Cesium</h3>
-            <p class="tech-desc">用于创建世界级3D地球和地图的JavaScript库</p>
-          </el-card>
-
-          <el-card class="tech-card" shadow="hover" @click="goToTech('three')">
-            <div class="tech-icon">
-              <i class="el-icon-s-platform"></i>
-            </div>
-            <h3 class="tech-name">Three.js</h3>
-            <p class="tech-desc">
-              JavaScript 3D库，用于在网页上创建和显示3D图形
-            </p>
-          </el-card>
-        </div>
-      </section>
+      <!-- 底部标语 -->
+      <footer class="footer-slogan">
+        <p>开启您的地理空间与三维可视化之旅</p>
+        <p class="contact-info">技术交流 / 商务合作请联系微信：YL71317</p>
+      </footer>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
 import TopNavbar from "../components/TopNavbar.vue";
-
-const router = useRouter();
-
-// 方法
-function exploreExamples() {
-  // 跳转到示例页面或展开示例列表
-  router.push("/cesium/examples");
-}
-
-function goToTech(tech) {
-  // 跳转到对应技术的页面
-  router.push(`/${tech}/examples`);
-}
+// 首页不再包含跳转逻辑，仅作为展示页
 </script>
 
 <style scoped>
@@ -158,496 +161,270 @@ function goToTech(tech) {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* 主题切换样式 */
-:root {
-  --bg-color: #f5f5f5;
-  --text-color: #333;
-  --card-bg: #fff;
-  --border-color: #e8e8e8;
-}
-
-.dark-theme {
-  --bg-color: #1a1a1a;
-  --text-color: #e0e0e0;
-  --card-bg: #2d2d2d;
-  --border-color: #404040;
-}
-
-.home-page {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-/* 主体内容区 */
-.main-container {
+.scroll-container {
   flex: 1;
-  display: flex;
-  overflow: hidden;
-  min-height: 0;
-}
-
-/* 左侧分类导航 */
-.sidebar {
-  width: 260px;
-  min-width: 260px;
-  height: 100%;
-  background-color: white;
-  border-right: 1px solid #e8e8e8;
   overflow-y: auto;
-  overflow-x: hidden;
-  flex-shrink: 0;
+  scroll-behavior: smooth;
 }
 
-.search-box {
-  padding: 16px;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.search-input:focus {
-  border-color: #1890ff;
-  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
-}
-
-.category-nav {
-  padding: 8px 0;
-}
-
-.category-item {
-  margin-bottom: 2px;
-}
-
-.category-header {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  user-select: none;
-  gap: 8px;
+/* 英雄区域 */
+.hero-section {
   position: relative;
-}
-
-.category-header:hover {
-  background-color: #f0f8ff;
-}
-
-.category-header.active {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  font-weight: 500;
-  border-left: 3px solid #1890ff;
-}
-
-.category-icon {
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.category-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.category-count {
-  font-size: 12px;
-  color: #999;
-  flex-shrink: 0;
-  margin-right: 8px;
-}
-
-.category-toggle {
-  font-size: 12px;
-  color: #999;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-/* 右侧内容区 */
-.content-area {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
+  height: 35vh;
+  min-height: 280px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background-color: #fafafa;
-}
-
-.content-header {
-  height: 56px;
-  min-height: 56px;
-  border-bottom: 1px solid #e8e8e8;
-  display: flex;
+  justify-content: center;
   align-items: center;
-  padding: 0 24px;
-  background-color: white;
-  flex-shrink: 0;
-}
-
-.content-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.title-icon {
-  font-size: 18px;
-}
-
-/* 示例网格 */
-.examples-grid {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  align-content: start;
-}
-
-.example-card {
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
+  text-align: center;
+  color: white;
+  background: #0f172a;
   overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.example-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-  border-color: #1890ff;
-}
-
-.example-preview {
-  width: 100%;
-  height: 180px;
-  overflow: hidden;
-  background-color: #f0f0f0;
-  position: relative;
-}
-
-.example-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.example-card:hover .example-preview img {
-  transform: scale(1.05);
-}
-
-.example-overlay {
+.hero-background {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
-.example-card:hover .example-overlay {
-  opacity: 1;
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
 }
 
-.play-icon {
-  font-size: 48px;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+.glow-1 {
+  width: 400px;
+  height: 400px;
+  background: #3b82f6;
+  top: -150px;
+  left: -100px;
+  animation: float 10s infinite alternate;
 }
 
-.example-info {
-  padding: 16px;
-  background-color: white;
+.glow-2 {
+  width: 500px;
+  height: 500px;
+  background: #8b5cf6;
+  bottom: -200px;
+  right: -100px;
+  animation: float 12s infinite alternate-reverse;
 }
 
-.example-name {
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0;
-  color: #333;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 滚动条样式 */
-.sidebar::-webkit-scrollbar,
-.examples-grid::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track,
-.examples-grid::-webkit-scrollbar-track {
-  background: #f5f5f5;
-}
-
-.sidebar::-webkit-scrollbar-thumb,
-.examples-grid::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
-  border-radius: 3px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover,
-.examples-grid::-webkit-scrollbar-thumb:hover {
-  background: #bfbfbf;
-}
-
-/* 英雄区域样式 */
-.hero-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.hero-section {
-  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-  color: white;
-  padding: 80px 0;
-  text-align: center;
+@keyframes float {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(30px, 30px); }
 }
 
 .hero-content {
+  position: relative;
+  z-index: 2;
   max-width: 1200px;
-  margin: 0 auto;
   padding: 0 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 48px;
-}
-
-.hero-text {
-  flex: 1;
-  text-align: left;
 }
 
 .hero-title {
   font-size: 36px;
-  font-weight: 700;
-  margin: 0 0 12px 0;
-  background: linear-gradient(90deg, #63b3ed, #90cdf4);
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(to right, #fff, #cbd5e1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.divider {
+  color: #3b82f6;
+  -webkit-text-fill-color: #3b82f6;
+  font-weight: 300;
+  margin: 0 10px;
 }
 
 .hero-subtitle {
-  font-size: 24px;
-  font-weight: 600;
-  margin: 0 0 16px 0;
-}
-
-.hero-description {
   font-size: 16px;
-  margin: 0 0 32px 0;
-  opacity: 0.9;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.hero-btn {
-  padding: 12px 32px;
-  font-size: 16px;
-  border-radius: 8px;
+.hero-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  opacity: 0.5;
 }
 
-.hero-icon {
+.line {
+  height: 1px;
+  width: 60px;
+  background: #475569;
+}
+
+.icon {
+  font-size: 20px;
+}
+
+/* 核心展示区域 */
+.showcase-section {
+  padding: 60px 40px;
+  background: linear-gradient(to bottom, #f8f9fa, #eef2f6);
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.showcase-container {
+  width: 100%;
+  max-width: 1600px; /* 增加最大宽度，利用宽屏空间 */
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.showcase-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.showcase-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  border-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Featured card slightly emphasized */
+.showcase-card.featured {
+  background: linear-gradient(to bottom, #fff, #f8fafc);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.card-icon-wrapper {
+  width: 100px;
+  height: 100px;
+  background: #f1f5f9;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.map-icon {
-  font-size: 120px;
-  opacity: 0.8;
-}
-
-/* 核心内容区域样式 */
-.core-section {
-  padding: 60px 0;
-  background-color: var(--bg-color);
-}
-
-.core-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.core-card {
-  border-radius: 8px;
-  overflow: hidden;
+  margin-bottom: 24px;
   transition: all 0.3s ease;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
 }
 
-.core-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+.showcase-card:hover .card-icon-wrapper {
+  background: #eff6ff;
+  transform: scale(1.1);
 }
 
-.card-header {
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.card-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.card-content {
-  padding: 20px 16px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-color);
-  margin-bottom: 20px;
-}
-
-.card-btn {
-  margin: 0 16px 16px 16px;
-}
-
-/* 热门技术区域样式 */
-.tech-section {
-  padding: 60px 0;
-  background-color: var(--bg-color);
-}
-
-.section-title {
-  text-align: center;
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 40px 0;
-  color: var(--text-color);
-}
-
-.tech-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-}
-
-.tech-card {
-  border-radius: 8px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  text-align: center;
-  padding: 32px 24px;
-}
-
-.tech-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border-color: #1890ff;
-}
-
-.tech-icon {
+.card-emoji {
   font-size: 48px;
-  margin: 0 0 16px 0;
-  color: #1890ff;
 }
 
-.tech-name {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  color: var(--text-color);
+.card-content h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
 }
 
-.tech-desc {
+.description {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #64748b;
+  margin-bottom: 24px;
+  flex: 1; /* 让描述部分占据剩余空间，保持底部对齐 */
+}
+
+.tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.tag {
+  background: #f8fafc;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.showcase-card:hover .tag {
+  background: #fff;
+  border-color: #bfdbfe;
+  color: #3b82f6;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+}
+
+/* 底部 */
+.footer-slogan {
+  text-align: center;
+  padding: 40px 0;
+  color: #94a3b8;
+  background: #0f172a;
+  border-top: 1px solid #1e293b;
+}
+
+.footer-slogan p {
+  margin: 8px 0;
   font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-color);
-  opacity: 0.8;
+  letter-spacing: 1px;
 }
 
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .hero-content {
-    flex-direction: column;
-    text-align: center;
-  }
+.contact-info {
+  color: #64748b;
+  font-size: 13px;
+}
 
-  .hero-text {
-    text-align: center;
-  }
-
-  .core-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
-  .tech-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+/* 响应式 */
+@media (max-width: 1024px) {
+  .showcase-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .hero-title {
-    font-size: 28px;
+    font-size: 32px;
   }
-
-  .hero-subtitle {
-    font-size: 20px;
+  
+  .showcase-container {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
   }
-
-  .hero-section {
-    padding: 60px 0;
-  }
-
-  .core-section,
-  .tech-section {
+  
+  .showcase-section {
     padding: 40px 0;
-  }
-
-  .core-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tech-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

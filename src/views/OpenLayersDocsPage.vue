@@ -5,13 +5,13 @@
 
     <!-- 主体内容区 -->
     <div class="docs-container">
-      <div class="docs-header">
+      <!-- <div class="docs-header">
         <h1 class="docs-title">
           <span class="title-icon">🗺️</span>
           OpenLayers 文档
         </h1>
         <p class="docs-description">使用 iframe 嵌入的 OpenLayers 教程网站</p>
-      </div>
+      </div> -->
 
       <!-- iframe 嵌入 OpenLayers 网站 -->
       <div class="iframe-container">

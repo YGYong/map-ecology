@@ -1,182 +1,115 @@
-// 示例分类数据 - 参考 Mars3D 网站的分类结构
+
+// 示例分类数据
 export const categories = [
-  { 
-    id: 1, 
-    name: "快速开始", 
-    count: 5, 
-    icon: "⚡",
+  {
+    id: 1,
+    name: "基础案例",
+    count: 57,
+    icon: "🌏",
     subcategories: [
-      { id: 11, name: "快速开始示例", count: 5, parentId: 1 }
-    ]
+      { id: 11, name: "地图与影像", count: 7, parentId: 1 },
+      { id: 12, name: "相机与交互", count: 7, parentId: 1 },
+      { id: 13, name: "实体对象", count: 14, parentId: 1 },
+      { id: 14, name: "模型与3DTiles", count: 5, parentId: 1 },
+      { id: 15, name: "材质与外观", count: 12, parentId: 1 },
+      { id: 16, name: "图元", count: 2, parentId: 1 },
+      { id: 17, name: "数据加载", count: 4, parentId: 1 },
+      { id: 18, name: "其他", count: 6, parentId: 1 },
+    ],
   },
-  { 
-    id: 2, 
-    name: "三维场景", 
-    count: 48, 
-    icon: "🌍",
+  {
+    id: 2,
+    name: "进阶案例",
+    count: 6,
+    icon: "🚀",
     subcategories: [
-      { id: 21, name: "场景基础控制", count: 5, parentId: 2 },
-      { id: 22, name: "球场景序列化", count: 10, parentId: 2 },
-      { id: 23, name: "球场景基础", count: 5, parentId: 2 },
-      { id: 24, name: "场景视觉控制", count: 7, parentId: 2 },
-      { id: 25, name: "相机及视角", count: 7, parentId: 2 },
-      { id: 26, name: "场景背景控制", count: 7, parentId: 2 },
-      { id: 27, name: "其他", count: 7, parentId: 2 }
-    ]
+      { id: 21, name: "进阶功能", count: 6, parentId: 2 },
+    ],
   },
-  { 
-    id: 3, 
-    name: "三维地形", 
-    count: 12, 
-    icon: "⛰️",
-    subcategories: [
-      { id: 31, name: "地形示例", count: 12, parentId: 3 }
-    ]
-  },
-  { 
-    id: 4, 
-    name: "瓦片图层", 
-    count: 34, 
-    icon: "🗺️",
-    subcategories: [
-      { id: 41, name: "瓦片图层示例", count: 34, parentId: 4 }
-    ]
-  },
-  { 
-    id: 5, 
-    name: "矢量图层", 
-    count: 33, 
-    icon: "📊",
-    subcategories: [
-      { id: 51, name: "矢量图层示例", count: 33, parentId: 5 }
-    ]
-  },
-  { 
-    id: 6, 
-    name: "3DTiles三维模型", 
-    count: 40, 
-    icon: "🏗️",
-    subcategories: [
-      { id: 61, name: "3DTiles示例", count: 40, parentId: 6 }
-    ]
-  },
-  { 
-    id: 7, 
-    name: "矢量对象", 
-    count: 205, 
-    icon: "🎯",
-    subcategories: [
-      { id: 71, name: "点对象", count: 50, parentId: 7 },
-      { id: 72, name: "线对象", count: 50, parentId: 7 },
-      { id: 73, name: "面对象", count: 50, parentId: 7 },
-      { id: 74, name: "模型对象", count: 55, parentId: 7 }
-    ]
-  },
-  { 
-    id: 8, 
-    name: "工具控件", 
-    count: 31, 
-    icon: "🛠️",
-    subcategories: [
-      { id: 81, name: "工具控件示例", count: 31, parentId: 8 }
-    ]
-  },
-  { 
-    id: 9, 
-    name: "环境特效", 
-    count: 16, 
-    icon: "✨",
-    subcategories: [
-      { id: 91, name: "环境特效示例", count: 16, parentId: 9 }
-    ]
-  },
-  { 
-    id: 10, 
-    name: "管理分析", 
-    count: 27, 
-    icon: "📈",
-    subcategories: [
-      { id: 101, name: "管理分析示例", count: 27, parentId: 10 }
-    ]
-  }
 ];
 
 // 示例数据
 export const examples = [
-  // 快速开始示例
-  { id: 1, name: "01_初始化", fileName: "01_初始化.vue", category: 11, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Cesium+Init" },
-  { id: 2, name: "02_天地图影像", fileName: "02_天地图影像.vue", category: 11, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=TianDiTu+Image" },
-  { id: 3, name: "03_天地图标注", fileName: "03_天地图标注.vue", category: 11, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=TianDiTu+Label" },
-  { id: 4, name: "04_高德地图", fileName: "04_高德地图.vue", category: 11, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Amap" },
-  { id: 5, name: "05_顶级影像", fileName: "05_顶级影像.vue", category: 11, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Top+Image" },
-  
-  // 场景基础控制
-  { id: 10, name: "10_场景初始化", fileName: "10_场景初始化.vue", category: 21, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Init" },
-  { id: 11, name: "11_场景切换", fileName: "11_场景切换.vue", category: 21, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Switch" },
-  { id: 12, name: "12_场景重置", fileName: "12_场景重置.vue", category: 21, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Reset" },
-  { id: 13, name: "13_场景保存", fileName: "13_场景保存.vue", category: 21, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Save" },
-  { id: 14, name: "14_场景加载", fileName: "14_场景加载.vue", category: 21, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Load" },
-  { id: 7, name: "07_气泡窗口", fileName: "07_气泡窗口.vue", category: 21, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Popup+Window" },
-  
-  // 球场景序列化
-  { id: 15, name: "15_场景序列化", fileName: "15_场景序列化.vue", category: 22, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Serialize" },
-  { id: 16, name: "16_场景反序列化", fileName: "16_场景反序列化.vue", category: 22, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+Deserialize" },
-  { id: 17, name: "17_场景状态保存", fileName: "17_场景状态保存.vue", category: 22, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Scene+State" },
-  
-  // 相机及视角
-  { id: 18, name: "18_默认相机视角", fileName: "11_默认相机视角.vue", category: 25, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Default+Camera" },
-  { id: 19, name: "19_相机常用方法", fileName: "12_相机常用方法.vue", category: 25, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Camera+Methods" },
-  { id: 20, name: "20_键盘控制相机", fileName: "13_键盘控制相机交互.vue", category: 25, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Keyboard+Camera" },
-  
-  // 点对象
-  { id: 21, name: "21_实体点", fileName: "18_实体点.vue", category: 71, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Entity+Point" },
-  { id: 22, name: "22_聚合点", fileName: "19_聚合点.vue", category: 71, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Point+Cluster" },
-  { id: 23, name: "23_海量图标", fileName: "10_海量图标.vue", category: 71, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Mass+Icons" },
-  
-  // 线对象
-  { id: 24, name: "24_实体线", fileName: "20_实体线.vue", category: 72, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Entity+Line" },
-  { id: 25, name: "25_折线发光材质", fileName: "41_折线发光材质.vue", category: 72, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Glow+Line" },
-  { id: 26, name: "26_折线轮廓材质", fileName: "42_折线轮廓材质.vue", category: 72, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Outline+Line" },
-  { id: 27, name: "27_折线虚线材质", fileName: "43_折线虚线材质.vue", category: 72, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Dashed+Line" },
-  { id: 44, name: "44_折线箭头材质", fileName: "44_折线箭头材质.vue", category: 72, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Arrow+Line" },
-  
-  // 面对象
-  { id: 28, name: "28_实体面", fileName: "21_实体面.vue", category: 73, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Entity+Polygon" },
-  { id: 29, name: "29_带孔洞面", fileName: "22_带孔洞面.vue", category: 73, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Hole+Polygon" },
-  { id: 30, name: "30_动态颜色材质", fileName: "36_动态颜色材质.vue", category: 73, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Dynamic+Color" },
-  
-  // 模型对象
-  { id: 31, name: "31_模型加载", fileName: "23_模型加载.vue", category: 74, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Model+Load" },
-  { id: 32, name: "32_模型动画", fileName: "24_模型动画.vue", category: 74, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Model+Animation" },
-  { id: 33, name: "33_模型裁剪", fileName: "25_模型裁剪.vue", category: 74, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Model+Clipping" },
-  
-  // 地形示例
-  { id: 34, name: "34_地形加载", fileName: "地形加载.vue", category: 31, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Terrain+Load" },
-  { id: 35, name: "35_地形分析", fileName: "地形分析.vue", category: 31, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Terrain+Analysis" },
-  
-  // 瓦片图层示例
-  { id: 36, name: "36_瓦片图层管理", fileName: "瓦片图层管理.vue", category: 41, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Imagery+Manage" },
-  { id: 37, name: "37_自定义瓦片图层", fileName: "自定义瓦片图层.vue", category: 41, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Custom+Imagery" },
-  
-  // 矢量图层示例
-  { id: 38, name: "38_GeoJSON加载", fileName: "09_加载GeoJSON.vue", category: 51, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=GeoJSON+Load" },
-  { id: 39, name: "39_KML加载", fileName: "KML加载.vue", category: 51, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=KML+Load" },
-  
-  // 3DTiles示例
-  { id: 40, name: "40_3DTiles加载", fileName: "3DTiles加载.vue", category: 61, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=3DTiles+Load" },
-  { id: 41, name: "41_3DTiles样式", fileName: "3DTiles样式.vue", category: 61, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=3DTiles+Style" },
-  
-  // 工具控件示例
-  { id: 42, name: "42_测量工具", fileName: "测量工具.vue", category: 81, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Measurement" },
-  { id: 43, name: "43_剖分工具", fileName: "剖分工具.vue", category: 81, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Section" },
-  
-  // 环境特效示例
-  { id: 45, name: "45_自定义天空盒", fileName: "08_自定义天空盒.vue", category: 91, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Custom+Skybox" },
-  { id: 46, name: "46_大气效果", fileName: "大气效果.vue", category: 91, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Atmosphere" },
-  
-  // 管理分析示例
-  { id: 47, name: "47_空间分析", fileName: "空间分析.vue", category: 101, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Spatial+Analysis" },
-  { id: 48, name: "48_路径规划", fileName: "路径规划.vue", category: 101, preview: "https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Path+Planning" }
+  // 1.1 地图与影像
+  { id: 1, name: "01_初始化", fileName: "cesiumExample/basic/01_初始化.vue", category: 11, preview: "" },
+  { id: 2, name: "02_天地图影像", fileName: "cesiumExample/basic/02_天地图影像.vue", category: 11, preview: "" },
+  { id: 3, name: "03_天地图标注", fileName: "cesiumExample/basic/03_天地图标注.vue", category: 11, preview: "" },
+  { id: 4, name: "04_高德地图", fileName: "cesiumExample/basic/04_高德地图.vue", category: 11, preview: "" },
+  { id: 5, name: "05_顶级影像", fileName: "cesiumExample/basic/05_顶级影像.vue", category: 11, preview: "" },
+  { id: 6, name: "06_底图综合案例", fileName: "cesiumExample/basic/06_底图综合案例.vue", category: 11, preview: "" },
+  { id: 51, name: "51_全球OSM", fileName: "cesiumExample/basic/51_全球OSM.vue", category: 11, preview: "" },
+
+  // 1.2 相机与交互
+  { id: 11, name: "11_默认相机视角", fileName: "cesiumExample/basic/11_默认相机视角.vue", category: 12, preview: "" },
+  { id: 12, name: "12_相机常用方法", fileName: "cesiumExample/basic/12_相机常用方法.vue", category: 12, preview: "" },
+  { id: 13, name: "13_键盘控制相机交互", fileName: "cesiumExample/basic/13_键盘控制相机交互.vue", category: 12, preview: "" },
+  { id: 14, name: "14_坐标系转换", fileName: "cesiumExample/basic/14_坐标系转换.vue", category: 12, preview: "" },
+  { id: 15, name: "15_屏幕事件", fileName: "cesiumExample/basic/15_屏幕事件.vue", category: 12, preview: "" },
+  { id: 16, name: "16_相机事件", fileName: "cesiumExample/basic/16_相机事件.vue", category: 12, preview: "" },
+  { id: 17, name: "17_渲染事件", fileName: "cesiumExample/basic/17_渲染事件.vue", category: 12, preview: "" },
+
+  // 1.3 实体对象
+  { id: 18, name: "18_实体点", fileName: "cesiumExample/basic/18_实体点.vue", category: 13, preview: "" },
+  { id: 19, name: "19_聚合点", fileName: "cesiumExample/basic/19_聚合点.vue", category: 13, preview: "" },
+  { id: 20, name: "20_实体线", fileName: "cesiumExample/basic/20_实体线.vue", category: 13, preview: "" },
+  { id: 21, name: "21_实体面", fileName: "cesiumExample/basic/21_实体面.vue", category: 13, preview: "" },
+  { id: 22, name: "22_带孔洞面", fileName: "cesiumExample/basic/22_带孔洞面.vue", category: 13, preview: "" },
+  { id: 26, name: "26_标签", fileName: "cesiumExample/basic/26_标签.vue", category: 13, preview: "" },
+  { id: 27, name: "27_广告牌", fileName: "cesiumExample/basic/27_广告牌.vue", category: 13, preview: "" },
+  { id: 28, name: "28_矩形", fileName: "cesiumExample/basic/28_矩形.vue", category: 13, preview: "" },
+  { id: 29, name: "29_墙", fileName: "cesiumExample/basic/29_墙.vue", category: 13, preview: "" },
+  { id: 30, name: "30_椭圆", fileName: "cesiumExample/basic/30_椭圆.vue", category: 13, preview: "" },
+  { id: 31, name: "31_椭圆体", fileName: "cesiumExample/basic/31_椭圆体.vue", category: 13, preview: "" },
+  { id: 32, name: "32_圆柱体", fileName: "cesiumExample/basic/32_圆柱体.vue", category: 13, preview: "" },
+  { id: 33, name: "33_箱", fileName: "cesiumExample/basic/33_箱.vue", category: 13, preview: "" },
+  { id: 34, name: "34_走廊", fileName: "cesiumExample/basic/34_走廊.vue", category: 13, preview: "" },
+
+  // 1.4 模型与3DTiles
+  { id: 23, name: "23_模型加载", fileName: "cesiumExample/basic/23_模型加载.vue", category: 14, preview: "" },
+  { id: 24, name: "24_模型动画", fileName: "cesiumExample/basic/24_模型动画.vue", category: 14, preview: "" },
+  { id: 25, name: "25_模型裁剪", fileName: "cesiumExample/basic/25_模型裁剪.vue", category: 14, preview: "" },
+  { id: 47, name: "47_添加模型", fileName: "cesiumExample/basic/47_添加模型.vue", category: 14, preview: "" },
+  { id: 52, name: "52_3DTiles加载状态监听", fileName: "cesiumExample/basic/52_3DTiles加载状态监听.vue", category: 14, preview: "" },
+
+  // 1.5 材质与外观
+  { id: 36, name: "36_动态颜色材质", fileName: "cesiumExample/basic/36_动态颜色材质.vue", category: 15, preview: "" },
+  { id: 37, name: "37_图片材质", fileName: "cesiumExample/basic/37_图片材质.vue", category: 15, preview: "" },
+  { id: 38, name: "38_棋盘材质", fileName: "cesiumExample/basic/38_棋盘材质.vue", category: 15, preview: "" },
+  { id: 39, name: "39_条纹材质", fileName: "cesiumExample/basic/39_条纹材质.vue", category: 15, preview: "" },
+  { id: 40, name: "40_网格材质", fileName: "cesiumExample/basic/40_网格材质.vue", category: 15, preview: "" },
+  { id: 41, name: "41_折线发光材质", fileName: "cesiumExample/basic/41_折线发光材质.vue", category: 15, preview: "" },
+  { id: 42, name: "42_折线轮廓材质", fileName: "cesiumExample/basic/42_折线轮廓材质.vue", category: 15, preview: "" },
+  { id: 43, name: "43_折线虚线材质", fileName: "cesiumExample/basic/43_折线虚线材质.vue", category: 15, preview: "" },
+  { id: 44, name: "44_折线箭头材质", fileName: "cesiumExample/basic/44_折线箭头材质.vue", category: 15, preview: "" },
+  { id: 48, name: "48_PerInstanceColorAppearance", fileName: "cesiumExample/basic/48_PerInstanceColorAppearance.vue", category: 15, preview: "" },
+  { id: 49, name: "49_EllipsoidSurfaceAppearance", fileName: "cesiumExample/basic/49_EllipsoidSurfaceAppearance.vue", category: 15, preview: "" },
+  { id: 50, name: "50_PolylineMaterialAppearance", fileName: "cesiumExample/basic/50_PolylineMaterialAppearance.vue", category: 15, preview: "" },
+
+  // 1.6 图元
+  { id: 45, name: "45_矩形图元", fileName: "cesiumExample/basic/45_矩形图元.vue", category: 16, preview: "" },
+  { id: 46, name: "46_箱图元", fileName: "cesiumExample/basic/46_箱图元.vue", category: 16, preview: "" },
+
+  // 1.7 数据加载
+  { id: 9, name: "09_加载GeoJSON", fileName: "cesiumExample/basic/09_加载GeoJSON.vue", category: 17, preview: "" },
+  { id: 54, name: "54_GeoJSON", fileName: "cesiumExample/basic/54_GeoJSON.vue", category: 17, preview: "" },
+  { id: 56, name: "56_CZML", fileName: "cesiumExample/basic/56_CZML.vue", category: 17, preview: "" },
+  { id: 57, name: "57_KML", fileName: "cesiumExample/basic/57_KML.vue", category: 17, preview: "" },
+
+  // 1.8 其他
+  { id: 7, name: "07_气泡窗口", fileName: "cesiumExample/basic/07_气泡窗口.vue", category: 18, preview: "" },
+  { id: 8, name: "08_自定义天空盒", fileName: "cesiumExample/basic/08_自定义天空盒.vue", category: 18, preview: "" },
+  { id: 10, name: "10_海量图标", fileName: "cesiumExample/basic/10_海量图标.vue", category: 18, preview: "" },
+  { id: 35, name: "35_实体生命周期", fileName: "cesiumExample/basic/35_实体生命周期.vue", category: 18, preview: "" },
+  { id: 53, name: "53_点击事件及样式表达式", fileName: "cesiumExample/basic/53_点击事件及样式表达式.vue", category: 18, preview: "" },
+  { id: 55, name: "55_区域掩膜", fileName: "cesiumExample/basic/55_区域掩膜.vue", category: 18, preview: "" },
+
+  // 2.1 进阶功能
+  { id: 101, name: "01_网格", fileName: "cesiumExample/advanced/01_网格.vue", category: 21, preview: "" },
+  { id: 102, name: "02_飞机飞行", fileName: "cesiumExample/advanced/02_飞机飞行.vue", category: 21, preview: "" },
+  { id: 103, name: "03_加载控件", fileName: "cesiumExample/advanced/03_加载控件.vue", category: 21, preview: "" },
+  { id: 104, name: "04_GUI调试", fileName: "cesiumExample/advanced/04_GUI调试.vue", category: 21, preview: "" },
+  { id: 105, name: "05_动态时序图", fileName: "cesiumExample/advanced/05_动态时序图.vue", category: 21, preview: "" },
+  { id: 106, name: "06_沿线标注", fileName: "cesiumExample/advanced/06_沿线标注.vue", category: 21, preview: "" },
 ];
 
 // 根据 ID 获取示例
@@ -187,10 +120,13 @@ export function getExampleById(id) {
 // 加载示例代码
 export async function loadExampleCode(fileName) {
   try {
-    const modules = import.meta.glob("../views/*.vue", {
+    // 匹配 views 下的所有 .vue 文件，包括子目录
+    const modules = import.meta.glob("../views/**/*.vue", {
       as: "raw",
       eager: false,
     });
+    
+    // 构造模块路径，fileName 已经包含了 cesiumExample/basic/ 前缀
     const modulePath = `../views/${fileName}`;
 
     if (modules[modulePath]) {
@@ -198,7 +134,7 @@ export async function loadExampleCode(fileName) {
       return code;
     }
 
-    throw new Error(`找不到示例文件: ${fileName}`);
+    throw new Error(`找不到示例文件: ${fileName} (路径: ${modulePath})`);
   } catch (error) {
     console.error("加载示例代码失败:", error);
     throw error;
