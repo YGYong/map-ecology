@@ -4,6 +4,8 @@ import ExampleDetailPage from '@/views/ExampleDetailPage.vue'
 import ErrorPanelDemo from '@/components/ErrorPanelDemo.vue'
 import BlankPage from '@/views/BlankPage.vue'
 import CesiumExamplesPage from '@/views/CesiumExamplesPage.vue'
+import OpenLayersDocsPage from '@/views/OpenLayersDocsPage.vue'
+import CesiumDocsPage from '@/views/CesiumDocsPage.vue'
 
 const routes = [
   {
@@ -30,7 +32,7 @@ const routes = [
   {
     path: '/cesium/docs',
     name: 'CesiumDocs',
-    component: BlankPage
+    component: CesiumDocsPage
   },
   // OpenLayers 路由
   {
@@ -41,7 +43,7 @@ const routes = [
   {
     path: '/openlayers/docs',
     name: 'OpenLayersDocs',
-    component: BlankPage
+    component: OpenLayersDocsPage
   },
   // Leaflet 路由
   {

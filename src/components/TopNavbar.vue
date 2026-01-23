@@ -86,17 +86,17 @@
         </el-menu>
       </div>
       <div class="navbar-right">
-        <el-button type="primary" size="small">新增案例</el-button>
-        <el-button size="small" @click="toggleFullScreen">全屏浏览</el-button>
+        <!-- <el-button type="primary" size="small">新增案例</el-button>
+        <el-button size="small" @click="toggleFullScreen">全屏浏览</el-button> -->
         <el-button size="small" circle>
-          <i class="el-icon-link" @click="goToGithub"></i>
+          <i class="el-icon-link" @click="goToGithub">11</i>
         </el-button>
-        <el-switch
+        <!-- <el-switch
           v-model="isDarkMode"
           active-text="深色"
           inactive-text="浅色"
           @change="toggleTheme"
-        />
+        /> -->
       </div>
     </div>
   </header>
@@ -107,7 +107,6 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 // 状态管理
 const activeMenu = ref("home");
 const isDarkMode = ref(false);
@@ -120,14 +119,36 @@ onMounted(() => {
     isDarkMode.value = true;
     document.documentElement.classList.add("dark-theme");
   }
+  
+  // 根据当前路由设置激活菜单项
+  updateActiveMenu();
 });
 
+// 方法
+function updateActiveMenu() {
+  const path = window.location.pathname;
+  
+  if (path === '/') {
+    activeMenu.value = 'home';
+  } else if (path.includes('/openlayers/')) {
+    activeMenu.value = 'openlayers';
+  } else if (path.includes('/leaflet/')) {
+    activeMenu.value = 'leaflet';
+  } else if (path.includes('/cesium/')) {
+    activeMenu.value = 'cesium';
+  } else if (path.includes('/three/')) {
+    activeMenu.value = 'three';
+  } else if (path.includes('/community')) {
+    activeMenu.value = 'community';
+  }
+}
 // 方法
 function goToHome() {
   router.push("/");
 }
 
 function goToRoute(path) {
+  // 所有路由都使用正常跳转
   router.push(path);
 }
 
