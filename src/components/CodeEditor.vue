@@ -138,7 +138,7 @@ export default {
         lineNumbers: true,
         lineWrapping: true,
         autoCloseBrackets: true,
-        matchBrackets: false, // 禁用括号匹配以避免错误
+        matchBrackets: true, // Re-enable match brackets
         foldGutter: true,
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         tabSize: 2,
@@ -172,6 +172,11 @@ export default {
           hint: this.cesiumHint
         }
       });
+
+      // Force refresh to ensure rendering
+      setTimeout(() => {
+        this.editor.refresh();
+      }, 100);
 
       // Requirement 9.1: Debounce syntax checking to avoid performance issues
       this.editor.on('change', () => {

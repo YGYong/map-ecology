@@ -31,7 +31,6 @@ export const categories = [
 // 示例数据
 export const examples = [
   // 1.1 地图与影像
-  { id: 1, name: "01_初始化", fileName: "cesiumExample/basic/01_初始化.vue", category: 11, preview: "" },
   { id: 2, name: "02_天地图影像", fileName: "cesiumExample/basic/02_天地图影像.vue", category: 11, preview: "" },
   { id: 3, name: "03_天地图标注", fileName: "cesiumExample/basic/03_天地图标注.vue", category: 11, preview: "" },
   { id: 4, name: "04_高德地图", fileName: "cesiumExample/basic/04_高德地图.vue", category: 11, preview: "" },

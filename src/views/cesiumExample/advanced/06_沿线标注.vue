@@ -361,7 +361,7 @@ const initMap = () => {
 
 <style scoped>
 .container {
-  width: 60vw;
-  height: 60vh;
+  width: 100%;
+  height: 100%;
 }
 </style>

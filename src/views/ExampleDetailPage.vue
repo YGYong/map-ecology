@@ -4,14 +4,8 @@
     <header class="top-navbar">
       <div class="navbar-container">
         <div class="navbar-left">
-          <button class="back-button" @click="goBack">← 返回</button>
+          <button class="back-button" @click="goBack">← 返回上一级</button>
           <h1 class="page-title">{{ currentExample?.name || '示例详情' }}</h1>
-        </div>
-        <div class="navbar-right">
-          <button class="action-btn" @click="resetCode">重置</button>
-          <button class="action-btn primary" @click="runCode" :disabled="isRunning">
-            {{ isRunning ? '运行中...' : '运行' }}
-          </button>
         </div>
       </div>
     </header>
@@ -29,6 +23,14 @@
               <span>📄</span>
               <span>代码编辑</span>
             </div>
+          </div>
+          <div class="editor-actions">
+            <button class="action-btn" @click="resetCode" title="重置代码">
+              <span>↺</span> 重置
+            </button>
+            <button class="action-btn primary" @click="runCode" :disabled="isRunning" title="运行代码 (Ctrl+S)">
+              <span>▶</span> {{ isRunning ? '运行中...' : '运行' }}
+            </button>
           </div>
         </div>
         <div class="editor-content">
@@ -125,7 +127,7 @@ async function loadExample() {
 }
 
 function goBack() {
-  router.push('/')
+  router.back()
 }
 
 function startResize() {
@@ -255,11 +257,11 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
 }
 
 .top-navbar {
-  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
-  color: white;
-  height: 50px;
-  min-height: 50px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-color: #2d2d2d;
+  color: #cccccc;
+  height: 40px;
+  min-height: 40px;
+  border-bottom: 1px solid #1e1e1e;
   flex-shrink: 0;
   z-index: 100;
 }
@@ -281,60 +283,64 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
 }
 
 .back-button {
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 6px 12px;
+  background-color: transparent;
+  border: none;
+  color: #cccccc;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
 .back-button:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .page-title {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: normal;
   margin: 0;
-  color: white;
+  color: #cccccc;
 }
 
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+/* Removed .navbar-right styles as it is empty now */
 
 .action-btn {
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 6px 16px;
-  border-radius: 4px;
-  font-size: 14px;
+  background-color: transparent;
+  border: none;
+  color: #cccccc;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: #3e3e42;
+  color: white;
 }
 
 .action-btn.primary {
-  background-color: #10b981;
-  border-color: #10b981;
+  background-color: #0e639c;
+  color: white;
 }
 
 .action-btn.primary:hover {
-  background-color: #059669;
+  background-color: #1177bb;
 }
 
 .action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background-color: #3a3d41;
 }
 
 .main-container {

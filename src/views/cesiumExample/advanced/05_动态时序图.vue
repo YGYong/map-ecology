@@ -200,8 +200,8 @@ const initMap = () => {
 .container {
   position: relative;
   overflow: hidden;
-  width: 60vw;
-  height: 60vh;
+  width: 100%;
+  height: 100%;
 }
 .container-map {
   width: 100%;

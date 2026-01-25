@@ -120,8 +120,8 @@ const switchMap = (mapType) => {
 <style scoped>
 .map-switcher {
   position: relative;
-  height: 60vh;
-  width: 60vw;
+  height: 100%;
+  width: 100%;
 }
 .container {
   width: 100%;
