@@ -40,14 +40,16 @@ export default {
     modelValue: {
       type: String,
       default: ''
+    },
+    showHeader: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
     return {
       code: this.modelValue,
       editor: null,
-      syntaxCheckTimer: null, // Debounce timer for syntax checking
-      resizeFrame: null,
       resizeObserver: null,
       // Cesium API keywords for autocomplete
       cesiumKeywords: [
@@ -101,77 +103,47 @@ export default {
     this.initEditor();
   },
   beforeUnmount() {
-    // Clean up debounce timer
-    if (this.syntaxCheckTimer) {
-      clearTimeout(this.syntaxCheckTimer);
-      this.syntaxCheckTimer = null;
-    }
-
-    if (this.resizeFrame) {
-      cancelAnimationFrame(this.resizeFrame);
-      this.resizeFrame = null;
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
     }
     
     if (this.editor) {
       try {
-        // 移除所有事件监听器
-        this.editor.off('change');
-        this.editor.off('inputRead');
-        this.editor.off('blur');
-        
-        window.removeEventListener('resize', this.handleResize);
-
-        if (this.resizeObserver) {
-          this.resizeObserver.disconnect();
-          this.resizeObserver = null;
+        const element = this.editor.getWrapperElement();
+        if (element && element.remove) {
+          element.remove();
         }
-
-        // 清除所有标记
-        const marks = this.editor.getAllMarks();
-        marks.forEach(mark => {
-          try {
-            mark.clear();
-          } catch (e) {
-            // 忽略清除标记时的错误
-          }
-        });
-        
-        // 销毁编辑器
         this.editor.toTextArea();
         this.editor = null;
       } catch (error) {
-        console.warn('清理 CodeMirror 编辑器时出错:', error);
+        console.warn('Error cleaning up CodeMirror:', error);
       }
     }
   },
   methods: {
     initEditor() {
+      // Ensure textarea exists
+      if (!this.$refs.textarea) return;
+
       this.editor = CodeMirror.fromTextArea(this.$refs.textarea, {
         mode: 'htmlmixed',
         theme: 'dracula',
         lineNumbers: true,
-        lineWrapping: true,
+        lineWrapping: false, // Disable wrapping to prevent height calculation issues
         autoCloseBrackets: true,
-        matchBrackets: false, // Disable match brackets to prevent runtime errors
+        matchBrackets: false, // Disable to avoid runtime errors
         foldGutter: true,
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         tabSize: 2,
         indentUnit: 2,
         indentWithTabs: false,
         styleActiveLine: true,
+        viewportMargin: Infinity, // Ensure content is rendered
         extraKeys: {
-          // Ctrl+S / Cmd+S to run code
-          'Ctrl-S': (_cm) => {
-            this.runCode();
-            return false;
-          },
-          'Cmd-S': (_cm) => {
-            this.runCode();
-            return false;
-          },
-          // Ctrl+Space for autocomplete
+          'Ctrl-S': () => { this.runCode(); return false; },
+          'Cmd-S': () => { this.runCode(); return false; },
           'Ctrl-Space': 'autocomplete',
-          // Tab for proper indentation
           'Tab': (cm) => {
             if (cm.somethingSelected()) {
               cm.indentSelection('add');
@@ -187,61 +159,36 @@ export default {
         }
       });
 
-      // Force refresh to ensure rendering
-      setTimeout(() => {
-        this.editor.refresh();
-      }, 100);
-
-      // Requirement 9.1: Debounce syntax checking to avoid performance issues
+      // Update code when editor changes
       this.editor.on('change', () => {
         this.code = this.editor.getValue();
         this.$emit('update:modelValue', this.code);
-        
-        // Debounce syntax checking (300ms delay)
-        if (this.syntaxCheckTimer) {
-          clearTimeout(this.syntaxCheckTimer);
-        }
-        
-        this.syntaxCheckTimer = setTimeout(() => {
-          this.performSyntaxCheck();
-        }, 300);
       });
 
-      // Enable autocomplete on input
+      // Enable autocomplete
       this.editor.on('inputRead', (cm, change) => {
         if (change.text[0].match(/[a-zA-Z.]/)) {
           CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
         }
       });
 
-      // Listen to window resize
-      window.addEventListener('resize', this.handleResize);
-
-      // Use ResizeObserver to monitor container size changes
-      if (window.ResizeObserver) {
+      // Set up ResizeObserver to handle layout changes
+      if (this.$refs.editorContent && window.ResizeObserver) {
         this.resizeObserver = new ResizeObserver(() => {
-          this.handleResize();
+          if (this.editor) {
+            // Use requestAnimationFrame to avoid "ResizeObserver loop limit exceeded"
+            requestAnimationFrame(() => {
+              this.editor.refresh();
+            });
+          }
         });
-        // Observe the editor content container instead of root
-        if (this.$refs.editorContent) {
-          this.resizeObserver.observe(this.$refs.editorContent);
-        }
+        this.resizeObserver.observe(this.$refs.editorContent);
       }
-    },
-
-    handleResize() {
-      if (this.editor) {
-        // Use requestAnimationFrame for smooth updates without flashing
-        if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame);
-        this.resizeFrame = requestAnimationFrame(() => {
-          // Check if editor is still valid
-          const wrapper = this.editor.getWrapperElement();
-          if (!wrapper || !wrapper.parentNode) return;
-
-          // Simply call refresh, rely on CSS height: 100%
-          this.editor.refresh();
-        });
-      }
+      
+      // Initial refresh
+      setTimeout(() => {
+        if (this.editor) this.editor.refresh();
+      }, 100);
     },
     
     // Custom hint function for Cesium API autocomplete
@@ -252,57 +199,31 @@ export default {
       const end = cursor.ch;
       const line = cursor.line;
       const currentWord = token.string;
-
-      // Get the text before cursor to check for Cesium context
       const lineText = cm.getLine(line).substring(0, end);
       
-      // Check if we're in a Cesium context (after "Cesium." or "viewer.")
       const cesiumMatch = lineText.match(/Cesium\.(\w*)$/);
       const viewerMatch = lineText.match(/viewer\.(\w*)$/);
       
       let list = [];
       
       if (cesiumMatch) {
-        // After "Cesium.", suggest Cesium API classes
         const prefix = cesiumMatch[1].toLowerCase();
         list = this.cesiumKeywords
           .filter(keyword => keyword !== 'Cesium' && keyword.toLowerCase().startsWith(prefix))
-          .map(keyword => ({
-            text: keyword,
-            displayText: keyword,
-            className: 'cesium-hint'
-          }));
+          .map(k => ({ text: k, displayText: k, className: 'cesium-hint' }));
       } else if (viewerMatch) {
-        // After "viewer.", suggest viewer properties and methods
-        const viewerProps = [
-          'scene', 'camera', 'entities', 'dataSources', 'canvas', 'clock',
-          'screenSpaceEventHandler', 'targetFrameRate', 'useDefaultRenderLoop',
-          'resolutionScale', 'useBrowserRecommendedResolution', 'automaticallyTrackDataSourceClocks',
-          'clockTrackedDataSource', 'trackedEntity', 'selectedEntity',
-          'zoomTo', 'flyTo', 'destroy', 'render', 'resize', 'forceResize',
-          'extend', 'isDestroyed'
-        ];
+        const viewerProps = ['scene', 'camera', 'entities', 'dataSources', 'canvas', 'zoomTo', 'flyTo', 'destroy', 'render'];
         const prefix = viewerMatch[1].toLowerCase();
         list = viewerProps
-          .filter(prop => prop.toLowerCase().startsWith(prefix))
-          .map(prop => ({
-            text: prop,
-            displayText: prop,
-            className: 'viewer-hint'
-          }));
+          .filter(p => p.toLowerCase().startsWith(prefix))
+          .map(p => ({ text: p, displayText: p, className: 'viewer-hint' }));
       } else if (currentWord && currentWord.length > 0) {
-        // General autocomplete for Cesium keywords
         const prefix = currentWord.toLowerCase();
         list = this.cesiumKeywords
-          .filter(keyword => keyword.toLowerCase().startsWith(prefix))
-          .map(keyword => ({
-            text: keyword,
-            displayText: keyword,
-            className: 'cesium-hint'
-          }));
+          .filter(k => k.toLowerCase().startsWith(prefix))
+          .map(k => ({ text: k, displayText: k, className: 'cesium-hint' }));
       }
 
-      // Fallback to default JavaScript hints if no Cesium-specific matches
       if (list.length === 0 && CodeMirror.hint.javascript) {
         return CodeMirror.hint.javascript(cm);
       }
@@ -312,37 +233,6 @@ export default {
         from: CodeMirror.Pos(line, start),
         to: CodeMirror.Pos(line, end)
       };
-    },
-    
-    /**
-     * Perform syntax checking (debounced)
-     * Requirement 9.1: Debounce syntax checking to avoid performance issues
-     * 
-     * This is a lightweight syntax check that doesn't block the UI.
-     * Full parsing and validation happens during code execution.
-     */
-    performSyntaxCheck() {
-      // Basic syntax validation without blocking the UI
-      // This could be extended to use a web worker for more complex checks
-      try {
-        // Simple check: ensure code has basic Vue SFC structure
-        const code = this.code;
-        if (code && code.trim()) {
-          // Check for basic template/script tags
-          const hasTemplate = /<template[^>]*>/.test(code);
-          const hasScript = /<script[^>]*>/.test(code);
-          
-          // Emit syntax check result (can be used by parent for visual feedback)
-          this.$emit('syntaxCheck', {
-            valid: hasTemplate || hasScript,
-            hasTemplate,
-            hasScript
-          });
-        }
-      } catch (error) {
-        // Silently fail - full validation happens during execution
-        console.debug('[CodeEditor] Syntax check error:', error.message);
-      }
     },
     
     runCode() {
@@ -359,24 +249,26 @@ export default {
   overflow: hidden;
   height: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
 }
 
 .editor-header {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  flex-shrink: 0;
 }
 
 .editor-content {
-  height: calc(100% - 48px);
+  flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 
-.editor-content.h-full {
-  height: 100%;
-}
-
+/* Ensure CodeMirror takes full height of its container */
 .editor-content :deep(.CodeMirror) {
-  height: 100%;
-  font-size: 14px;
+  height: 100% !important;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -385,51 +277,19 @@ export default {
   border-right: 1px solid #444 !important;
 }
 
-.editor-content :deep(.CodeMirror-linenumber) {
-  color: #888 !important;
-}
-
-.editor-content :deep(.CodeMirror-cursor) {
-  border-left: 2px solid #f8f8f2 !important;
-}
-
-.editor-content :deep(.CodeMirror-activeline-background) {
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Autocomplete hint styles */
+/* Hint styles */
 .editor-content :deep(.CodeMirror-hints) {
   background: #282a36 !important;
   border: 1px solid #444 !important;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 13px;
-  max-height: 300px;
-  overflow-y: auto;
+  z-index: 1000;
 }
 
 .editor-content :deep(.CodeMirror-hint) {
   color: #f8f8f2 !important;
-  padding: 4px 8px;
-  border-radius: 2px;
 }
 
 .editor-content :deep(.CodeMirror-hint-active) {
   background: #44475a !important;
   color: #50fa7b !important;
-}
-
-.editor-content :deep(.cesium-hint) {
-  color: #8be9fd !important;
-}
-
-.editor-content :deep(.viewer-hint) {
-  color: #ff79c6 !important;
-}
-
-/* Active line highlight */
-.editor-content :deep(.CodeMirror-activeline .CodeMirror-gutter-elt) {
-  background: rgba(255, 255, 255, 0.05) !important;
 }
 </style>

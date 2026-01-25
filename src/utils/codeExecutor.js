@@ -45,6 +45,9 @@ export class CodeExecutor {
         ref: (val) => ({ value: val }),
         reactive: (obj) => obj,
         onMounted: (fn) => {
+          // Store onMounted hook to be called immediately during execution or shortly after
+          // We can't use setTimeout(..., 0) if we want to ensure order relative to other synchronous code
+          // But for Vue lifecycle simulation, async execution is often expected.
           setTimeout(() => {
             try {
               fn()
@@ -142,20 +145,22 @@ export class CodeExecutor {
   }
 
   applyViewerConfig(script) {
-    // Attempt to find new Cesium.Viewer(..., { config })
+    // Relaxed regex to match new Cesium.Viewer(anyVariable, { config })
+    // Matches: new Cesium.Viewer( VAR_NAME , { ... })
+    // We capture the config object inside the second argument
     const match = script.match(/new\s+Cesium\.Viewer\s*\([^,]+,\s*(\{[\s\S]*?\})\)/)
+    
+    // Default configuration (all widgets disabled by default in our viewer setup)
+    // We need to re-enable them if the user code asks for them, or disable them if explicitly set to false
+    // But since our base viewer starts with most things false, we mainly look for what to enable.
+    
     if (match && match[1]) {
       try {
-        // Evaluate the config object
-        // We need a safe way to eval object literal. 
-        // Using Function with 'return' is safer than raw eval, but still requires care.
-        // We assume the config object relies only on Cesium or basic literals.
         const configFn = new Function('Cesium', `return ${match[1]}`)
         const config = configFn(Cesium)
         
-        console.log('Applying Viewer Config:', config)
+        // console.log('Applying Viewer Config:', config)
         
-        // Apply known configuration options to the existing viewer
         const widgetMap = {
           geocoder: 'geocoder',
           homeButton: 'homeButton',
@@ -168,20 +173,29 @@ export class CodeExecutor {
         }
         
         Object.keys(widgetMap).forEach(key => {
-          if (config[key] === false) {
-            const widget = this.viewer[widgetMap[key]]
-            if (widget && widget.container) {
-              widget.container.style.display = 'none'
-            }
-          } else if (config[key] === true) {
-             const widget = this.viewer[widgetMap[key]]
-            if (widget && widget.container) {
-              widget.container.style.display = ''
-            }
+          const widget = this.viewer[widgetMap[key]]
+          
+          if (widget && widget.container) {
+             // Logic:
+             // 1. If config[key] is false -> hide
+             // 2. If config[key] is true -> show
+             // 3. If config[key] is undefined (default) ->
+             //    Cesium default is usually TRUE for most widgets.
+             //    Our viewer default is FALSE.
+             //    If user code creates a "new Viewer", they expect Cesium defaults.
+             //    So if they DON'T mention a widget, it should probably be SHOWN (revert to Cesium default).
+             
+             if (config[key] === false) {
+               widget.container.style.display = 'none'
+             } else {
+               // If true OR undefined, show it (restore standard Cesium behavior)
+               widget.container.style.display = ''
+             }
           }
         })
         
         // Handle baseLayer
+        // If baseLayer is false, remove all imagery layers
         if (config.baseLayer === false) {
           this.viewer.imageryLayers.removeAll()
         }
