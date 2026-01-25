@@ -4,7 +4,7 @@
       <h3 class="font-semibold text-white">代码编辑器</h3>
       <el-button size="small" type="primary" @click="runCode">运行代码</el-button>
     </div>
-    <div class="editor-content" :class="{ 'h-full': !showHeader }">
+    <div class="editor-content" ref="editorContent" :class="{ 'h-full': !showHeader }">
       <textarea ref="textarea" v-model="code"></textarea>
     </div>
   </div>
@@ -47,6 +47,8 @@ export default {
       code: this.modelValue,
       editor: null,
       syntaxCheckTimer: null, // Debounce timer for syntax checking
+      resizeFrame: null,
+      resizeObserver: null,
       // Cesium API keywords for autocomplete
       cesiumKeywords: [
         'Cesium', 'Viewer', 'Entity', 'Cartesian3', 'Cartesian2', 'Color',
@@ -104,6 +106,11 @@ export default {
       clearTimeout(this.syntaxCheckTimer);
       this.syntaxCheckTimer = null;
     }
+
+    if (this.resizeFrame) {
+      cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
     
     if (this.editor) {
       try {
@@ -112,6 +119,13 @@ export default {
         this.editor.off('inputRead');
         this.editor.off('blur');
         
+        window.removeEventListener('resize', this.handleResize);
+
+        if (this.resizeObserver) {
+          this.resizeObserver.disconnect();
+          this.resizeObserver = null;
+        }
+
         // 清除所有标记
         const marks = this.editor.getAllMarks();
         marks.forEach(mark => {
@@ -138,7 +152,7 @@ export default {
         lineNumbers: true,
         lineWrapping: true,
         autoCloseBrackets: true,
-        matchBrackets: true, // Re-enable match brackets
+        matchBrackets: false, // Disable match brackets to prevent runtime errors
         foldGutter: true,
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         tabSize: 2,
@@ -199,6 +213,35 @@ export default {
           CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
         }
       });
+
+      // Listen to window resize
+      window.addEventListener('resize', this.handleResize);
+
+      // Use ResizeObserver to monitor container size changes
+      if (window.ResizeObserver) {
+        this.resizeObserver = new ResizeObserver(() => {
+          this.handleResize();
+        });
+        // Observe the editor content container instead of root
+        if (this.$refs.editorContent) {
+          this.resizeObserver.observe(this.$refs.editorContent);
+        }
+      }
+    },
+
+    handleResize() {
+      if (this.editor) {
+        // Use requestAnimationFrame for smooth updates without flashing
+        if (this.resizeFrame) cancelAnimationFrame(this.resizeFrame);
+        this.resizeFrame = requestAnimationFrame(() => {
+          // Check if editor is still valid
+          const wrapper = this.editor.getWrapperElement();
+          if (!wrapper || !wrapper.parentNode) return;
+
+          // Simply call refresh, rely on CSS height: 100%
+          this.editor.refresh();
+        });
+      }
     },
     
     // Custom hint function for Cesium API autocomplete

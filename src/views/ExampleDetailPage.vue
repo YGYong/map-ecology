@@ -33,7 +33,7 @@
             </button>
           </div>
         </div>
-        <div class="editor-content">
+        <div class="editor-content-wrapper">
           <code-editor v-model="code" @run="runCode" :show-header="false" />
         </div>
       </div>
@@ -404,10 +404,11 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   border-bottom: 2px solid #3b82f6;
 }
 
-.editor-content {
+.editor-content-wrapper {
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  position: relative;
 }
 
 .resize-handle {
