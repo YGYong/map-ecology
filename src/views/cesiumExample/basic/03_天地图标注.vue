@@ -41,7 +41,7 @@ const initMap = () => {
     url:
       "http://{s}.tianditu.gov.cn/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&tileMatrix={TileMatrix}&tileRow={TileRow}&tileCol={TileCol}&style=default&format=tiles&tk=" +
       token,
-    layer: "img",
+    layer: "cia",
     style: "default",
     format: "tiles",
     tileMatrixSetID: "w",

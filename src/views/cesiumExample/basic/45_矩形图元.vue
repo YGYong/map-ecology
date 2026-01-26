@@ -64,7 +64,7 @@ onMounted(async () => {
   });
 
   viewer.scene.primitives.add(primitive);
-  viewer.camera.flyTo({
+  viewer.camera.setView({
     destination: Cesium.Rectangle.fromDegrees(116.3, 39.8, 116.5, 40.19),
     orientation: {
       heading: Cesium.Math.toRadians(0),

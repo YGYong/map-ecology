@@ -1,4 +1,5 @@
 import * as Cesium from "cesium";
+import { resolveRuntimeAsset } from "./runtimeAssetMap";
 
 export class CodeExecutor {
   constructor(viewer) {
@@ -8,6 +9,7 @@ export class CodeExecutor {
     this.sandboxRoot = null;
     this.originalViewerParent = null;
     this.originalViewerNextSibling = null;
+    this.initialTerrainProvider = viewer?.terrainProvider ?? null;
   }
 
   async execute(parsed) {
@@ -16,6 +18,7 @@ export class CodeExecutor {
       this.cleanup();
 
       let { script, template, style } = parsed;
+      const fileName = parsed?.fileName || "";
 
       // 1. Process Style
       if (style) {
@@ -56,6 +59,7 @@ export class CodeExecutor {
         console: window.console,
         document: window.document,
         window: window,
+        __resolveAsset: (importPath) => resolveRuntimeAsset(fileName, importPath),
         ref: (val) => ({ value: val }),
         reactive: (obj) => obj,
         onMounted: (fn) => {
@@ -85,6 +89,7 @@ export class CodeExecutor {
 
       // 5. Process Script
       if (script) {
+        script = this.transformAssetImports(script);
         script = script.replace(/import\s+.*?from\s+['"].*?['"];?\s*/g, "");
         script = script.replace(/import\s+['"].*?['"];?\s*/g, "");
         script = script.replace(/export\s+(default\s+)?/g, "");
@@ -93,10 +98,7 @@ export class CodeExecutor {
           /\b(let|const|var)\s+viewer\s*=\s*(?:ref\s*\(\s*null\s*\)|null)\s*;?\s*/g,
           "",
         );
-        script = script.replace(
-          /\b(let|const|var)\s+cesiumContainer\s*=\s*ref\s*\(\s*null\s*\)\s*;?\s*/g,
-          "",
-        );
+        script = this.stripTemplateRefDeclarations(script, Object.keys(context.refs));
 
         // Transform variables
         script = script.replace(
@@ -144,8 +146,39 @@ export class CodeExecutor {
     }
   }
 
+  transformAssetImports(script) {
+    const assetExtRe = /\.(png|jpe?g|gif|webp|svg|bmp|tiff?|ktx2|glb|gltf|json|bin)(\?.*)?$/i;
+    const importRe =
+      /^\s*import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"]\s*;?\s*$/gm;
+
+    return script.replace(importRe, (full, varName, importPath) => {
+      if (!assetExtRe.test(importPath)) return "";
+      return `this.${varName} = __resolveAsset(${JSON.stringify(importPath)});`;
+    });
+  }
+
+  stripTemplateRefDeclarations(script, refNames) {
+    if (!Array.isArray(refNames) || refNames.length === 0) return script;
+
+    const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let result = script;
+
+    refNames.forEach((refName) => {
+      const name = escapeRegExp(refName);
+      const re = new RegExp(
+        `\\b(let|const|var)\\s+${name}\\s*=\\s*(?:ref\\s*\\(\\s*null\\s*\\)|ref\\s*\\(\\s*\\)|null)\\s*;?\\s*`,
+        "g",
+      );
+      result = result.replace(re, "");
+    });
+
+    return result;
+  }
+
   applyConfigToViewer(config) {
     if (!this.viewer || !this.viewer.container) return;
+
+    this.applyTerrainToViewer(config);
 
     const selectorMap = this.getWidgetSelectorMap();
     const findElement = (selectors) => {
@@ -172,6 +205,40 @@ export class CodeExecutor {
 
     if (config.baseLayer === false) {
       this.viewer.imageryLayers.removeAll();
+    }
+  }
+
+  applyTerrainToViewer(config) {
+    if (!this.viewer) return;
+
+    const hasTerrainProviderKey = Object.prototype.hasOwnProperty.call(
+      config,
+      "terrainProvider",
+    );
+    const hasTerrainKey = Object.prototype.hasOwnProperty.call(config, "terrain");
+
+    if (!hasTerrainProviderKey && !hasTerrainKey) return;
+
+    try {
+      if (hasTerrainProviderKey) {
+        if (config.terrainProvider === false || config.terrainProvider === null) {
+          if (Cesium.EllipsoidTerrainProvider) {
+            this.viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+          }
+        } else if (config.terrainProvider) {
+          this.viewer.terrainProvider = config.terrainProvider;
+        }
+      }
+
+      if (hasTerrainKey) {
+        if (this.viewer.terrain !== undefined) {
+          this.viewer.terrain = config.terrain;
+        } else if (config.terrain && config.terrain.provider) {
+          this.viewer.terrainProvider = config.terrain.provider;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to apply terrain config:", e);
     }
   }
 
@@ -328,6 +395,10 @@ export class CodeExecutor {
 
     // Reset Viewer State
     if (this.viewer) {
+      if (this.initialTerrainProvider && this.viewer.terrainProvider) {
+        this.viewer.terrainProvider = this.initialTerrainProvider;
+      }
+
       const selectorMap = this.getWidgetSelectorMap();
       Object.values(selectorMap).forEach((selectors) => {
         selectors.forEach((selector) => {

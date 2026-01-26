@@ -40,7 +40,7 @@ onMounted(async () => {
     destination: Cesium.Cartesian3.fromDegrees(116.3911, 39.9067, 500),
     orientation: {
       heading: Cesium.Math.toRadians(0),
-      pitch: Cesium.Math.toRadians(-90),
+      pitch: Cesium.Math.toRadians(-30),
       roll: Cesium.Math.toRadians(0),
     },
   });

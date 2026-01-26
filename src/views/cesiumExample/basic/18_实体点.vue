@@ -30,13 +30,13 @@ onMounted(() => {
 
   // 添加实体
   const pointEntity = viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075, 50),
+    position: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075, 10),
     point: {
       color: Cesium.Color.RED.withAlpha(0.8), // 80%不透明的红色
       pixelSize: 20, // 直径20像素
       outlineColor: Cesium.Color.WHITE, // 白色轮廓
       outlineWidth: 3, // 轮廓宽度3像素
-      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND, // 贴地显示
+      // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND, // 贴地显示
     },
   });
   viewer.zoomTo(pointEntity); // 缩放到实体位置
@@ -60,7 +60,7 @@ onMounted(() => {
   // 相机距离 100-5000 米之间显示点
   pointEntity.point.distanceDisplayCondition =
     new Cesium.DistanceDisplayCondition(
-      100, // 最小可见距离（米）
+      10, // 最小可见距离（米）
       5000 // 最大可见距离（米）
     );
 });

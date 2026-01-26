@@ -1,5 +1,5 @@
 // Vue SFC 解析器
-export function parseSFC(code) {
+export function parseSFC(code, options = {}) {
   const errors = []
   
   try {
@@ -27,6 +27,7 @@ export function parseSFC(code) {
       script: scriptContent.trim(),
       template: templateContent.trim(),
       style: styleContent.trim(),
+      fileName: options.fileName || '',
       errors
     }
   } catch (error) {
@@ -40,6 +41,7 @@ export function parseSFC(code) {
       script: '',
       template: '',
       style: '',
+      fileName: options.fileName || '',
       errors
     }
   }

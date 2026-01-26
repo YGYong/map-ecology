@@ -5,12 +5,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
-import mx from "./skyBox/tycho2t3_80_mx.jpg";
-import my from "./skyBox/tycho2t3_80_my.jpg";
-import mz from "./skyBox/tycho2t3_80_mz.jpg";
-import px from "./skyBox/tycho2t3_80_px.jpg";
-import py from "./skyBox/tycho2t3_80_py.jpg";
-import pz from "./skyBox/tycho2t3_80_pz.jpg";
+import mx from "./imgs/tycho2t3_80_mx.jpg";
+import my from "./imgs/tycho2t3_80_my.jpg";
+import mz from "./imgs/tycho2t3_80_mz.jpg";
+import px from "./imgs/tycho2t3_80_px.jpg";
+import py from "./imgs/tycho2t3_80_py.jpg";
+import pz from "./imgs/tycho2t3_80_pz.jpg";
 const cesiumContainer = ref(null);
 let viewer = null;
 

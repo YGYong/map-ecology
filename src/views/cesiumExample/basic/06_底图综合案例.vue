@@ -11,12 +11,12 @@
 
 <script setup>
 import { ref, onMounted, reactive } from "vue";
-import img from "@/assets/earthbump1k.jpg";
+import img from "./imgs/earthbump1k.jpg";
 import * as Cesium from "cesium";
 
 const cesiumContainer = ref(null);
 const currentMap = ref("tianditu");
-const viewer = ref(null);
+let viewer = null;
 const imageryLayers = reactive({
   tianditu: [], // 天地图图层数组
   gaode: [], // 高德图层数组
@@ -25,11 +25,9 @@ const imageryLayers = reactive({
 
 onMounted(() => {
   // 初始化Viewer时不加载任何底图
-  viewer.value = new Cesium.Viewer(cesiumContainer.value, {
+  viewer = new Cesium.Viewer(cesiumContainer.value, {
     baseLayer: false,
     baseLayerPicker: false,
-    timeline: false,
-    animation: false,
   });
   loadAllMaps(); // 预加载所有底图
 });
@@ -88,7 +86,7 @@ const loadAllMaps = async () => {
   // 将所有图层添加到viewer，但默认隐藏
   Object.values(imageryLayers).forEach((layerArray) => {
     layerArray.forEach((layer) => {
-      viewer.value.imageryLayers.add(layer);
+      viewer.imageryLayers.add(layer);
       layer.show = false; // 默认隐藏所有图层
     });
   });
@@ -100,7 +98,7 @@ const loadAllMaps = async () => {
 // 切换底图显示
 const switchMap = (mapType) => {
   // 隐藏所有图层
-  viewer.value.imageryLayers._layers.forEach((layer) => {
+  viewer.imageryLayers._layers.forEach((layer) => {
     layer.show = false;
   });
 
@@ -108,7 +106,7 @@ const switchMap = (mapType) => {
   if (imageryLayers[mapType]) {
     imageryLayers[mapType].forEach((layer) => {
       layer.show = true;
-      viewer.value.render();
+      viewer.render();
     });
   }
 
@@ -117,16 +115,18 @@ const switchMap = (mapType) => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .map-switcher {
   position: relative;
   height: 100%;
   width: 100%;
 }
+
 .container {
   width: 100%;
   height: 100%;
 }
+
 .map-buttons {
   position: absolute;
   top: 20px;
@@ -134,10 +134,29 @@ const switchMap = (mapType) => {
   z-index: 1;
   display: flex;
   gap: 10px;
+
   button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.25s;
     width: 140px;
     background-color: #f0f0f0;
     color: #000;
   }
+
+  button:hover {
+    border-color: #646cff;
+  }
+
+  button:focus,
+  button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+
 }
 </style>

@@ -5,7 +5,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
-import img from "@/assets/earthbump1k.jpg";
+import img from "./imgs/earthbump1k.jpg";
 const cesiumContainer = ref(null);
 let viewer = null;
 

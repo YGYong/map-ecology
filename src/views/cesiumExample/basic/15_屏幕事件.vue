@@ -55,7 +55,7 @@ onMounted(() => {
     id: "circle",
     name: "circle",
     description: "This is circle",
-    position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883),
+    position: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075, 0),
     ellipse: {
       semiMajorAxis: 1000,
       semiMinorAxis: 1000,

@@ -70,7 +70,7 @@ onMounted(async () => {
   viewer.scene.primitives.add(rectanglePrimitive);
   // 定位
   viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075, 5000), // 设置初始视角
+    destination: Cesium.Cartesian3.fromDegrees(116.4075, 39.9175, 5000), // 设置初始视角
   });
 });
 

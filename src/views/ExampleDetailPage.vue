@@ -170,7 +170,7 @@ async function runCode() {
   isRunning.value = true
   
   try {
-    const parsed = parseSFC(code.value)
+    const parsed = parseSFC(code.value, { fileName: currentExample.value?.fileName || '' })
     
     if (parsed.errors && parsed.errors.length > 0) {
       const parseError = parsed.errors[0]

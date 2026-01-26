@@ -23,19 +23,18 @@ onMounted(() => {
     timeline: false, // 关闭时间轴
     fullscreenButton: false, // 关闭全屏按钮
     baseLayer: false, // 关闭默认地图
-    shouldAnimate: true, // 添加模型动画
   });
   // 清空logo
   viewer.cesiumWidget.creditContainer.style.display = "none";
   initMap();
 
   const label = viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075, 50),
+    position: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075),
     label: {
       text: "Hello World", // 标签文本
       font: "30px sans-serif", // 字体
       style: Cesium.LabelStyle.FILL, // 样式
-      fillColor: Cesium.Color.WHITE, // 填充颜色
+      fillColor: Cesium.Color.RED, // 填充颜色
       outlineColor: Cesium.Color.BLACK, // 轮廓颜色
       outlineWidth: 2, // 轮廓宽度
       scale: 1.0, // 缩放比例

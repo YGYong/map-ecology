@@ -9,9 +9,9 @@ const cesiumContainer = ref(null);
 let viewer = null;
 
 // 天地图TOKEN
-const token = "05be06461004055923091de7f3e51aa6";
+const token = "2b34f6afbcd235c2bc4bed3f7735f1f5";
 
-onMounted(async () => {
+onMounted(() => {
   // 初始化Viewer
   viewer = new Cesium.Viewer(cesiumContainer.value, {
     geocoder: false, // 关闭地理编码搜索
@@ -28,27 +28,35 @@ onMounted(async () => {
   viewer.cesiumWidget.creditContainer.style.display = "none";
   initMap();
 
-  // 模拟一个GeoJson数据
-  const geojson = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: {
-          name: "City A",
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [116.404, 39.915],
-        },
-      },
-    ],
-  };
+  // 异步加载中国GeoJson数据
+  const geoJsonData = Cesium.GeoJsonDataSource.load(
+    "https://geojson.cn/api/china/1.6.2/china.json",
+    {
+      stroke: Cesium.Color.SKYBLUE, // 边框颜色
+      fill: Cesium.Color.PINK, // 填充颜色
+      strokeWidth: 3, // 边框宽度
+    }
+  );
 
-  // 加载GeoJson数据
-  const dataSource = await Cesium.GeoJsonDataSource.load(geojson);
-  viewer.dataSources.add(dataSource);
-  viewer.flyTo(dataSource);
+  // 将数据源添加到Viewer中
+  geoJsonData.then((dataSource) => {
+    viewer.dataSources.add(dataSource);
+    // 遍历所有实体
+    dataSource.entities.values.forEach((entity) => {
+      if (entity.polygon) {
+        // 设置随机颜色
+        entity.polygon.material = new Cesium.ColorMaterialProperty(
+          Cesium.Color.fromRandom({
+            alpha: 0.8, // 设置透明度
+          })
+        );
+        // 区域随机拉伸高度
+        entity.polygon.extrudedHeight = Math.random() * 100000;
+      }
+    });
+    // 设置视图范围
+    viewer.zoomTo(dataSource);
+  });
 });
 
 // 加载天地图
