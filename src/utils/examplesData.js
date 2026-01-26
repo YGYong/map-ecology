@@ -258,13 +258,6 @@ export const examples = [
     category: 14,
     preview: "@/assets/cesiumImg/47_添加模型.png",
   },
-  {
-    id: 52,
-    name: "3DTiles加载状态监听",
-    fileName: "cesiumExample/basic/52_3DTiles加载状态监听.vue",
-    category: 14,
-    preview: "@/assets/cesiumImg/52_3DTiles加载状态监听.png",
-  },
 
   // 1.5 材质与外观
   {

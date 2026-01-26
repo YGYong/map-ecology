@@ -29,7 +29,7 @@ onMounted(async () => {
 
   // 添加3D Tileset
   const tileset = await Cesium.Cesium3DTileset.fromUrl(
-    new URL("./models/Tileset/tileset.json", import.meta.url).href,
+    new URL("/models/Tileset/tileset.json", window.location.href).href,
     {
       maximumScreenSpaceError: 16, // 最大屏幕空间误差
       maximumCacheOverflowBytes: 536870912, // 最大缓存溢出字节数

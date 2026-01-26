@@ -5,7 +5,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
-import jiangsu from "./models/jiangsu.json";
 const cesiumContainer = ref(null);
 let viewer = null;
 
@@ -31,7 +30,7 @@ onMounted(() => {
 
   // 区域掩膜
   const geoJsonData = new Cesium.GeoJsonDataSource().load(
-    jiangsu,
+    new URL("/models/jiangsu.json", window.location.href).href,
     {
       stroke: Cesium.Color.SKYBLUE, // 边框颜色
       fill: Cesium.Color.fromAlpha(Cesium.Color.WHITE, 0), // 填充颜色

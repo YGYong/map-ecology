@@ -30,7 +30,7 @@ onMounted(() => {
 
   viewer.dataSources.add(
     Cesium.KmlDataSource.load(
-      new URL("./models/kml/gdpPerCapita2008.kmz", import.meta.url).href,
+      new URL("/models/kml/gdpPerCapita2008.kmz", window.location.href).href,
       {
         camera: viewer.scene.camera,
         canvas: viewer.scene.canvas,
