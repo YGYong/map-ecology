@@ -25,6 +25,7 @@ import 'codemirror/addon/fold/xml-fold';
 import 'codemirror/addon/fold/indent-fold';
 import 'codemirror/addon/fold/markdown-fold';
 import 'codemirror/addon/fold/comment-fold';
+import 'codemirror/addon/comment/comment';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
@@ -150,6 +151,8 @@ function initEditor() {
     extraKeys: {
       'Ctrl-S': () => { runCode(); return false; },
       'Cmd-S': () => { runCode(); return false; },
+      'Ctrl-/': (cm) => { toggleLineComment(cm); return false; },
+      'Cmd-/': (cm) => { toggleLineComment(cm); return false; },
       'Ctrl-Space': 'autocomplete',
       'Tab': (cm) => {
         if (cm.somethingSelected()) {
@@ -201,6 +204,60 @@ function initEditor() {
   setTimeout(() => {
     if (editor) editor.refresh();
   }, 100);
+}
+
+function toggleLineComment(cm) {
+  const selections = cm.listSelections()
+  let startLine = Infinity
+  let endLine = -Infinity
+
+  selections.forEach(sel => {
+    const a = sel.anchor
+    const h = sel.head
+    const from = Math.min(a.line, h.line)
+    const to = Math.max(a.line, h.line)
+    startLine = Math.min(startLine, from)
+    endLine = Math.max(endLine, to)
+  })
+
+  if (!Number.isFinite(startLine) || !Number.isFinite(endLine) || endLine < startLine) return
+
+  if (cm.somethingSelected()) {
+    const lastSel = selections[selections.length - 1]
+    const a = lastSel.anchor
+    const h = lastSel.head
+    const fromLine = Math.min(a.line, h.line)
+    const toLine = Math.max(a.line, h.line)
+    const lastLineCh = (a.line === toLine ? a.ch : h.ch)
+    if (fromLine !== toLine && lastLineCh === 0) {
+      endLine = Math.max(startLine, endLine - 1)
+    }
+  }
+
+  const lines = []
+  for (let line = startLine; line <= endLine; line++) {
+    const text = cm.getLine(line)
+    if (text.trim().length === 0) continue
+    lines.push({ line, text })
+  }
+
+  if (lines.length === 0) return
+
+  const allCommented = lines.every(({ text }) => /^\s*\/\//.test(text))
+
+  cm.operation(() => {
+    lines.forEach(({ line, text }) => {
+      if (allCommented) {
+        const next = text.replace(/^(\s*)\/\/\s?/, '$1')
+        cm.replaceRange(next, { line, ch: 0 }, { line, ch: text.length })
+      } else {
+        const indentMatch = text.match(/^(\s*)/)
+        const indent = indentMatch ? indentMatch[1] : ''
+        const next = `${indent}// ${text.slice(indent.length)}`
+        cm.replaceRange(next, { line, ch: 0 }, { line, ch: text.length })
+      }
+    })
+  })
 }
 
 function cesiumHint(cm) {
