@@ -29,6 +29,13 @@ export const categories = [
 export const examples = [
   // 1.1 地图与影像
   {
+    id: 1,
+    name: "默认地图",
+    fileName: "cesiumExample/basic/01_初始化.vue",
+    category: 11,
+    preview: "@/assets/cesiumImg/01_默认地图.png",
+  },
+  {
     id: 2,
     name: "天地图影像",
     fileName: "cesiumExample/basic/02_天地图影像.vue",

@@ -158,6 +158,13 @@ export class CodeExecutor {
 
     Object.keys(selectorMap).forEach((key) => {
       if (config[key] === undefined) return;
+      if (key === "baseLayerPicker") {
+        const { button, dropDown } = this.getBaseLayerPickerElements();
+        const display = config[key] === false ? "none" : "";
+        if (button) button.style.display = display;
+        if (dropDown) dropDown.style.display = display;
+        return;
+      }
       const el = findElement(selectorMap[key]);
       if (!el) return;
       el.style.display = config[key] === false ? "none" : "";
@@ -182,9 +189,7 @@ export class CodeExecutor {
         ".cesium-sceneModePicker",
       ],
       baseLayerPicker: [
-        ".cesium-baseLayerPicker-wrapper",
         ".cesium-baseLayerPicker-dropDown",
-        ".cesium-baseLayerPickerDropDown",
       ],
       navigationHelpButton: [
         ".cesium-navigationHelpButton-wrapper",
@@ -202,6 +207,17 @@ export class CodeExecutor {
         ".cesium-fullscreen-button",
       ],
     };
+  }
+
+  getBaseLayerPickerElements() {
+    const dropDown = this.viewer.container.querySelector(
+      ".cesium-baseLayerPicker-dropDown",
+    );
+    const img = this.viewer.container.querySelector(
+      ".cesium-baseLayerPicker-selected",
+    );
+    const button = img ? img.closest("button") : null;
+    return { button, dropDown };
   }
 
   processStyle(style) {
@@ -319,6 +335,11 @@ export class CodeExecutor {
           if (el) el.style.display = "";
         });
       });
+
+      const { button, dropDown } = this.getBaseLayerPickerElements();
+      if (button) button.style.display = "";
+      if (dropDown) dropDown.style.display = "";
+
       if (
         this.viewer.cesiumWidget &&
         this.viewer.cesiumWidget.creditContainer
