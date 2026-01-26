@@ -1,16 +1,13 @@
 <template>
   <div class="code-editor">
-    <div v-if="showHeader" class="editor-header flex justify-between items-center p-2 bg-gray-800 border-b border-gray-700">
-      <h3 class="font-semibold text-white">代码编辑器</h3>
-      <el-button size="small" type="primary" @click="runCode">运行代码</el-button>
-    </div>
-    <div class="editor-content" ref="editorContent" :class="{ 'h-full': !showHeader }">
+    <div class="editor-content" ref="editorContent">
       <textarea ref="textarea" v-model="code"></textarea>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
@@ -34,211 +31,241 @@ import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/selection/active-line';
 
-export default {
-  name: 'CodeEditor',
-  props: {
-    modelValue: {
-      type: String,
-      default: ''
-    },
-    showHeader: {
-      type: Boolean,
-      default: true
-    }
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: ''
   },
-  data() {
-    return {
-      code: this.modelValue,
-      editor: null,
-      resizeObserver: null,
-      // Cesium API keywords for autocomplete
-      cesiumKeywords: [
-        'Cesium', 'Viewer', 'Entity', 'Cartesian3', 'Cartesian2', 'Color',
-        'HeadingPitchRoll', 'Transforms', 'Math', 'Camera', 'Scene',
-        'ImageryLayer', 'Terrain', 'DataSource', 'GeoJsonDataSource',
-        'CzmlDataSource', 'KmlDataSource', 'EntityCollection', 'Billboard',
-        'Label', 'Point', 'Polyline', 'Polygon', 'Model', 'Primitive',
-        'GroundPrimitive', 'ClassificationPrimitive', 'PointPrimitive',
-        'BillboardCollection', 'LabelCollection', 'PolylineCollection',
-        'PrimitiveCollection', 'Material', 'Appearance', 'GeometryInstance',
-        'BoxGeometry', 'CircleGeometry', 'CorridorGeometry', 'CylinderGeometry',
-        'EllipseGeometry', 'EllipsoidGeometry', 'PolygonGeometry', 'PolylineGeometry',
-        'RectangleGeometry', 'SphereGeometry', 'WallGeometry', 'Ion',
-        'IonResource', 'Resource', 'RequestScheduler', 'TileMapServiceImageryProvider',
-        'UrlTemplateImageryProvider', 'WebMapServiceImageryProvider',
-        'WebMapTileServiceImageryProvider', 'ArcGisMapServerImageryProvider',
-        'BingMapsImageryProvider', 'GoogleEarthEnterpriseMapsProvider',
-        'MapboxImageryProvider', 'MapboxStyleImageryProvider', 'OpenStreetMapImageryProvider',
-        'SingleTileImageryProvider', 'TileCoordinatesImageryProvider',
-        'CesiumTerrainProvider', 'EllipsoidTerrainProvider', 'VRTheWorldTerrainProvider',
-        'GoogleEarthEnterpriseTerrainProvider', 'ArcGISTiledElevationTerrainProvider',
-        'Clock', 'Timeline', 'Animation', 'BaseLayerPicker', 'FullscreenButton',
-        'Geocoder', 'HomeButton', 'InfoBox', 'NavigationHelpButton',
-        'SceneModePicker', 'SelectionIndicator', 'VRButton', 'ScreenSpaceEventHandler',
-        'ScreenSpaceEventType', 'KeyboardEventModifier', 'Matrix3', 'Matrix4',
-        'Quaternion', 'Rectangle', 'BoundingSphere', 'OrientedBoundingBox',
-        'Plane', 'Ray', 'Ellipsoid', 'GeographicProjection', 'WebMercatorProjection',
-        'JulianDate', 'TimeInterval', 'TimeIntervalCollection', 'ClockRange',
-        'ClockStep', 'Iso8601', 'LeapSecond', 'TimeStandard', 'CallbackProperty',
-        'CompositeProperty', 'ConstantProperty', 'PropertyBag', 'SampledProperty',
-        'TimeIntervalCollectionProperty', 'VelocityOrientationProperty',
-        'PositionPropertyArray', 'PropertyArray', 'ReferenceProperty'
-      ]
-    }
-  },
-  watch: {
-    modelValue(newValue) {
-      this.code = newValue;
-      if (this.editor) {
-        const currentValue = this.editor.getValue();
-        if (currentValue !== newValue) {
-          const cursor = this.editor.getCursor();
-          this.editor.setValue(newValue);
-          this.editor.setCursor(cursor);
-        }
-      }
-    }
-  },
-  mounted() {
-    this.initEditor();
-  },
-  beforeUnmount() {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
-    
-    if (this.editor) {
-      try {
-        const element = this.editor.getWrapperElement();
-        if (element && element.remove) {
-          element.remove();
-        }
-        this.editor.toTextArea();
-        this.editor = null;
-      } catch (error) {
-        console.warn('Error cleaning up CodeMirror:', error);
-      }
-    }
-  },
-  methods: {
-    initEditor() {
-      // Ensure textarea exists
-      if (!this.$refs.textarea) return;
+  showHeader: {
+    type: Boolean,
+    default: true
+  }
+});
 
-      this.editor = CodeMirror.fromTextArea(this.$refs.textarea, {
-        mode: 'htmlmixed',
-        theme: 'dracula',
-        lineNumbers: true,
-        lineWrapping: false, // Disable wrapping to prevent height calculation issues
-        autoCloseBrackets: true,
-        matchBrackets: false, // Disable to avoid runtime errors
-        foldGutter: true,
-        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-        tabSize: 2,
-        indentUnit: 2,
-        indentWithTabs: false,
-        styleActiveLine: true,
-        viewportMargin: Infinity, // Ensure content is rendered
-        extraKeys: {
-          'Ctrl-S': () => { this.runCode(); return false; },
-          'Cmd-S': () => { this.runCode(); return false; },
-          'Ctrl-Space': 'autocomplete',
-          'Tab': (cm) => {
-            if (cm.somethingSelected()) {
-              cm.indentSelection('add');
-            } else {
-              cm.replaceSelection(cm.getOption('indentWithTabs') ? '\t' : 
-                Array(cm.getOption('indentUnit') + 1).join(' '), 'end', '+input');
-            }
-          }
-        },
-        hintOptions: {
-          completeSingle: false,
-          hint: this.cesiumHint
-        }
-      });
+const emit = defineEmits(['update:modelValue', 'run', 'syntaxCheck']);
 
-      // Update code when editor changes
-      this.editor.on('change', () => {
-        this.code = this.editor.getValue();
-        this.$emit('update:modelValue', this.code);
-      });
+const code = ref(props.modelValue);
+const textarea = ref(null);
+const editorContent = ref(null);
 
-      // Enable autocomplete
-      this.editor.on('inputRead', (cm, change) => {
-        if (change.text[0].match(/[a-zA-Z.]/)) {
-          CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
-        }
-      });
+let editor = null;
+let resizeObserver = null;
+let syntaxCheckTimer = null;
 
-      // Set up ResizeObserver to handle layout changes
-      if (this.$refs.editorContent && window.ResizeObserver) {
-        this.resizeObserver = new ResizeObserver(() => {
-          if (this.editor) {
-            // Use requestAnimationFrame to avoid "ResizeObserver loop limit exceeded"
-            requestAnimationFrame(() => {
-              this.editor.refresh();
-            });
-          }
-        });
-        this.resizeObserver.observe(this.$refs.editorContent);
-      }
-      
-      // Initial refresh
-      setTimeout(() => {
-        if (this.editor) this.editor.refresh();
-      }, 100);
-    },
-    
-    // Custom hint function for Cesium API autocomplete
-    cesiumHint(cm) {
-      const cursor = cm.getCursor();
-      const token = cm.getTokenAt(cursor);
-      const start = token.start;
-      const end = cursor.ch;
-      const line = cursor.line;
-      const currentWord = token.string;
-      const lineText = cm.getLine(line).substring(0, end);
-      
-      const cesiumMatch = lineText.match(/Cesium\.(\w*)$/);
-      const viewerMatch = lineText.match(/viewer\.(\w*)$/);
-      
-      let list = [];
-      
-      if (cesiumMatch) {
-        const prefix = cesiumMatch[1].toLowerCase();
-        list = this.cesiumKeywords
-          .filter(keyword => keyword !== 'Cesium' && keyword.toLowerCase().startsWith(prefix))
-          .map(k => ({ text: k, displayText: k, className: 'cesium-hint' }));
-      } else if (viewerMatch) {
-        const viewerProps = ['scene', 'camera', 'entities', 'dataSources', 'canvas', 'zoomTo', 'flyTo', 'destroy', 'render'];
-        const prefix = viewerMatch[1].toLowerCase();
-        list = viewerProps
-          .filter(p => p.toLowerCase().startsWith(prefix))
-          .map(p => ({ text: p, displayText: p, className: 'viewer-hint' }));
-      } else if (currentWord && currentWord.length > 0) {
-        const prefix = currentWord.toLowerCase();
-        list = this.cesiumKeywords
-          .filter(k => k.toLowerCase().startsWith(prefix))
-          .map(k => ({ text: k, displayText: k, className: 'cesium-hint' }));
-      }
+const cesiumKeywords = [
+  'Cesium', 'Viewer', 'Entity', 'Cartesian3', 'Cartesian2', 'Color',
+  'HeadingPitchRoll', 'Transforms', 'Math', 'Camera', 'Scene',
+  'ImageryLayer', 'Terrain', 'DataSource', 'GeoJsonDataSource',
+  'CzmlDataSource', 'KmlDataSource', 'EntityCollection', 'Billboard',
+  'Label', 'Point', 'Polyline', 'Polygon', 'Model', 'Primitive',
+  'GroundPrimitive', 'ClassificationPrimitive', 'PointPrimitive',
+  'BillboardCollection', 'LabelCollection', 'PolylineCollection',
+  'PrimitiveCollection', 'Material', 'Appearance', 'GeometryInstance',
+  'BoxGeometry', 'CircleGeometry', 'CorridorGeometry', 'CylinderGeometry',
+  'EllipseGeometry', 'EllipsoidGeometry', 'PolygonGeometry', 'PolylineGeometry',
+  'RectangleGeometry', 'SphereGeometry', 'WallGeometry', 'Ion',
+  'IonResource', 'Resource', 'RequestScheduler', 'TileMapServiceImageryProvider',
+  'UrlTemplateImageryProvider', 'WebMapServiceImageryProvider',
+  'WebMapTileServiceImageryProvider', 'ArcGisMapServerImageryProvider',
+  'BingMapsImageryProvider', 'GoogleEarthEnterpriseMapsProvider',
+  'MapboxImageryProvider', 'MapboxStyleImageryProvider', 'OpenStreetMapImageryProvider',
+  'SingleTileImageryProvider', 'TileCoordinatesImageryProvider',
+  'CesiumTerrainProvider', 'EllipsoidTerrainProvider', 'VRTheWorldTerrainProvider',
+  'GoogleEarthEnterpriseTerrainProvider', 'ArcGISTiledElevationTerrainProvider',
+  'Clock', 'Timeline', 'Animation', 'BaseLayerPicker', 'FullscreenButton',
+  'Geocoder', 'HomeButton', 'InfoBox', 'NavigationHelpButton',
+  'SceneModePicker', 'SelectionIndicator', 'VRButton', 'ScreenSpaceEventHandler',
+  'ScreenSpaceEventType', 'KeyboardEventModifier', 'Matrix3', 'Matrix4',
+  'Quaternion', 'Rectangle', 'BoundingSphere', 'OrientedBoundingBox',
+  'Plane', 'Ray', 'Ellipsoid', 'GeographicProjection', 'WebMercatorProjection',
+  'JulianDate', 'TimeInterval', 'TimeIntervalCollection', 'ClockRange',
+  'ClockStep', 'Iso8601', 'LeapSecond', 'TimeStandard', 'CallbackProperty',
+  'CompositeProperty', 'ConstantProperty', 'PropertyBag', 'SampledProperty',
+  'TimeIntervalCollectionProperty', 'VelocityOrientationProperty',
+  'PositionPropertyArray', 'PropertyArray', 'ReferenceProperty'
+];
 
-      if (list.length === 0 && CodeMirror.hint.javascript) {
-        return CodeMirror.hint.javascript(cm);
-      }
-
-      return {
-        list: list,
-        from: CodeMirror.Pos(line, start),
-        to: CodeMirror.Pos(line, end)
-      };
-    },
-    
-    runCode() {
-      this.$emit('run', this.code);
+watch(() => props.modelValue, (newValue) => {
+  code.value = newValue;
+  if (editor) {
+    const currentValue = editor.getValue();
+    if (currentValue !== newValue) {
+      const cursor = editor.getCursor();
+      editor.setValue(newValue);
+      editor.setCursor(cursor);
     }
   }
+});
+
+onMounted(() => {
+  initEditor();
+});
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
+
+  if (syntaxCheckTimer) {
+    clearTimeout(syntaxCheckTimer);
+    syntaxCheckTimer = null;
+  }
+
+  if (editor) {
+    try {
+      // 移除所有事件监听器
+      editor.off('change');
+      editor.off('inputRead');
+
+      const element = editor.getWrapperElement();
+      if (element && element.remove) {
+        element.remove();
+      }
+      editor.toTextArea();
+      editor = null;
+    } catch (error) {
+      console.warn('Error cleaning up CodeMirror:', error);
+    }
+  }
+});
+
+function initEditor() {
+  if (!textarea.value) return;
+
+  editor = CodeMirror.fromTextArea(textarea.value, {
+    mode: 'htmlmixed',
+    theme: 'dracula',
+    lineNumbers: true,
+    lineWrapping: true,
+    autoCloseBrackets: true,
+    matchBrackets: false,
+    foldGutter: true,
+    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+    tabSize: 2,
+    indentUnit: 2,
+    indentWithTabs: false,
+    styleActiveLine: true,
+    viewportMargin: Infinity,
+    extraKeys: {
+      'Ctrl-S': () => { runCode(); return false; },
+      'Cmd-S': () => { runCode(); return false; },
+      'Ctrl-Space': 'autocomplete',
+      'Tab': (cm) => {
+        if (cm.somethingSelected()) {
+          cm.indentSelection('add');
+        } else {
+          cm.replaceSelection(cm.getOption('indentWithTabs') ? '\t' :
+            Array(cm.getOption('indentUnit') + 1).join(' '), 'end', '+input');
+        }
+      }
+    },
+    hintOptions: {
+      completeSingle: false,
+      hint: cesiumHint
+    }
+  });
+
+  editor.on('change', () => {
+    code.value = editor.getValue();
+    emit('update:modelValue', code.value);
+
+    // Debounce syntax checking
+    if (syntaxCheckTimer) {
+      clearTimeout(syntaxCheckTimer);
+    }
+    syntaxCheckTimer = setTimeout(() => {
+      performSyntaxCheck();
+    }, 300);
+  });
+
+  editor.on('inputRead', (cm, change) => {
+    if (change.text[0].match(/[a-zA-Z.]/)) {
+      CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
+    }
+  });
+
+  // Set up ResizeObserver
+  if (editorContent.value && window.ResizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      if (editor) {
+        requestAnimationFrame(() => {
+          editor.refresh();
+        });
+      }
+    });
+    resizeObserver.observe(editorContent.value);
+  }
+
+  // Initial refresh
+  setTimeout(() => {
+    if (editor) editor.refresh();
+  }, 100);
+}
+
+function cesiumHint(cm) {
+  const cursor = cm.getCursor();
+  const token = cm.getTokenAt(cursor);
+  const start = token.start;
+  const end = cursor.ch;
+  const line = cursor.line;
+  const currentWord = token.string;
+  const lineText = cm.getLine(line).substring(0, end);
+
+  const cesiumMatch = lineText.match(/Cesium\.(\w*)$/);
+  const viewerMatch = lineText.match(/viewer\.(\w*)$/);
+
+  let list = [];
+
+  if (cesiumMatch) {
+    const prefix = cesiumMatch[1].toLowerCase();
+    list = cesiumKeywords
+      .filter(keyword => keyword !== 'Cesium' && keyword.toLowerCase().startsWith(prefix))
+      .map(k => ({ text: k, displayText: k, className: 'cesium-hint' }));
+  } else if (viewerMatch) {
+    const viewerProps = ['scene', 'camera', 'entities', 'dataSources', 'canvas', 'zoomTo', 'flyTo', 'destroy', 'render'];
+    const prefix = viewerMatch[1].toLowerCase();
+    list = viewerProps
+      .filter(p => p.toLowerCase().startsWith(prefix))
+      .map(p => ({ text: p, displayText: p, className: 'viewer-hint' }));
+  } else if (currentWord && currentWord.length > 0) {
+    const prefix = currentWord.toLowerCase();
+    list = cesiumKeywords
+      .filter(k => k.toLowerCase().startsWith(prefix))
+      .map(k => ({ text: k, displayText: k, className: 'cesium-hint' }));
+  }
+
+  if (list.length === 0 && CodeMirror.hint.javascript) {
+    return CodeMirror.hint.javascript(cm);
+  }
+
+  return {
+    list: list,
+    from: CodeMirror.Pos(line, start),
+    to: CodeMirror.Pos(line, end)
+  };
+}
+
+function performSyntaxCheck() {
+  try {
+    const content = code.value;
+    if (content && content.trim()) {
+      const hasTemplate = /<template[^>]*>/.test(content);
+      const hasScript = /<script[^>]*>/.test(content);
+
+      emit('syntaxCheck', {
+        valid: hasTemplate || hasScript,
+        hasTemplate,
+        hasScript
+      });
+    }
+  } catch (error) {
+    console.debug('[CodeEditor] Syntax check error:', error.message);
+  }
+}
+
+function runCode() {
+  emit('run', code.value);
 }
 </script>
 
@@ -262,6 +289,7 @@ export default {
   flex: 1;
   position: relative;
   overflow: hidden;
+  height: calc(100% - 48px);
 }
 
 /* Ensure CodeMirror takes full height of its container */
@@ -291,5 +319,13 @@ export default {
 .editor-content :deep(.CodeMirror-hint-active) {
   background: #44475a !important;
   color: #50fa7b !important;
+}
+
+.editor-content :deep(.cesium-hint) {
+  color: #8be9fd !important;
+}
+
+.editor-content :deep(.viewer-hint) {
+  color: #ff79c6 !important;
 }
 </style>

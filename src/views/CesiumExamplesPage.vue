@@ -10,29 +10,17 @@
         <div class="search-box">
           <el-input placeholder="请输入关键字搜索" size="small" />
         </div>
-        
-        <el-menu
-          :default-openeds="['1']"
-          class="category-menu"
-          :collapse-transition="false"
-        >
-          <el-sub-menu
-            v-for="category in categoriesData"
-            :key="category.id"
-            :index="category.id.toString()"
-          >
+
+        <el-menu :default-openeds="['1']" class="category-menu" :collapse-transition="false">
+          <el-sub-menu v-for="category in categoriesData" :key="category.id" :index="category.id.toString()">
             <template #title>
               <span class="category-icon">{{ category.icon }}</span>
               <span class="category-name">{{ category.name }}</span>
               <span class="category-count">({{ category.count }})</span>
             </template>
-            <el-menu-item
-              v-for="subcategory in category.subcategories"
-              :key="subcategory.id"
-              :index="subcategory.id.toString()"
-              :class="{ active: selectedSubcategory === subcategory.id }"
-              @click="selectSubcategory(subcategory, category)"
-            >
+            <el-menu-item v-for="subcategory in category.subcategories" :key="subcategory.id"
+              :index="subcategory.id.toString()" :class="{ active: selectedSubcategory === subcategory.id }"
+              @click="selectSubcategory(subcategory, category)">
               <span class="subcategory-name">{{ subcategory.name }}</span>
               <span class="subcategory-count">({{ subcategory.count }})</span>
             </el-menu-item>
@@ -51,42 +39,27 @@
 
         <div class="examples-container">
           <!-- 按小专栏分组显示示例 -->
-          <div
-            v-for="category in categoriesData"
-            :key="category.id"
-            class="category-section"
-          >
-            <div
-              v-for="subcategory in category.subcategories"
-              :key="subcategory.id"
-              class="subcategory-section"
-              :id="`subcategory-${subcategory.id}`"
-            >
+          <div v-for="category in categoriesData" :key="category.id" class="category-section">
+            <div v-for="subcategory in category.subcategories" :key="subcategory.id" class="subcategory-section"
+              :id="`subcategory-${subcategory.id}`">
               <h3 class="subcategory-title">
                 <span class="subcategory-icon">{{ category.icon }}</span>
                 {{ subcategory.name }} ({{ getExamplesBySubcategory(subcategory.id).length }})
               </h3>
               <div class="examples-grid">
-                <div
-                  v-for="example in getExamplesBySubcategory(subcategory.id)"
-                  :key="example.id"
-                  class="example-card"
-                  @click="goToExample(example.id)"
-                >
+                <div v-for="example in getExamplesBySubcategory(subcategory.id)" :key="example.id" class="example-card"
+                  @click="goToExample(example.id)">
                   <div class="example-preview">
-                    <img 
-                      :src="example.preview" 
-                      :alt="example.name"
-                      loading="lazy"
-                    />
-                    <div class="example-overlay">
+                    <img :src="getPreviewImage(example.preview)" :alt="example.name" loading="lazy" />
+                    <!-- <div class="example-overlay">
                       <el-button type="primary" circle icon="el-icon-video-camera" size="large" />
-                    </div>
+                    </div> -->
                   </div>
                   <div class="example-info">
-                    <el-descriptions size="small" :column="1" :border="false">
+                    {{ example.name }}
+                    <!-- <el-descriptions size="small" :column="1" :border="false">
                       <el-descriptions-item>{{ example.name }}</el-descriptions-item>
-                    </el-descriptions>
+                    </el-descriptions> -->
                   </div>
                 </div>
               </div>
@@ -105,6 +78,22 @@ import { examples, categories } from '../utils/examplesData'
 import TopNavbar from '../components/TopNavbar.vue'
 
 const router = useRouter()
+
+// 导入所有预览图
+const images = import.meta.glob('../assets/cesiumImg/*.{png,jpg,jpeg,svg}', { eager: true })
+
+// 获取预览图 URL
+function getPreviewImage(path) {
+  if (!path) return ''
+
+  // 处理 @ 别名，将其转换为相对于当前文件的路径
+  // 当前文件在 src/views/，图片在 src/assets/
+  // 所以 @/assets 对应 ../assets
+  const lookupPath = path.replace('@/assets', '../assets')
+
+  const mod = images[lookupPath]
+  return mod ? mod.default : path
+}
 
 // 状态管理
 const selectedCategory = ref(1) // 默认选中"快速开始"分类
@@ -146,7 +135,7 @@ function getExamplesBySubcategory(subcategoryId) {
 function selectSubcategory(subcategory, category) {
   selectedSubcategory.value = subcategory.id
   selectedCategory.value = category.id
-  
+
   // 滚动定位到对应的小专栏
   setTimeout(() => {
     const element = document.getElementById(`subcategory-${subcategory.id}`)
@@ -451,7 +440,7 @@ function goToExample(exampleId) {
     width: 220px;
     min-width: 220px;
   }
-  
+
   .examples-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
@@ -462,26 +451,26 @@ function goToExample(exampleId) {
   .navbar-left {
     gap: 16px;
   }
-  
+
   .main-nav {
     display: none;
   }
-  
+
   .sidebar {
     width: 60px;
     min-width: 60px;
   }
-  
+
   .category-name,
   .category-count {
     display: none;
   }
-  
+
   .category-header {
     justify-content: center;
     padding: 12px 8px;
   }
-  
+
   .examples-grid {
     padding: 16px;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

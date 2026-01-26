@@ -119,9 +119,9 @@ function goToRoute(path) {
 }
 
 .navbar-container {
-  max-width: 1400px;
+  /* max-width: 1400px; */
   height: 100%;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   display: flex;
   justify-content: space-between;
   align-items: center;
