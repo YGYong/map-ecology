@@ -345,12 +345,37 @@ export class CodeExecutor {
 
           el.addEventListener(eventName, (event) => {
             try {
-              // Execute handler in context
+              const exp = String(handlerExpression || "").trim();
+              const treatAsFunctionRef =
+                exp &&
+                !exp.includes("(") &&
+                !exp.includes("=") &&
+                !exp.includes("++") &&
+                !exp.includes("--") &&
+                !exp.includes("?") &&
+                !exp.includes(":");
+
+              if (treatAsFunctionRef) {
+                const getter = new Function(
+                  "$event",
+                  `
+                  with(this) {
+                    return (${exp});
+                  }
+                `,
+                );
+                const fn = getter.call(context, event);
+                if (typeof fn === "function") {
+                  fn.call(context, event);
+                  return;
+                }
+              }
+
               const handler = new Function(
                 "$event",
                 `
                 with(this) {
-                  ${handlerExpression}
+                  ${exp}
                 }
               `,
               );
