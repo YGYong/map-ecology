@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <div ref="mapContainer" style="width: 100vw; height: 100vh"></div>
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
@@ -19,7 +17,14 @@ onMounted(() => {
   });
 
   L.tileLayer(
-    `https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}`
+    `https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}`,
   ).addTo(map);
 });
 </script>
+
+<style scoped>
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+</style>

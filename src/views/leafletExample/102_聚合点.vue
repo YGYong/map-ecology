@@ -5,6 +5,10 @@
 </template>
 
 <script setup>
+/**
+ * 依赖下载
+ * npm install leaflet.markercluster
+ */
 import { onMounted, onUnmounted } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css'; // 聚合插件的CSS

@@ -122,7 +122,7 @@ onMounted(() => {
       maxZoom: 18,
       minZoom: 3,
       attribution: '&copy; <a href="https://www.amap.com/">高德地图</a>',
-    }
+    },
   ).addTo(map);
 
   // 初始化图层组
@@ -225,49 +225,50 @@ const resetMapView = () => {
 
 <style scoped>
 .map-wrapper {
-  display: flex;
-  flex-direction: column; /* 默认垂直布局，小屏幕下控制面板在地图上方 */
-  height: 100vh; /* 占据整个视口高度 */
-  width: 100vw;
+  position: relative;
+  height: 100%;
+  width: 100%;
   font-family: sans-serif;
-  box-sizing: border-box; /* 确保内边距和边框包含在宽度和高度内 */
+  overflow: hidden;
 }
 
-@media (min-width: 768px) {
-  .map-wrapper {
-    flex-direction: row; /* 大屏幕下水平布局，控制面板在左侧 */
-  }
+.map-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: #e0e0e0;
 }
 
 .control-panel {
-  flex-shrink: 0; /* 不压缩 */
-  width: 100%; /* 小屏幕下占满宽度 */
-  background-color: #f8f8f8;
-  border-right: 1px solid #eee;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000; /* Ensure it's above the map */
+  width: 200px;
+  height: 25%;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-@media (min-width: 768px) {
-  .control-panel {
-    width: 250px; /* 大屏幕下固定宽度 */
-    height: 100%; /* 占据整个高度 */
-  }
+  gap: 10px;
 }
 
 .control-panel h2 {
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin: 0 0 10px 0;
   color: #333;
-  font-size: 1.2em;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .control-group label {
@@ -275,30 +276,23 @@ const resetMapView = () => {
   align-items: center;
   cursor: pointer;
   color: #555;
+  font-size: 14px;
 }
 
 .control-group input[type="checkbox"] {
   margin-right: 8px;
-  transform: scale(1.2); /* 放大复选框 */
-}
-
-.map-container {
-  flex-grow: 1; /* 占据剩余空间 */
-  height: 100%; /* 确保地图容器在flex布局中占据高度 */
-  min-height: 300px; /* 最小高度，防止在小屏幕下地图过小 */
-  background-color: #e0e0e0; /* 地图加载前的背景色 */
 }
 
 .reset-button {
-  padding: 10px 15px;
+  padding: 8px 12px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 14px;
   transition: background-color 0.3s ease;
-  margin-top: auto; /* 将按钮推到底部 */
+  margin-top: 5px;
 }
 
 .reset-button:hover {

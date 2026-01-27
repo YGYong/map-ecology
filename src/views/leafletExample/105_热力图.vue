@@ -5,6 +5,10 @@
 </template>
 
 <script setup>
+/**
+ * 依赖下载
+ * npm install leaflet.heat
+ */
 import { ref, onMounted, onUnmounted } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';

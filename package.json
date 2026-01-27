@@ -16,6 +16,9 @@
     "codemirror": "^5.65.20",
     "element-plus": "^2.13.1",
     "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
+    "leaflet.heat": "^0.2.0",
+    "leaflet.markercluster": "^1.5.3",
     "ol": "^10.0.0",
     "vue": "^3.5.13",
     "vue-router": "^4.6.4"

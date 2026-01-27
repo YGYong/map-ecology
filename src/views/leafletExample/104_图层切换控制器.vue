@@ -89,65 +89,64 @@ const resetMapView = () => {
 </script>
 
 <style scoped>
-/* 样式与上一个案例类似，确保布局一致 */
 .map-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  position: relative;
+  height: 100%;
   width: 100%;
   font-family: sans-serif;
-  box-sizing: border-box;
+  overflow: hidden;
 }
 
-@media (min-width: 768px) {
-  .map-wrapper {
-    flex-direction: row;
-  }
+.map-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: #e0e0e0;
 }
 
 .control-panel {
-  flex-shrink: 0;
-  width: 100%;
-  padding: 20px;
-  background-color: #f8f8f8;
-  border-right: 1px solid #eee;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  position: absolute;
+  top: 10px;
+  left: 80px;
+  z-index: 1000;
+  width: 240px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-@media (min-width: 768px) {
-  .control-panel {
-    width: 280px;
-    height: 100%;
-  }
-}
-
 .control-panel h2 {
-  margin-top: 0;
-  margin-bottom: 15px;
+  margin: 0 0 10px 0;
   color: #333;
-  font-size: 1.2em;
+  font-size: 16px;
+  font-weight: bold;
 }
 
-.map-container {
-  flex-grow: 1;
-  height: 100%;
-  min-height: 300px;
-  background-color: #e0e0e0;
+.control-panel p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
 }
 
 .reset-button {
-  padding: 10px 15px;
+  padding: 8px 12px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 14px;
   transition: background-color 0.3s ease;
-  margin-top: auto;
+  margin-top: 5px;
 }
 
 .reset-button:hover {

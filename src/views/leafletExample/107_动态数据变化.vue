@@ -131,6 +131,7 @@ const resetMapView = () => {
 .control-panel {
   flex-shrink: 0;
   width: 100%;
+  
   background-color: #f8f8f8;
   border-right: 1px solid #eee;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);

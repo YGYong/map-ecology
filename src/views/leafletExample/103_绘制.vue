@@ -19,13 +19,17 @@
 </template>
 
 <script setup>
+/**
+ * 依赖下载
+ * npm install leaflet-draw
+ */
 import { ref, onMounted, onUnmounted } from "vue";
 // 需要使用cdn引入
 
-// import "leaflet/dist/leaflet.css";
-// import "leaflet-draw/dist/leaflet.draw.css"; // Leaflet.draw 插件的CSS
-// import L from "leaflet";
-// import "leaflet-draw"; // 引入 Leaflet.draw 插件JS
+import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css"; // Leaflet.draw 插件的CSS
+import L from "leaflet";
+import "leaflet-draw"; // 引入 Leaflet.draw 插件JS
 
 let map = null;
 let drawnItems = null; // 用于存储绘制的图层
