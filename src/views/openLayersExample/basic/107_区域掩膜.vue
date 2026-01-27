@@ -9,12 +9,13 @@ import XYZ from "ol/source/XYZ.js";
 import TileLayer from "ol/layer/Tile.js";
 import View from "ol/View.js";
 import "ol/ol.css";
-import modalData from "../../../../gis-start/src/openLayers/320000_bj.json";
 
 const mapContainer = ref(null);
 let map = null;
 let canvas = null;
 let ctx = null;
+let jiangsuPolygons = null;
+let loadJiangsuPromise = null;
 
 const view = new View({
   center: [118.7784, 32.0647], // 南京市中心经纬度
@@ -54,7 +55,7 @@ onMounted(async () => {
 });
 
 // 添加区域掩膜
-const addMask = (params) => {
+const addMask = async (params) => {
   const { fillStyle, strokeStyle, lineWidth } = {
     fillStyle: "rgba(255,255,255,0.8)",
     strokeStyle: "#f00",
@@ -62,10 +63,22 @@ const addMask = (params) => {
     ...params,
   };
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!jiangsuPolygons) {
+    if (!loadJiangsuPromise) {
+      loadJiangsuPromise = fetch("/models/jiangsu.json")
+        .then((res) => res.json())
+        .then((json) => {
+          jiangsuPolygons = json?.features?.[0]?.geometry?.coordinates || null;
+        })
+        .catch(() => {
+          jiangsuPolygons = null;
+        });
+    }
+    await loadJiangsuPromise;
+  }
+  if (!jiangsuPolygons) return;
 
-  // 获取整个江苏省的所有多边形
-  const jiangsuPolygons = modalData.features[0].geometry.coordinates;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // 1. 绘制整个画布为半透明白色
   ctx.fillStyle = fillStyle;

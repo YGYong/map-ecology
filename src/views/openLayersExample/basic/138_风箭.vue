@@ -96,7 +96,7 @@ onMounted(async () => {
 
     try {
       // 加载气象数据（注意：需要确保此路径下有对应的JSON文件）
-      const response = await fetch("/src/openlayers/weather.json");
+      const response = await fetch("/openlayers/weather.json");
       const data = await response.json();
 
       // 创建气象数据要素

@@ -1,0 +1,12 @@
+{
+  "list": [
+    { "coord": { "lon": 116.4074, "lat": 39.9042 }, "wind": { "speed": 6.5, "deg": 45 } },
+    { "coord": { "lon": 117.2000, "lat": 39.1333 }, "wind": { "speed": 4.2, "deg": 110 } },
+    { "coord": { "lon": 121.4737, "lat": 31.2304 }, "wind": { "speed": 7.8, "deg": 210 } },
+    { "coord": { "lon": 114.3055, "lat": 30.5928 }, "wind": { "speed": 3.9, "deg": 320 } },
+    { "coord": { "lon": 113.2644, "lat": 23.1291 }, "wind": { "speed": 5.1, "deg": 160 } },
+    { "coord": { "lon": 104.0665, "lat": 30.5723 }, "wind": { "speed": 2.7, "deg": 30 } },
+    { "coord": { "lon": 108.9398, "lat": 34.3416 }, "wind": { "speed": 6.0, "deg": 260 } }
+  ]
+}
+

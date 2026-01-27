@@ -1,3 +1,4 @@
+<!-- 使用`SingleTileImageryProvider`添加顶级影像瓦片，下面为单张图片加载 -->
 <template>
   <div ref="cesiumContainer" class="container"></div>
 </template>

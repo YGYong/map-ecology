@@ -1,3 +1,5 @@
+<!-- 使用`scene.cartesianToCanvasCoordinates`将三维坐标转换为屏幕坐标 -->
+<!-- 在`preRender`事件中实时更新元素位置 -->
 <template>
   <div class="container">
     <div ref="cesiumContainer" class="container-map"></div>

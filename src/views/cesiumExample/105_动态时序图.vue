@@ -1,3 +1,4 @@
+<!-- 参考：https://github.com/jiawanlong/Cesium-Examples -->
 <template>
   <div class="container">
     <div ref="cesiumContainer" class="container-map"></div>

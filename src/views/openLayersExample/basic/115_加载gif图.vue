@@ -16,7 +16,7 @@ import Style from "ol/style/Style.js";
 import Icon from "ol/style/Icon.js";
 import "ol/ol.css";
 // 引入gif动图
-import gifUrl from "./assets/globe.gif";
+import gifUrl from "./imgs/globe.gif";
 const mapContainer = ref(null);
 let map = null;
 const view = new View({

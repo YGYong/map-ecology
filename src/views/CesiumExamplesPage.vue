@@ -146,7 +146,7 @@ function selectSubcategory(subcategory, category) {
 }
 
 function goToExample(exampleId) {
-  router.push(`/examples/${exampleId}`)
+  router.push(`/examples/cesium/${exampleId}`)
 }
 </script>
 

@@ -44,27 +44,37 @@
         @mousedown="startResize"
       ></div>
 
-      <!-- 右侧 Cesium 查看器 -->
-      <div class="cesium-viewer-panel">
-        <cesium-viewer ref="cesiumViewer" />
+      <!-- 右侧运行区 -->
+      <div class="viewer-panel">
+        <cesium-viewer v-if="engine === 'cesium'" ref="cesiumViewer" />
+        <sandbox-host v-else ref="sandboxHost" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { computed, ref, onMounted, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CodeEditor from '../components/CodeEditor.vue'
 import CesiumViewer from '../components/CesiumViewer.vue'
+import SandboxHost from '../components/SandboxHost.vue'
 import ErrorPanel from '../components/ErrorPanel.vue'
 import { getExampleById, loadExampleCode } from '../utils/examplesData'
+import { getFrameworkExampleById } from '@/utils/frameworkExamples'
 import { parseSFC } from '../utils/sfcParser'
 import { CodeExecutor } from '../utils/codeExecutor'
+import { LeafletCodeExecutor } from '@/utils/leafletCodeExecutor'
+import { OpenLayersCodeExecutor } from '@/utils/openLayersCodeExecutor'
 import { useErrorHandler } from '../composables/useErrorHandler'
 
 const router = useRouter()
 const route = useRoute()
+
+const engine = computed(() => {
+  const value = route.params.engine
+  return value === 'leaflet' || value === 'openlayers' || value === 'cesium' ? value : 'cesium'
+})
 
 // 错误处理
 const { addError, clearErrors, latestError } = useErrorHandler()
@@ -79,6 +89,7 @@ const isResizing = ref(false)
 
 // Cesium Viewer 引用
 const cesiumViewer = ref(null)
+const sandboxHost = ref(null)
 
 // 代码执行器实例
 let codeExecutor = null
@@ -99,8 +110,8 @@ watch(() => route.params.id, () => {
 
 // 方法
 async function loadExample() {
-  const exampleId = parseInt(route.params.id)
-  const example = getExampleById(exampleId)
+  const exampleId = route.params.id
+  const example = engine.value === 'cesium' ? getExampleById(parseInt(exampleId)) : getFrameworkExampleById(engine.value, exampleId)
   
   if (example) {
     currentExample.value = example
@@ -182,33 +193,68 @@ async function runCode() {
       return
     }
     
-    if (!cesiumViewer.value || !cesiumViewer.value.getViewer) {
-      addError({
-        type: 'cesium',
-        message: 'Cesium Viewer 未初始化'
-      })
-      return
+    let result = null
+    if (engine.value === 'cesium') {
+      if (!cesiumViewer.value || !cesiumViewer.value.getViewer) {
+        addError({
+          type: 'cesium',
+          message: 'Cesium Viewer 未初始化'
+        })
+        return
+      }
+      
+      const viewerInstance = cesiumViewer.value.getViewer()
+      
+      if (!viewerInstance) {
+        addError({
+          type: 'cesium',
+          message: 'Cesium Viewer 实例不可用'
+        })
+        return
+      }
+      
+      if (!codeExecutor) {
+        codeExecutor = new CodeExecutor(viewerInstance)
+      }
+      
+      if (cesiumViewer.value.clearScene) {
+        cesiumViewer.value.clearScene()
+      }
+      
+      result = await codeExecutor.execute(parsed)
+    } else {
+      if (!sandboxHost.value || !sandboxHost.value.getHostElement) {
+        addError({
+          type: engine.value,
+          message: '运行容器未初始化'
+        })
+        return
+      }
+      
+      const hostEl = sandboxHost.value.getHostElement()
+      if (!hostEl) {
+        addError({
+          type: engine.value,
+          message: '运行容器实例不可用'
+        })
+        return
+      }
+      
+      if (!codeExecutor || codeExecutor.__engine !== engine.value) {
+        if (engine.value === 'leaflet') {
+          codeExecutor = new LeafletCodeExecutor(hostEl)
+        } else {
+          codeExecutor = new OpenLayersCodeExecutor(hostEl)
+        }
+        codeExecutor.__engine = engine.value
+      }
+      
+      if (sandboxHost.value.clear) {
+        sandboxHost.value.clear()
+      }
+      
+      result = await codeExecutor.execute(parsed)
     }
-    
-    const viewerInstance = cesiumViewer.value.getViewer()
-    
-    if (!viewerInstance) {
-      addError({
-        type: 'cesium',
-        message: 'Cesium Viewer 实例不可用'
-      })
-      return
-    }
-    
-    if (!codeExecutor) {
-      codeExecutor = new CodeExecutor(viewerInstance)
-    }
-    
-    if (cesiumViewer.value.clearScene) {
-      cesiumViewer.value.clearScene()
-    }
-    
-    const result = await codeExecutor.execute(parsed)
     
     if (result.success) {
       clearErrors()
@@ -235,9 +281,16 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   const startTime = Date.now()
   
   while (Date.now() - startTime < maxWaitTime) {
-    if (cesiumViewer.value && cesiumViewer.value.getViewer) {
-      const viewerInstance = cesiumViewer.value.getViewer()
-      if (viewerInstance) return true
+    if (engine.value === 'cesium') {
+      if (cesiumViewer.value && cesiumViewer.value.getViewer) {
+        const viewerInstance = cesiumViewer.value.getViewer()
+        if (viewerInstance) return true
+      }
+    } else {
+      if (sandboxHost.value && sandboxHost.value.getHostElement) {
+        const hostEl = sandboxHost.value.getHostElement()
+        if (hostEl) return true
+      }
     }
     await new Promise(resolve => setTimeout(resolve, checkInterval))
   }
@@ -425,7 +478,7 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   background-color: #3b82f6;
 }
 
-.cesium-viewer-panel {
+.viewer-panel {
   flex: 1;
   min-width: 0;
   height: 100%;

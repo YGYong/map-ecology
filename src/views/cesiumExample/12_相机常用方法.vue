@@ -1,3 +1,4 @@
+<!-- `lookAt`控制相机固定看向一个点，5s后恢复自由控制 -->
 <template>
   <div ref="cesiumContainer" class="container"></div>
 </template>

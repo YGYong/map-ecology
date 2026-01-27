@@ -1,3 +1,4 @@
+<!-- 同时添加`WMTS`、`XYZ`、`单张图片`三种底图，通过切换选择器进行底图切换 -->
 <template>
   <div class="map-switcher">
     <div class="map-buttons">

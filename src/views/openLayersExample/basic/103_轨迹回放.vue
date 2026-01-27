@@ -29,6 +29,7 @@ import { Style, Stroke, Icon } from "ol/style";
 import { defaults as defaultControls, FullScreen, ScaleLine } from "ol/control";
 import { fromLonLat } from "ol/proj";
 import "ol/ol.css";
+import carIconUrl from "./imgs/world.png";
 
 const map = ref(null);
 const mapContainer = ref(null);
@@ -73,7 +74,7 @@ function getAngle(p1, p2) {
 function carStyle(angle = 0) {
   return new Style({
     image: new Icon({
-      src: "/src/assets/car.png",
+      src: carIconUrl,
       anchor: [0.5, 0.5],
       rotateWithView: true,
       rotation: -angle, // 加上这一行实现方向旋转

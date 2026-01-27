@@ -2,7 +2,7 @@
   <div ref="mapContainer" id="map"></div>
   <div style="position: absolute; top: 10px; left: 100px; z-index: 1000">
     <button @click="gotoNJ">去南京</button>
-    <!-- <button @click="changeLayer" style="margin-left: 15px">切换地图</button> -->
+    <button @click="changeLayer" style="margin-left: 15px">切换地图</button>
   </div>
 </template>
 
@@ -15,7 +15,6 @@ import TileLayer from "ol/layer/Tile.js";
 import View from "ol/View.js";
 import ImageLayer from "ol/layer/Image.js";
 import Static from "ol/source/ImageStatic.js";
-import Vector from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
 import GeoJSON from "ol/format/GeoJSON.js";
@@ -23,12 +22,7 @@ import Style from "ol/style/Style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import "ol/ol.css";
-import img from "../assets/vue.svg"; // 确保路径正确
-import Feature from "ol/Feature.js";
-import Point from "ol/geom/Point.js";
-import Icon from "ol/style/Icon";
-import CircleStyle from "ol/style/Circle.js";
-import Text from "ol/style/Text.js";
+import img from "./imgs/world.png";
 const mapContainer = ref(null);
 let map = null;
 const view = new View({
@@ -56,7 +50,8 @@ onMounted(async () => {
     ],
     view,
   });
-  addFeature();
+  addImage();
+  loadGeoJson();
 });
 const gotoNJ = () => {
   console.log(map.getView());
@@ -68,42 +63,60 @@ const gotoNJ = () => {
   //   zoom: 15,
   // });
 };
+// 切换地图图层
+let change = false;
+const changeLayer = () => {
+  console.log(map.getLayers(), " map.getLayers()");
+  change = !change;
+  map.getLayers().forEach((layer) => {
+    if (layer instanceof TileLayer) {
+      if (change) {
+        // 切换到高德路网图层
+        layer.setSource(
+          new XYZ({
+            url: "https://webst01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}",
+          })
+        );
+      } else {
+        layer.setSource(
+          new XYZ({
+            url: "https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
+          })
+        );
+      }
+    }
+  });
+};
 
-// 创建一个点
-const addFeature = () => {
-  const feature = new Feature({
-    geometry: new Point([116.4074, 39.9042]), // 北京市中心经纬度
-    name: "Beijing",
+// 添加静态图片
+const addImage = () => {
+  const imageLayer = new ImageLayer({
+    source: new Static({
+      url: img, // 替换为你的图片路径
+      imageExtent: [128.66, 32.86, 130.05, 34.55], // 图片的范围
+    }),
   });
-  const source = new Vector({
-    features: [feature],
-  });
-  const layer = new VectorLayer({
-    source: source,
-    // 图片标记
-    // style: new Style({
-    //   image: new Icon({
-    //     anchor: [0.5, 1],
-    //     src: img, // 使用本地图片
-    //     // scale: 0.05, // 缩放图标大小
-    //   }),
-    // }),
-    // 圆形标记
+  map.addLayer(imageLayer);
+};
+
+// 加载GeoJson数据
+const loadGeoJson = () => {
+  const vectorLayer = new VectorLayer({
+    source: new VectorSource({
+      url: "https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json", // 替换为你的GeoJSON数据URL
+      format: new GeoJSON(),
+    }),
     style: new Style({
-      image: new CircleStyle({
-        radius: 10,
-        fill: new Fill({ color: "red" }),
-        stroke: new Stroke({ color: "white", width: 2 }),
+      fill: new Fill({
+        color: "rgba(255, 255, 0, 0.6)",
       }),
-      text: new Text({
-        text: feature.get("name"), // 显示点的名称
-        offsetY: -15, // 文本偏移
-        fill: new Fill({ color: "black" }),
-        stroke: new Stroke({ color: "white", width: 2 }),
+      stroke: new Stroke({
+        color: "#ffcc33",
+        width: 2,
       }),
     }),
   });
-  map.addLayer(layer);
+  map.addLayer(vectorLayer);
 };
 </script>
 <style scoped>

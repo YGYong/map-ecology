@@ -3,6 +3,23 @@
 </template>
 
 <script setup>
+/**
+ * ```bash
+# 依赖安装
+npm install dat.gui --save
+
+# 引入依赖
+import * as dat from "dat.gui";
+
+# 创建实例
+const gui = new dat.GUI();
+```
+
+1. 使用`dat.gui`创建调试面板
+2. 可以通过`gui.add()`方法添加控制项，支持多种类型的输入
+3. 调试面板可以用于实时修改变量值，便于调试和测试
+4. 调试面板可以通过`gui.domElement.style`设置样式
+ */
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
 import * as dat from "dat.gui";

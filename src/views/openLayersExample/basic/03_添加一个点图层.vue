@@ -15,6 +15,7 @@ import TileLayer from "ol/layer/Tile.js";
 import View from "ol/View.js";
 import ImageLayer from "ol/layer/Image.js";
 import Static from "ol/source/ImageStatic.js";
+import Vector from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
 import GeoJSON from "ol/format/GeoJSON.js";
@@ -22,12 +23,11 @@ import Style from "ol/style/Style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import "ol/ol.css";
-import img from "../assets/vue.svg"; // 确保路径正确
+import img from "./imgs/world.png";
 import Feature from "ol/Feature.js";
 import Point from "ol/geom/Point.js";
 import Icon from "ol/style/Icon";
-import Circle from "ol/style/Circle.js";
-import Heatmap from "ol/layer/Heatmap.js";
+import CircleStyle from "ol/style/Circle.js";
 import Text from "ol/style/Text.js";
 const mapContainer = ref(null);
 let map = null;
@@ -71,24 +71,39 @@ const gotoNJ = () => {
 
 // 创建一个点
 const addFeature = () => {
-  // 生成1000个点，创建热力图
-  const features = [];
-  for (let i = 0; i < 1000; i++) {
-    const randomLon = 116.4074 + (Math.random() - 0.5) * 0.01; // 随机生成纬度
-    const randomLat = 39.9042 + (Math.random() - 0.5) * 0.01; // 随机生成经度
-    const feature = new Feature({
-      geometry: new Point([randomLon, randomLat]),
-    });
-    features.push(feature);
-  }
-  // 创建一个矢量图层
-  const heatmapLayer = new Heatmap({
-    source: new VectorSource({
-      features,
+  const feature = new Feature({
+    geometry: new Point([116.4074, 39.9042]), // 北京市中心经纬度
+    name: "Beijing",
+  });
+  const source = new Vector({
+    features: [feature],
+  });
+  const layer = new VectorLayer({
+    source: source,
+    // 图片标记
+    // style: new Style({
+    //   image: new Icon({
+    //     anchor: [0.5, 1],
+    //     src: img, // 使用本地图片
+    //     // scale: 0.05, // 缩放图标大小
+    //   }),
+    // }),
+    // 圆形标记
+    style: new Style({
+      image: new CircleStyle({
+        radius: 10,
+        fill: new Fill({ color: "red" }),
+        stroke: new Stroke({ color: "white", width: 2 }),
+      }),
+      text: new Text({
+        text: feature.get("name"), // 显示点的名称
+        offsetY: -15, // 文本偏移
+        fill: new Fill({ color: "black" }),
+        stroke: new Stroke({ color: "white", width: 2 }),
+      }),
     }),
   });
-  console.log(heatmapLayer);
-  map.addLayer(heatmapLayer);
+  map.addLayer(layer);
 };
 </script>
 <style scoped>

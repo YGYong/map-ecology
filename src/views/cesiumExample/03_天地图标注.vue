@@ -1,3 +1,4 @@
+<!-- 使用`WebMapTileServiceImageryProvider`添加 WMTS 影像，同时加载天地图影像 + 标注服务 -->
 <template>
   <div ref="cesiumContainer" class="container"></div>
 </template>

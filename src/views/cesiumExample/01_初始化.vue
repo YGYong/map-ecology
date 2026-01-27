@@ -1,3 +1,4 @@
+<!-- 最简约的一个 Cesium 地图 -->
 <template>
   <div ref="cesiumContainer" class="container"></div>
 </template>

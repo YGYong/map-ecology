@@ -3,6 +3,10 @@
 </template>
 
 <script setup>
+/**
+  # 依赖安装
+  npm install cesium-navigation-es6 --save
+ */
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
 import CesiumNavigation from "cesium-navigation-es6";

@@ -1,3 +1,4 @@
+<!-- 使用`UrlTemplateImageryProvider`添加 XYZ 影像 -->
 <template>
   <div ref="cesiumContainer" class="container"></div>
 </template>

@@ -15,6 +15,8 @@
     "@vue/compiler-sfc": "^3.5.27",
     "codemirror": "^5.65.20",
     "element-plus": "^2.13.1",
+    "leaflet": "^1.9.4",
+    "ol": "^10.0.0",
     "vue": "^3.5.13",
     "vue-router": "^4.6.4"
   },

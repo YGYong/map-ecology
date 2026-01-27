@@ -2,7 +2,7 @@
   <div ref="mapContainer" id="map"></div>
   <div style="position: absolute; top: 10px; left: 100px; z-index: 1000">
     <button @click="gotoNJ">去南京</button>
-    <button @click="changeLayer" style="margin-left: 15px">切换地图</button>
+    <!-- <button @click="changeLayer" style="margin-left: 15px">切换地图</button> -->
   </div>
 </template>
 
@@ -22,7 +22,13 @@ import Style from "ol/style/Style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import "ol/ol.css";
-import img from "../assets/vue.svg"; // 确保路径正确
+import img from "./imgs/world.png";
+import Feature from "ol/Feature.js";
+import Point from "ol/geom/Point.js";
+import Icon from "ol/style/Icon";
+import Circle from "ol/style/Circle.js";
+import Heatmap from "ol/layer/Heatmap.js";
+import Text from "ol/style/Text.js";
 const mapContainer = ref(null);
 let map = null;
 const view = new View({
@@ -50,8 +56,7 @@ onMounted(async () => {
     ],
     view,
   });
-  addImage();
-  loadGeoJson();
+  addFeature();
 });
 const gotoNJ = () => {
   console.log(map.getView());
@@ -63,60 +68,27 @@ const gotoNJ = () => {
   //   zoom: 15,
   // });
 };
-// 切换地图图层
-let change = false;
-const changeLayer = () => {
-  console.log(map.getLayers(), " map.getLayers()");
-  change = !change;
-  map.getLayers().forEach((layer) => {
-    if (layer instanceof TileLayer) {
-      if (change) {
-        // 切换到高德路网图层
-        layer.setSource(
-          new XYZ({
-            url: "https://webst01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}",
-          })
-        );
-      } else {
-        layer.setSource(
-          new XYZ({
-            url: "https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
-          })
-        );
-      }
-    }
-  });
-};
 
-// 添加静态图片
-const addImage = () => {
-  const imageLayer = new ImageLayer({
-    source: new Static({
-      url: img, // 替换为你的图片路径
-      imageExtent: [128.66, 32.86, 130.05, 34.55], // 图片的范围
-    }),
-  });
-  map.addLayer(imageLayer);
-};
-
-// 加载GeoJson数据
-const loadGeoJson = () => {
-  const vectorLayer = new VectorLayer({
+// 创建一个点
+const addFeature = () => {
+  // 生成1000个点，创建热力图
+  const features = [];
+  for (let i = 0; i < 1000; i++) {
+    const randomLon = 116.4074 + (Math.random() - 0.5) * 0.01; // 随机生成纬度
+    const randomLat = 39.9042 + (Math.random() - 0.5) * 0.01; // 随机生成经度
+    const feature = new Feature({
+      geometry: new Point([randomLon, randomLat]),
+    });
+    features.push(feature);
+  }
+  // 创建一个矢量图层
+  const heatmapLayer = new Heatmap({
     source: new VectorSource({
-      url: "https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json", // 替换为你的GeoJSON数据URL
-      format: new GeoJSON(),
-    }),
-    style: new Style({
-      fill: new Fill({
-        color: "rgba(255, 255, 0, 0.6)",
-      }),
-      stroke: new Stroke({
-        color: "#ffcc33",
-        width: 2,
-      }),
+      features,
     }),
   });
-  map.addLayer(vectorLayer);
+  console.log(heatmapLayer);
+  map.addLayer(heatmapLayer);
 };
 </script>
 <style scoped>

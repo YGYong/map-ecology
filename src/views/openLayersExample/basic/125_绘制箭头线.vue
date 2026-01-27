@@ -38,6 +38,7 @@ import Draw from "ol/interaction/Draw";
 import Point from "ol/geom/Point";
 import { Style, Stroke, Icon } from "ol/style";
 import "ol/ol.css";
+import arrowIconUrl from "./imgs/arrow.png";
 
 const mapContainer = ref(null);
 let map = null;
@@ -73,7 +74,7 @@ const styleFunction = (feature) => {
       new Style({
         geometry: new Point(end),
         image: new Icon({
-          src: "/src/openLayers/assets/arrow.png",
+          src: arrowIconUrl,
           anchor: [0.75, 0.5],
           rotateWithView: true,
           rotation: -rotation,

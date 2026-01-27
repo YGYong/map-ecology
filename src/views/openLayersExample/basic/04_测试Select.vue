@@ -23,7 +23,7 @@ import Style from "ol/style/Style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import "ol/ol.css";
-import img from "../assets/vue.svg"; // 确保路径正确
+import img from "./imgs/world.png";
 import Feature from "ol/Feature.js";
 import Point from "ol/geom/Point.js";
 import Icon from "ol/style/Icon";

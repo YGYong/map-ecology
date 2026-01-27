@@ -1,3 +1,4 @@
+<!-- 使用`WebMapTileServiceImageryProvider`添加 WMTS 影像，下面为天地图加载，`地球更蓝一些`-->
 <template>
   <div ref="cesiumContainer" class="container"></div>
 </template>

@@ -4,6 +4,8 @@ import ExampleDetailPage from '@/views/ExampleDetailPage.vue'
 import ErrorPanelDemo from '@/components/ErrorPanelDemo.vue'
 import BlankPage from '@/views/BlankPage.vue'
 import CesiumExamplesPage from '@/views/CesiumExamplesPage.vue'
+import LeafletExamplesPage from '@/views/LeafletExamplesPage.vue'
+import OpenLayersExamplesPage from '@/views/OpenLayersExamplesPage.vue'
 import OpenLayersDocsPage from '@/views/OpenLayersDocsPage.vue'
 import CesiumDocsPage from '@/views/CesiumDocsPage.vue'
 
@@ -15,8 +17,12 @@ const routes = [
   },
   {
     path: '/examples/:id',
+    redirect: (to) => `/examples/cesium/${to.params.id}`
+  },
+  {
+    path: '/examples/:engine/:id',
     name: 'ExampleDetail',
-    component: ExampleDetailPage
+    component: ExampleDetailPage,
   },
   {
     path: '/demo/error-panel',
@@ -38,7 +44,7 @@ const routes = [
   {
     path: '/openlayers/examples',
     name: 'OpenLayersExamples',
-    component: BlankPage
+    component: OpenLayersExamplesPage
   },
   {
     path: '/openlayers/docs',
@@ -49,7 +55,7 @@ const routes = [
   {
     path: '/leaflet/examples',
     name: 'LeafletExamples',
-    component: BlankPage
+    component: LeafletExamplesPage
   },
   {
     path: '/leaflet/docs',

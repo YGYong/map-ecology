@@ -3,6 +3,12 @@
 </template>
 
 <script setup>
+/**
+ * 1. 修改旋转事件为右键拖拽（默认是左键）
+ * 2. 修改缩放事件为仅支持滚轮
+ * 3. 配置倾斜事件支持多种方式
+ * 4. 禁用所有相机交互（完全控制场景）
+ */
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
 const cesiumContainer = ref(null);

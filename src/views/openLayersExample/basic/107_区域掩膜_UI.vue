@@ -131,7 +131,6 @@ import XYZ from "ol/source/XYZ.js";
 import TileLayer from "ol/layer/Tile.js";
 import View from "ol/View.js";
 import "ol/ol.css";
-import modalData from "../../../../gis-start/src/openLayers/320000_bj.json";
 
 const mapContainer = ref(null);
 let map = null;
@@ -139,6 +138,8 @@ let canvas = null;
 let ctx = null;
 let clipCanvas = null;
 let clipCtx = null;
+let jiangsuPolygons = null;
+let loadJiangsuPromise = null;
 
 // 响应式状态
 const maskEnabled = ref(true);
@@ -234,13 +235,25 @@ const updateMask = () => {
 };
 
 // 添加区域遮罩
-const addMask = () => {
+const addMask = async () => {
   const fillStyle = `rgba(255,255,255,${maskOpacity.value})`;
   
+  if (!jiangsuPolygons) {
+    if (!loadJiangsuPromise) {
+      loadJiangsuPromise = fetch("/models/jiangsu.json")
+        .then((res) => res.json())
+        .then((json) => {
+          jiangsuPolygons = json?.features?.[0]?.geometry?.coordinates || null;
+        })
+        .catch(() => {
+          jiangsuPolygons = null;
+        });
+    }
+    await loadJiangsuPromise;
+  }
+  if (!jiangsuPolygons) return;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // 获取整个江苏省的所有多边形
-  const jiangsuPolygons = modalData.features[0].geometry.coordinates;
   
   // 1. 绘制整个画布为半透明白色
   ctx.fillStyle = fillStyle;
@@ -304,10 +317,25 @@ const updateClipping = () => {
 };
 
 // 添加裁剪效果
-const addClipping = () => {
+const addClipping = async () => {
   clipCtx.clearRect(0, 0, clipCanvas.width, clipCanvas.height);
   
   if (clipShape.value === 'polygon') {
+    if (!jiangsuPolygons) {
+      if (!loadJiangsuPromise) {
+        loadJiangsuPromise = fetch("/models/jiangsu.json")
+          .then((res) => res.json())
+          .then((json) => {
+            jiangsuPolygons = json?.features?.[0]?.geometry?.coordinates || null;
+          })
+          .catch(() => {
+            jiangsuPolygons = null;
+          });
+      }
+      await loadJiangsuPromise;
+    }
+    if (!jiangsuPolygons) return;
+
     // 对于多边形裁剪，只显示江苏省区域内的内容
     // 先填充整个画布为黑色遮罩
     clipCtx.fillStyle = "rgba(255,255,255,1)";
@@ -315,7 +343,6 @@ const addClipping = () => {
     
     // 使用destination-out模式清除江苏省区域，显示下方地图
     clipCtx.globalCompositeOperation = "destination-out";
-    const jiangsuPolygons = modalData.features[0].geometry.coordinates;
     jiangsuPolygons.forEach((polygon) => {
       const ring = polygon[0];
       const coords = ring.map((coord) => map.getPixelFromCoordinate(coord));

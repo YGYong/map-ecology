@@ -26,6 +26,7 @@
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import carIconUrl from "./imgs/car.svg";
 
 let map = null;
 let markerLayerGroup = null;
@@ -38,7 +39,7 @@ const showGeoJSON = ref(true);
 
 // 自定义图标定义
 const customIcon = L.icon({
-  iconUrl: "/src/assets/car.png",
+  iconUrl: carIconUrl,
   iconSize: [38, 38],
   iconAnchor: [19, 38],
   popupAnchor: [0, -38],

@@ -3,6 +3,14 @@
 </template>
 
 <script setup>
+/**
+ * 1. WGS84 ↔ Cartesian3
+ * 2. 经纬度 ↔ 弧度
+ * 3. Cartesian3 ↔ 屏幕坐标
+ * 4. WGS84 ↔ Web 墨卡托投影
+ * 5. 计算直线距离（米）
+ * 6. 计算椭球面距离（沿地球表面）
+ */
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
 const cesiumContainer = ref(null);

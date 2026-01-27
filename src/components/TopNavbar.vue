@@ -99,6 +99,12 @@ function updateActiveMenu() {
   
   if (path === '/') {
     activeMenu.value = 'home';
+  } else if (path.startsWith('/examples/')) {
+    const parts = path.split('/').filter(Boolean);
+    const engine = parts[1];
+    if (engine === 'leaflet' || engine === 'openlayers' || engine === 'cesium' || engine === 'three') {
+      activeMenu.value = engine;
+    }
   } else if (path.includes('/openlayers/')) {
     activeMenu.value = 'openlayers';
   } else if (path.includes('/leaflet/')) {

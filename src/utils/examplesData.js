@@ -439,7 +439,7 @@ export const examples = [
   {
     id: 103,
     name: "加载控件",
-    fileName: "cesiumExample/03_加载控件.vue",
+    fileName: "cesiumExample/103_加载控件.vue",
     category: 21,
     preview: "@/assets/cesiumImg/103_加载控件.png",
   },
@@ -476,8 +476,8 @@ export async function loadExampleCode(fileName) {
   try {
     // 匹配 views 下的所有 .vue 文件，包括子目录
     const modules = import.meta.glob("../views/**/*.vue", {
-      as: "raw",
-      eager: false,
+      query: "?raw",
+      import: "default",
     });
 
     // 构造模块路径，fileName 已经包含了 cesiumExample/ 前缀

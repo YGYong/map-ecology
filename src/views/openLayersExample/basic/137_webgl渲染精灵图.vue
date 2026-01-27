@@ -15,6 +15,7 @@ import XYZ from "ol/source/XYZ";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import "ol/ol.css";
+import spriteUrl from "./imgs/ufo_shapes.png";
 
 const mapContainer = ref(null);
 let map = null;
@@ -57,7 +58,7 @@ onMounted(() => {
   const webglLayer = new WebGLVectorLayer({
     source: vectorSource,
     style: {
-      "icon-src": "/src/openlayers/assets/ufo_shapes.png", // 精灵图路径
+      "icon-src": spriteUrl,
       "icon-width": 128, // 精灵图总宽度
       "icon-height": 64, // 精灵图总高度
       "icon-size": [32, 32], // 单个图标大小

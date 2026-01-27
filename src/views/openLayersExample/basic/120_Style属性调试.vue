@@ -111,6 +111,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import { Style, Icon, Text, Fill, Stroke, Circle } from 'ol/style';
 import 'ol/ol.css';
+import iconUrl from './imgs/world.png';
 
 const mapContainer = ref(null);
 let map = null;
@@ -188,7 +189,7 @@ onMounted(() => {
   iconStyle = new Style({
     image: new Icon({
       anchor: [0.5, 1],
-      src: '/src/assets/vue.svg',
+      src: iconUrl,
     }),
     text: new Text({
       text: 'World\nText',

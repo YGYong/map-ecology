@@ -8,6 +8,7 @@
 import { onMounted, onUnmounted } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import palaceImgUrl from './imgs/palace.svg';
 
 let map = null;
 
@@ -27,7 +28,7 @@ onMounted(() => {
   const customPopupContent = `
     <div class="custom-popup">
       <h3>北京故宫</h3>
-      <img src="/src/assets/vue.svg" width="24" alt="故宫" style="border-radius: 4px; margin-bottom: 8px;">
+      <img src="${palaceImgUrl}" width="24" alt="故宫" style="border-radius: 4px; margin-bottom: 8px;">
       <p>中国明清两代的皇家宫殿，世界文化遗产。</p>
       <a href="https://www.dpm.org.cn/" target="_blank" class="popup-link">了解更多</a>
       <button class="popup-button" onclick="alert('您点击了故宫按钮！')">点击我</button>
