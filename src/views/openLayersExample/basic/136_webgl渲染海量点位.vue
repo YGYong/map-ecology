@@ -1,3 +1,5 @@
+<!-- [官网地址](https://openlayers.org/en/latest/examples/webgl-points-layer.html)，**不属于稳定版本，使用时需注意**
+ -->
 <template>
   <div class="map-container">
     <div ref="mapContainer" id="map"></div>

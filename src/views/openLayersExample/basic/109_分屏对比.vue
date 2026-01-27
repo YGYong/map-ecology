@@ -1,3 +1,4 @@
+<!-- https://openlayers.org/en/latest/examples/layer-swipe.html -->
 <template>
   <div>
     <div id="map" class="map"></div>

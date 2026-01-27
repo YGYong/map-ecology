@@ -5,6 +5,10 @@
 </template>
 
 <script setup>
+/**
+ * [风箭](https://openlayers.org/en/latest/examples/wind-arrows.html)，这个案例一般，主要看一下自定义箭头和角度计算，正常绘制风场还需要有**动画效果**，我在插件案例中介绍了一个好用的工具
+
+ */
 import { ref, onMounted, onUnmounted } from "vue";
 import Feature from "ol/Feature.js";
 import Map from "ol/Map.js";

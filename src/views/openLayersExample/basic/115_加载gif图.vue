@@ -3,6 +3,20 @@
 </template>
 
 <script setup>
+/**
+ * 案例参考[官方示例 Animated GIF](https://openlayers.org/en/latest/examples/animated-gif.html)
+
+## 介绍
+
+1. 需要使用到 `gifler` 库来加载 gif 图像。
+2. `gifler`不支持**ES6**模块导入，需要使用 CDN 引入。
+3. 在 OpenLayers 中使用 gif 图像时，需要将其作为 `ol/style/Icon` 的图像源。
+
+```html
+<!-- 通过 CDN 引入 gifler 库 -->
+<script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
+```
+ */
 import { ref, onMounted } from "vue";
 import Map from "ol/Map.js";
 import XYZ from "ol/source/XYZ.js";

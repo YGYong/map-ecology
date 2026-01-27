@@ -36,6 +36,10 @@
 </template>
 
 <script setup>
+/**
+ * 1. 这里我采用官方使用的插件`chaikin-smooth`平滑绘制线条，[插件地址](https://www.npmjs.com/package/chaikin-smooth)
+2. `Turf.js`也有类似的方案，如贝塞尔曲线，不仅有线，还有面，多边形等等
+ */
 import { ref, onMounted, onUnmounted } from 'vue';
 import Map from 'ol/Map';
 import View from 'ol/View';

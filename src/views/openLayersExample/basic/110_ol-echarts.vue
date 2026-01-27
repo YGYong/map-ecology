@@ -3,6 +3,25 @@
 </template>
 
 <script setup>
+/**
+ * 插件地址：[ol-echarts](https://github.com/sakitam-fdd/ol3Echarts?tab=readme-ov-file)
+
+`tips`:我这里是 openlayers10+,所以下载`ol-echarts`
+
+![ol-echarts](./assets/ol-echarts.png)
+
+## 实现思路
+
+案例参考：[来源](https://blog.csdn.net/treasurecp/article/details/122221087)
+
+```bash
+# 安装依赖
+npm install ol-echarts --save
+
+npm install echarts --save
+```
+
+ */
 import { ref, onMounted } from "vue";
 import Map from "ol/Map.js";
 import XYZ from "ol/source/XYZ.js";

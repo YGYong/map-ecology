@@ -1,3 +1,4 @@
+<!-- https://openlayers.org/en/latest/examples/clusters-dynamic.html -->
 <template>
   <div class="cluster-map-container">
     <div ref="mapContainer" class="map"></div>

@@ -34,6 +34,19 @@
 </template>
 
 <script setup>
+/**
+ * # ol-wind 使用
+
+插件地址：[npm ol-wind](https://www.npmjs.com/package/ol-wind)
+
+教程API地址：[ol-wind 教程](https://blog.sakitam.com/wind-layer/)，不仅只支持ol，几乎所有的主流地图库都支持
+
+```bash
+# 安装依赖
+npm install ol-wind --save
+
+```
+ */
 import { ref, onMounted, onUnmounted } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
