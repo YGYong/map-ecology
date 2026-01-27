@@ -14,6 +14,9 @@ import { ref, onMounted, reactive } from "vue";
 import img from "./imgs/earthbump1k.jpg";
 import * as Cesium from "cesium";
 
+// 天地图TOKEN
+const token = window.TIANDITU_TOKEN;
+
 const cesiumContainer = ref(null);
 const currentMap = ref("tianditu");
 let viewer = null;
@@ -37,7 +40,7 @@ const loadAllMaps = async () => {
   // 天地图WMTS - 底图
   const tiandituBase = new Cesium.ImageryLayer(
     new Cesium.WebMapTileServiceImageryProvider({
-      url: "http://{s}.tianditu.gov.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=2b34f6afbcd235c2bc4bed3f7735f1f5",
+      url: "http://{s}.tianditu.gov.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" + token,
       layer: "img",
       style: "default",
       format: "tiles",
@@ -52,7 +55,7 @@ const loadAllMaps = async () => {
   // 天地图WMTS - 标注
   const tiandituLabel = new Cesium.ImageryLayer(
     new Cesium.WebMapTileServiceImageryProvider({
-      url: "http://{s}.tianditu.gov.cn/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&tileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=2b34f6afbcd235c2bc4bed3f7735f1f5",
+      url: "http://{s}.tianditu.gov.cn/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&tileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" + token,
       layer: "cia",
       style: "default",
       format: "tiles",

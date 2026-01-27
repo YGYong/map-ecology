@@ -9,11 +9,10 @@ const cesiumContainer = ref(null);
 let viewer = null;
 
 // 天地图TOKEN
-const token = "2b34f6afbcd235c2bc4bed3f7735f1f5";
+const token = window.TIANDITU_TOKEN;
 
 // 设置访问令牌
-Cesium.Ion.defaultAccessToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwZTEwODgwMS1iYTY0LTRhNmYtYWFhMS03MDEzMjlhYWNjOTciLCJpZCI6MzAwMTM5LCJpYXQiOjE3NDY1ODI5MTR9.P4bdCMYyoubNMaQ_-ZkU99mM8Da3o8HIo4A57stHRAg";
+Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN;
 
 onMounted(async () => {
   // 初始化Viewer

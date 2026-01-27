@@ -485,7 +485,7 @@ export async function loadExampleCode(fileName) {
 
     if (modules[modulePath]) {
       const code = await modules[modulePath]();
-      return code;
+      return normalizeExampleTokens(code);
     }
 
     throw new Error(`找不到示例文件: ${fileName} (路径: ${modulePath})`);
@@ -493,4 +493,20 @@ export async function loadExampleCode(fileName) {
     console.error("加载示例代码失败:", error);
     throw error;
   }
+}
+
+function normalizeExampleTokens(code) {
+  let result = String(code || "");
+
+  result = result.replace(
+    /^\s*(const|let|var)\s+token\s*=\s*['"][^'"]+['"]\s*;?\s*$/gm,
+    "$1 token = window.TIANDITU_TOKEN;",
+  );
+
+  result = result.replace(
+    /Cesium\.Ion\.defaultAccessToken\s*=\s*(?:\s*['"][^'"]+['"]\s*;?|\s*[\s\S]*?\s*;)/g,
+    "Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN;",
+  );
+
+  return result;
 }

@@ -43,7 +43,7 @@ let mapTimer = null;
 let currentTimeMapIndex = 0;
 
 // 天地图TOKEN
-const token = "2b34f6afbcd235c2bc4bed3f7735f1f5";
+const token = window.TIANDITU_TOKEN;
 
 onMounted(() => {
   // 初始化Viewer

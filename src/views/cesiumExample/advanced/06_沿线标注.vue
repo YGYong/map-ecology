@@ -22,7 +22,7 @@ const viewModel = {
   maxDistance: Number.POSITIVE_INFINITY,
 };
 
-const token = "2b34f6afbcd235c2bc4bed3f7735f1f5";
+const token = window.TIANDITU_TOKEN;
 
 onMounted(() => {
   viewer = new Cesium.Viewer(cesiumContainer.value, {
