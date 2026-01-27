@@ -12,38 +12,48 @@
             <li class="nav-item" :class="{ active: activeMenu === 'home' }" @click="goToHome">
               <span class="nav-link">首页</span>
             </li>
-            
-            <li class="nav-item has-dropdown" :class="{ active: activeMenu === 'openlayers' || activeMenu === 'leaflet' }">
-              <span class="nav-link">OpenLayers | Leaflet <span class="arrow">▼</span></span>
-              <ul class="dropdown-menu">
-                <li class="dropdown-header">OpenLayers</li>
-                <li class="dropdown-item" @click.stop="goToRoute('/openlayers/examples')">案例</li>
-                <li class="dropdown-item" @click.stop="goToRoute('/openlayers/docs')">文档</li>
-                <li class="dropdown-divider"></li>
-                <li class="dropdown-header">Leaflet</li>
-                <li class="dropdown-item" @click.stop="goToRoute('/leaflet/examples')">案例</li>
-                <li class="dropdown-item" @click.stop="goToRoute('/leaflet/docs')">文档</li>
-              </ul>
+
+            <li class="nav-item" :class="{ active: activeMenu === 'leaflet' }" @click="goToRoute('/leaflet/examples')">
+              <span class="nav-link">Leaflet</span>
             </li>
 
-            <li class="nav-item has-dropdown" :class="{ active: activeMenu === 'cesium' }">
-              <span class="nav-link">Cesium <span class="arrow">▼</span></span>
-              <ul class="dropdown-menu">
-                <li class="dropdown-item" @click.stop="goToRoute('/cesium/examples')">案例</li>
-                <li class="dropdown-item" @click.stop="goToRoute('/cesium/docs')">文档</li>
-              </ul>
+            <li class="nav-item" :class="{ active: activeMenu === 'openlayers' }" @click="goToRoute('/openlayers/examples')">
+              <span class="nav-link">OpenLayers</span>
             </li>
 
-            <li class="nav-item has-dropdown" :class="{ active: activeMenu === 'three' }">
-              <span class="nav-link">Three.js <span class="arrow">▼</span></span>
-              <ul class="dropdown-menu">
-                <li class="dropdown-item" @click.stop="goToRoute('/three/examples')">案例</li>
-                <li class="dropdown-item" @click.stop="goToRoute('/three/docs')">文档</li>
-              </ul>
+            <li class="nav-item" :class="{ active: activeMenu === 'cesium' }" @click="goToRoute('/cesium/examples')">
+              <span class="nav-link">Cesium</span>
             </li>
 
-            <li class="nav-item" :class="{ active: activeMenu === 'community' }" @click="goToRoute('/community')">
-              <span class="nav-link">社区</span>
+            <li class="nav-item" :class="{ active: activeMenu === 'three' }" @click="goToRoute('/three/examples')">
+              <span class="nav-link">Three</span>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link nav-external" :href="docsUrl" target="_blank" rel="noopener noreferrer">
+                文档
+                <svg class="external-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/>
+                </svg>
+              </a>
+            </li>
+
+            <li class="nav-item has-dropdown" :class="{ active: activeMenu === 'community' }">
+              <span class="nav-link">社区 <span class="arrow">▼</span></span>
+              <ul class="dropdown-menu dropdown-menu-left">
+                <li class="dropdown-item">
+                  <a class="dropdown-link" href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+                </li>
+                <li class="dropdown-item">
+                  <a class="dropdown-link" href="https://gitee.com" target="_blank" rel="noopener noreferrer">Gitee</a>
+                </li>
+                <li class="dropdown-item">
+                  <a class="dropdown-link" href="https://juejin.cn" target="_blank" rel="noopener noreferrer">掘金</a>
+                </li>
+                <li class="dropdown-item">
+                  <a class="dropdown-link" href="https://www.zhihu.com" target="_blank" rel="noopener noreferrer">知乎</a>
+                </li>
+              </ul>
             </li>
           </ul>
         </nav>
@@ -61,12 +71,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
+const route = useRoute();
 // 状态管理
 const activeMenu = ref("home");
+const docsUrl = import.meta.env.VITE_DOCS_URL || "https://cesium.com/learn/cesiumjs/ref-doc/";
 
 // 生命周期
 onMounted(() => {
@@ -74,9 +86,16 @@ onMounted(() => {
   updateActiveMenu();
 });
 
+watch(
+  () => route.path,
+  () => {
+    updateActiveMenu();
+  },
+);
+
 // 方法
 function updateActiveMenu() {
-  const path = window.location.pathname;
+  const path = route.path || window.location.pathname;
   
   if (path === '/') {
     activeMenu.value = 'home';
@@ -100,10 +119,6 @@ function goToHome() {
 
 function goToRoute(path) {
   router.push(path);
-  // Simple update, the onMounted/watcher would be better but this works for now
-  updateActiveMenu(); 
-  // Need to handle the updateActiveMenu logic slightly better if we want instant feedback without page reload
-  // But since router.push is client-side navigation, we should watch the route.
 }
 </script>
 
@@ -206,6 +221,16 @@ function goToRoute(path) {
   gap: 4px;
 }
 
+.nav-external {
+  text-decoration: none;
+}
+
+.external-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.65;
+}
+
 .nav-item:hover .nav-link,
 .nav-item.active .nav-link {
   color: #1890ff;
@@ -250,6 +275,15 @@ function goToRoute(path) {
   transform: translateX(-50%) translateY(0);
 }
 
+.dropdown-menu-left {
+  left: 0;
+  transform: translateX(0) translateY(10px);
+}
+
+.nav-item.has-dropdown:hover .dropdown-menu-left {
+  transform: translateX(0) translateY(0);
+}
+
 .dropdown-header {
   padding: 8px 20px 4px;
   font-size: 12px;
@@ -271,6 +305,12 @@ function goToRoute(path) {
   transition: background-color 0.2s, color 0.2s;
   white-space: nowrap;
   text-align: left;
+}
+
+.dropdown-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
 }
 
 .dropdown-item:hover {
