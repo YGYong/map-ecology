@@ -15,8 +15,9 @@
               <span class="category-name">{{ category.name }}</span>
               <span class="category-count">({{ category.count }})</span>
             </template>
-            <el-menu-item v-for="subcategory in category.subcategories" :key="subcategory.id" :index="subcategory.id.toString()"
-              :class="{ active: selectedSubcategory === subcategory.id }" @click="selectSubcategory(subcategory, category)">
+            <el-menu-item v-for="subcategory in category.subcategories" :key="subcategory.id"
+              :index="subcategory.id.toString()" :class="{ active: selectedSubcategory === subcategory.id }"
+              @click="selectSubcategory(subcategory, category)">
               <span class="subcategory-name">{{ subcategory.name }}</span>
               <span class="subcategory-count">({{ getExamplesBySubcategory(subcategory.id).length }})</span>
             </el-menu-item>
@@ -68,7 +69,12 @@ const router = useRouter();
 
 const keyword = ref("");
 
-const images = import.meta.glob("../views/leafletExample/**/imgs/*.{png,jpg,jpeg,webp,svg,gif}", {
+const assetPreviews = import.meta.glob("../assets/leafletImg/*.{png,jpg,jpeg,webp,svg,gif}", {
+  eager: true,
+  import: "default",
+});
+
+const exampleImages = import.meta.glob("../views/leafletExample/**/imgs/*.{png,jpg,jpeg,webp,svg,gif}", {
   eager: true,
   import: "default",
 });
@@ -125,7 +131,15 @@ function goToExample(exampleId) {
   router.push(`/examples/leaflet/${exampleId}`);
 }
 
+// 获取预览图 URL
 function getPreviewImage(example) {
+  const preview = example?.preview;
+  if (preview) {
+    const lookupPath = String(preview).replace(/^@\//, "../");
+    if (assetPreviews[lookupPath]) return assetPreviews[lookupPath];
+    return placeholder;
+  }
+
   const dir = example.fileName.replace(/\/[^/]+$/, "");
   const prefix = `../views/${dir}/imgs/`;
 
@@ -145,7 +159,7 @@ function getPreviewImage(example) {
 
   for (const name of preferNames) {
     const hit = `${prefix}${name}`;
-    if (images[hit]) return images[hit];
+    if (exampleImages[hit]) return exampleImages[hit];
   }
 
   return placeholder;

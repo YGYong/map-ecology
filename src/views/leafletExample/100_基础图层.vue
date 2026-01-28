@@ -1,41 +1,18 @@
 <template>
-  <div class="map-wrapper">
-    <div class="control-panel">
-      <h2>地图图层控制</h2>
-      <div class="control-group">
-        <label>
-          <input type="checkbox" v-model="showMarkers" />
-          显示标记点
-        </label>
-        <label>
-          <input type="checkbox" v-model="showShapes" />
-          显示绘制图形
-        </label>
-        <label>
-          <input type="checkbox" v-model="showGeoJSON" />
-          显示 GeoJSON 数据
-        </label>
-      </div>
-      <button @click="resetMapView" class="reset-button">重置地图视图</button>
-    </div>
-    <div id="comprehensive-map" class="map-container"></div>
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import carIconUrl from "./imgs/car.svg";
 
+const mapContainer = ref(null);
 let map = null;
 let markerLayerGroup = null;
 let shapeLayerGroup = null;
 let geojsonLayerGroup = null;
-
-const showMarkers = ref(true);
-const showShapes = ref(true);
-const showGeoJSON = ref(true);
 
 // 自定义图标定义
 const customIcon = L.icon({
@@ -113,7 +90,7 @@ const initialZoom = 12;
 
 onMounted(() => {
   // 初始化地图
-  map = L.map("comprehensive-map").setView(initialView, initialZoom);
+  map = L.map(mapContainer.value).setView(initialView, initialZoom);
 
   // 添加高德地图瓦片图层
   L.tileLayer(
@@ -182,124 +159,12 @@ onMounted(() => {
         : {};
     },
   }).addTo(geojsonLayerGroup);
-
-  // 监听图层显示状态的变化
-  watch(showMarkers, (newValue) => {
-    if (newValue) {
-      map.addLayer(markerLayerGroup);
-    } else {
-      map.removeLayer(markerLayerGroup);
-    }
-  });
-
-  watch(showShapes, (newValue) => {
-    if (newValue) {
-      map.addLayer(shapeLayerGroup);
-    } else {
-      map.removeLayer(shapeLayerGroup);
-    }
-  });
-
-  watch(showGeoJSON, (newValue) => {
-    if (newValue) {
-      map.addLayer(geojsonLayerGroup);
-    } else {
-      map.removeLayer(geojsonLayerGroup);
-    }
-  });
 });
-
-onUnmounted(() => {
-  if (map) {
-    map.remove(); // 组件卸载时销毁地图实例
-    map = null;
-  }
-});
-
-const resetMapView = () => {
-  if (map) {
-    map.setView(initialView, initialZoom);
-  }
-};
 </script>
 
 <style scoped>
-.map-wrapper {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  font-family: sans-serif;
-  overflow: hidden;
-}
-
 .map-container {
   width: 100%;
   height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  background-color: #e0e0e0;
-}
-
-.control-panel {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1000; /* Ensure it's above the map */
-  width: 200px;
-  height: 25%;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 5px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.control-panel h2 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.control-group label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #555;
-  font-size: 14px;
-}
-
-.control-group input[type="checkbox"] {
-  margin-right: 8px;
-}
-
-.reset-button {
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-  margin-top: 5px;
-}
-
-.reset-button:hover {
-  background-color: #0056b3;
-}
-
-.reset-button:active {
-  background-color: #004085;
 }
 </style>

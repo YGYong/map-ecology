@@ -2,11 +2,14 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-measure/dist/leaflet-measure.css";
 
 import L from "leaflet";
 import "leaflet.markercluster";
 import "leaflet-draw";
 import "leaflet.heat";
+import "leaflet-measure";
+import leafletImage from "leaflet-image";
 
 import { DomCodeExecutor } from "./domCodeExecutor";
 
@@ -18,7 +21,7 @@ if (typeof window !== 'undefined') {
 
 export class LeafletCodeExecutor extends DomCodeExecutor {
   constructor(hostElement) {
-    super(hostElement, () => ({ L }));
+    super(hostElement, () => ({ L, leafletImage }));
   }
 }
 

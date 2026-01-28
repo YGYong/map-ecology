@@ -1,7 +1,5 @@
 <template>
-  <div class="map-wrapper">
-    <div id="map-heatmap" class="map-container"></div>
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
@@ -9,20 +7,20 @@
  * 依赖下载
  * npm install leaflet.heat
  */
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import 'leaflet.heat'; // 引入热力图插件JS
 
 let map = null;
 let heatLayer = null;
-const showHeatmap = ref(true);
+const mapContainer = ref(null);
 
 const initialView = [39.909186, 116.397479];
 const initialZoom = 12;
 
 onMounted(() => {
-  map = L.map('map-heatmap').setView(initialView, initialZoom);
+  map = L.map(mapContainer.value).setView(initialView, initialZoom);
 
   L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
     maxZoom: 18,
@@ -52,39 +50,11 @@ onMounted(() => {
     }
   }).addTo(map);
 });
-
-onUnmounted(() => {
-  if (map) {
-    if (heatLayer) {
-      map.removeLayer(heatLayer);
-    }
-    map.remove();
-    map = null;
-    heatLayer = null;
-  }
-});
 </script>
 
 <style scoped>
-.map-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  font-family: sans-serif;
-  box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  .map-wrapper {
-    flex-direction: row;
-  }
-}
-
 .map-container {
-  flex-grow: 1;
+  width: 100%;
   height: 100%;
-  min-height: 300px;
-  background-color: #e0e0e0;
 }
 </style>

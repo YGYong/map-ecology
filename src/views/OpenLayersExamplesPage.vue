@@ -44,7 +44,7 @@
                 <div v-for="example in getExamplesBySubcategory(subcategory.id)" :key="example.id" class="example-card"
                   @click="goToExample(example.id)">
                   <div class="example-preview">
-                    <img :src="getPreviewImage(example)" :alt="example.name" loading="lazy" />
+                    <img v-if="getPreviewImage(example)" :src="getPreviewImage(example)" :alt="example.name" loading="lazy" />
                   </div>
                   <div class="example-info">{{ example.name }}</div>
                 </div>
@@ -61,12 +61,16 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import TopNavbar from "../components/TopNavbar.vue";
-import placeholder from "@/assets/example-placeholder.svg";
 import { getFrameworkCatalog } from "@/utils/frameworkExamples";
 
 const router = useRouter();
 
 const keyword = ref("");
+
+const assetPreviews = import.meta.glob("../assets/openLayersImg/*.{png,jpg,jpeg,webp,svg,gif}", {
+  eager: true,
+  import: "default",
+});
 
 const images = import.meta.glob("../views/openLayersExample/**/imgs/*.{png,jpg,jpeg,webp,svg,gif}", {
   eager: true,
@@ -126,6 +130,12 @@ function goToExample(exampleId) {
 }
 
 function getPreviewImage(example) {
+  const preview = example?.preview;
+  if (preview) {
+    const lookupPath = String(preview).replace(/^@\//, "../");
+    return assetPreviews[lookupPath] || "";
+  }
+
   const dir = example.fileName.replace(/\/[^/]+$/, "");
   const prefix = `../views/${dir}/imgs/`;
 
@@ -148,7 +158,7 @@ function getPreviewImage(example) {
     if (images[hit]) return images[hit];
   }
 
-  return placeholder;
+  return "";
 }
 </script>
 

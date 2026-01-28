@@ -1,7 +1,5 @@
 <template>
-  <div class="map-wrapper">
-    <div id="map-cluster" class="map-container"></div>
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
@@ -9,7 +7,7 @@
  * 依赖下载
  * npm install leaflet.markercluster
  */
-import { onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css'; // 聚合插件的CSS
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'; // 聚合插件默认主题CSS
@@ -22,8 +20,10 @@ let markers = null;
 const initialView = [39.909186, 116.397479];
 const initialZoom = 10; // 初始缩放级别稍微小一点，更容易看到聚合效果
 
+const mapContainer = ref(null);
+
 onMounted(() => {
-  map = L.map('map-cluster').setView(initialView, initialZoom);
+  map = L.map(mapContainer.value).setView(initialView, initialZoom);
 
   L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
     maxZoom: 18,
@@ -51,42 +51,11 @@ onMounted(() => {
   // map.fitBounds(markers.getBounds());
 });
 
-onUnmounted(() => {
-  if (map) {
-    map.remove();
-    map = null;
-    markers = null;
-  }
-});
-
-const resetMapView = () => {
-  if (map) {
-    map.setView(initialView, initialZoom);
-  }
-};
 </script>
 
 <style scoped>
-/* 样式与上一个案例类似，确保布局一致 */
-.map-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  font-family: sans-serif;
-  box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  .map-wrapper {
-    flex-direction: row;
-  }
-}
-
 .map-container {
-  flex-grow: 1;
   height: 100%;
-  min-height: 300px;
-  background-color: #e0e0e0;
+  width: 100%;
 }
 </style>
