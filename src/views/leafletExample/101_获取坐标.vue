@@ -4,8 +4,8 @@
       <h2>地图事件监听</h2>
       <div class="info-display">
         <p>点击地图获取坐标：</p>
-        <p><strong>经度 (Lng):</strong> {{ lng.value !== null ? lng.value.toFixed(6) : "N/A" }}</p>
-        <p><strong>纬度 (Lat):</strong> {{ lat.value !== null ? lat.value.toFixed(6) : "N/A" }}</p>
+        <p><strong>经度 (Lng):</strong> {{ lng !== null ? lng.toFixed(6) : "N/A" }}</p>
+        <p><strong>纬度 (Lat):</strong> {{ lat !== null ? lat.toFixed(6) : "N/A" }}</p>
       </div>
       <button @click="resetMapView" class="reset-button">重置地图视图</button>
     </div>

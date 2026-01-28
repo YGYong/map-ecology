@@ -21,15 +21,15 @@ export const leafletExamples = [
     category: 2001,
   },
   {
-    id: "100_基础图层绘制",
+    id: "100_基础图层",
     name: "基础图层绘制",
-    fileName: "leafletExample/100_基础图层绘制.vue",
+    fileName: "leafletExample/100_基础图层.vue",
     category: 2001,
   },
   {
-    id: "104_图层切换控制器",
+    id: "104_图层切换",
     name: "图层切换控制器",
-    fileName: "leafletExample/104_图层切换控制器.vue",
+    fileName: "leafletExample/104_图层切换.vue",
     category: 2002,
   },
   {
@@ -69,12 +69,6 @@ export const leafletExamples = [
     category: 2003,
   },
   {
-    id: "113_拖拽",
-    name: "拖拽",
-    fileName: "leafletExample/113_拖拽.vue",
-    category: 2003,
-  },
-  {
     id: "109_动画",
     name: "动画",
     fileName: "leafletExample/109_动画.vue",
@@ -104,11 +98,4 @@ export const leafletExamples = [
     fileName: "leafletExample/106_路径规划.vue",
     category: 2004,
   },
-  {
-    id: "114_模拟API",
-    name: "模拟API",
-    fileName: "leafletExample/114_模拟API.vue",
-    category: 2004,
-  },
 ];
-
