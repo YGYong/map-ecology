@@ -67,7 +67,7 @@ import RegularShape from "ol/style/RegularShape.js";
 
 import { DomCodeExecutor } from "./domCodeExecutor";
 
-const moduleRegistry = {
+const baseModuleRegistry = {
   "ol/Map": { default: Map },
   "ol/Map.js": { default: Map },
   "ol/View": { default: View },
@@ -265,8 +265,84 @@ const openLayersContext = {
   RegularShape,
 };
 
+let optionalDepsPromise = null;
+
+const normalizeExport = (mod, preferredNames = []) => {
+  if (!mod) return null;
+  if (mod.default !== undefined) return mod.default;
+  for (const name of preferredNames) {
+    if (mod[name] !== undefined) return mod[name];
+  }
+  return mod;
+};
+
+const loadOptionalDeps = async () => {
+  if (optionalDepsPromise) return optionalDepsPromise;
+
+  optionalDepsPromise = (async () => {
+    const contextAdditions = {};
+    const registryAdditions = {};
+
+    try {
+      const echartsMod = await import("echarts");
+      contextAdditions.echarts = echartsMod.default ?? echartsMod;
+      registryAdditions["echarts"] = echartsMod;
+    } catch {
+      // optional
+    }
+
+    try {
+      const olEchartsMod = await import("ol-echarts");
+      const layer = normalizeExport(olEchartsMod, ["EChartsLayer"]);
+      contextAdditions.EChartsLayer = layer;
+      registryAdditions["ol-echarts"] = { default: layer, EChartsLayer: layer };
+    } catch {
+      // optional
+    }
+
+    try {
+      const olWindMod = await import("ol-wind");
+      const layer = normalizeExport(olWindMod, ["WindLayer"]);
+      contextAdditions.WindLayer = layer;
+      registryAdditions["ol-wind"] = { default: layer, WindLayer: layer };
+    } catch {
+      // optional
+    }
+
+    try {
+      const smoothMod = await import("chaikin-smooth");
+      const fn = normalizeExport(smoothMod, ["smooth"]);
+      contextAdditions.smooth = fn;
+      registryAdditions["chaikin-smooth"] = { default: fn, smooth: fn };
+    } catch {
+      // optional
+    }
+
+    try {
+      const giflerMod = await import("gifler");
+      const fn = normalizeExport(giflerMod, ["gifler"]);
+      contextAdditions.gifler = fn;
+      registryAdditions["gifler"] = { default: fn, gifler: fn };
+    } catch {
+      // optional
+    }
+
+    return { contextAdditions, registryAdditions };
+  })();
+
+  return optionalDepsPromise;
+};
+
 export class OpenLayersCodeExecutor extends DomCodeExecutor {
   constructor(hostElement) {
-    super(hostElement, () => openLayersContext, moduleRegistry);
+    super(
+      hostElement,
+      async () => {
+        const { contextAdditions, registryAdditions } = await loadOptionalDeps();
+        this.moduleRegistry = { ...baseModuleRegistry, ...registryAdditions };
+        return { ...openLayersContext, ...contextAdditions };
+      },
+      baseModuleRegistry,
+    );
   }
 }

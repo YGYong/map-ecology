@@ -559,7 +559,7 @@ export class DomCodeExecutor {
           this.updateBindings();
         };
 
-        el.addEventListener(eventName, fromEl);
+        el.addEventListener(eventName, fromEl, true);
         bindingsArray.push(updateEl);
       }
 
