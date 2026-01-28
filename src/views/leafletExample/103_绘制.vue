@@ -8,8 +8,6 @@
  * npm install leaflet-draw
  */
 import { ref, onMounted } from "vue";
-// 需要使用cdn引入
-
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css"; // Leaflet.draw 插件的CSS
 import L from "leaflet";

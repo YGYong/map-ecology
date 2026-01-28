@@ -5,6 +5,9 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-measure/dist/leaflet-measure.css";
 
 import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import "leaflet.markercluster";
 import "leaflet-draw";
 import "leaflet.heat";
@@ -18,6 +21,13 @@ import { DomCodeExecutor } from "./domCodeExecutor";
 if (typeof window !== 'undefined') {
     window.L = L;
 }
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 export class LeafletCodeExecutor extends DomCodeExecutor {
   constructor(hostElement) {

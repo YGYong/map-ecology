@@ -10,6 +10,7 @@
 
 <script setup>
 /**
+ * 依赖下载
  * npm install leaflet-image
  */
 import { ref, onMounted } from "vue";

@@ -39,10 +39,10 @@ export class CodeExecutor {
 
       // Mock Cesium to intercept Viewer creation
       const self = this;
-      const MockCesium = Object.defineProperties(
-        {},
-        Object.getOwnPropertyDescriptors(Cesium),
-      );
+      const MockCesium = {};
+      Object.keys(Cesium).forEach((k) => {
+        MockCesium[k] = Cesium[k];
+      });
       MockCesium.Viewer = function (container, options) {
         // Apply configuration to the real existing viewer
         self.applyConfigToViewer(options || {});
