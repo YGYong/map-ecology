@@ -5,17 +5,9 @@
 <script setup>
 /**
  * 案例参考[官方示例 Animated GIF](https://openlayers.org/en/latest/examples/animated-gif.html)
-
-## 介绍
-
-1. 需要使用到 `gifler` 库来加载 gif 图像。
-2. `gifler`不支持**ES6**模块导入，需要使用 CDN 引入。
-3. 在 OpenLayers 中使用 gif 图像时，需要将其作为 `ol/style/Icon` 的图像源。
-
-```html
-<!-- 通过 CDN 引入 gifler 库 -->
-src="https://unpkg.com/gifler@0.1.0/gifler.min.js"
-```
+ * 
+ * 1. 需要使用到 `gifler` 库来加载 gif 图像。
+ * 2. `gifler` 不支持 ES6 模块导入，通过 CDN 引入。
  */
 import { ref, onMounted } from "vue";
 import Map from "ol/Map.js";
@@ -28,36 +20,50 @@ import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import Style from "ol/style/Style.js";
 import Icon from "ol/style/Icon.js";
+import { fromLonLat } from "ol/proj.js";
 import "ol/ol.css";
-import gifler from "gifler";
-// 引入gif动图
+
+// 引入 gif 动图
 import gifUrl from "./imgs/globe.gif";
+
 const mapContainer = ref(null);
 let map = null;
+
 const view = new View({
-  center: [116.4074, 39.9042], // 北京市中心经纬度
+  center: fromLonLat([116.4074, 39.9042]),
   zoom: 10,
-  projection: "EPSG:4326", // 默认使用Web Mercator投影，需要设置为EPSG:4326经纬度
 });
-onMounted(() => {
+
+onMounted(async () => {
+  // 动态加载 gifler (如果全局没有)
+  if (typeof window.gifler !== 'function') {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/gifler@0.1.0/gifler.min.js';
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
   map = new Map({
     target: mapContainer.value,
     layers: [
       new TileLayer({
         source: new XYZ({
-          // 高德地图瓦片服务地址
-          url: "https://webst01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}",
+          url: "https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}",
         }),
       }),
     ],
     view,
   });
+
   loadGif();
 });
-// 加载gif
+
 const loadGif = () => {
   const iconFeature = new Feature({
-    geometry: new Point([116.4074, 39.9042]),
+    geometry: new Point(fromLonLat([116.4074, 39.9042])),
   });
 
   const vectorSource = new VectorSource({
@@ -70,8 +76,8 @@ const loadGif = () => {
 
   map.addLayer(vectorLayer);
 
-  // 使用gifler加载gif
-  const gif = gifler(gifUrl);
+  // 使用 gifler 加载 gif
+  const gif = window.gifler(gifUrl);
   gif.frames(
     document.createElement("canvas"),
     function (ctx, frame) {
@@ -92,13 +98,13 @@ const loadGif = () => {
     true
   );
 
-  // 鼠标悬停时显示手型
   map.on("pointermove", function (e) {
     const hit = map.hasFeatureAtPixel(e.pixel);
     map.getTargetElement().style.cursor = hit ? "pointer" : "";
   });
 };
 </script>
+
 <style scoped>
 #map {
   width: 100vw;

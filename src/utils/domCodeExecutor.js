@@ -67,7 +67,7 @@ export class DomCodeExecutor {
         return refObj;
       };
 
-      const context = {
+      const baseContext = {
         console: window.console,
         document: window.document,
         window: window,
@@ -133,25 +133,55 @@ export class DomCodeExecutor {
       };
 
       if (typeof this.contextFactory === "function") {
-        Object.assign(context, await this.contextFactory());
+        Object.assign(baseContext, await this.contextFactory());
       }
+
+      // Proxy for Script Context: Handles ref assignments automatically
+      const scriptContext = new Proxy(baseContext, {
+        get(target, prop) {
+          return target[prop];
+        },
+        set(target, prop, value) {
+          const val = target[prop];
+          if (val && typeof val === "object" && "value" in val && !prop.startsWith("__")) {
+            val.value = value;
+            return true;
+          }
+          target[prop] = value;
+          return true;
+        },
+        has(target, prop) {
+          return prop in target;
+        }
+      });
+
+      // Proxy for Template Context: Automatically unwraps refs for template usage
+      const templateContext = new Proxy(scriptContext, {
+        get(target, prop) {
+          const val = target[prop];
+          if (val && typeof val === "object" && "value" in val && !prop.startsWith("__")) {
+            return val.value;
+          }
+          return val;
+        }
+      });
 
       if (template) {
-        this.renderTemplate(template, context);
+        this.renderTemplate(template, templateContext);
       }
 
-      Object.keys(context.refs).forEach((refName) => {
-        context[refName] = { value: context.refs[refName] };
+      Object.keys(baseContext.refs).forEach((refName) => {
+        baseContext[refName] = { value: baseContext.refs[refName] };
       });
 
       if (script) {
-        this.applyModuleImports(script, context);
+        this.applyModuleImports(script, baseContext);
         script = this.transformAssetImports(script);
         script = script.replace(/import\s+.*?from\s+['"].*?['"];?\s*/g, "");
         script = script.replace(/import\s+['"].*?['"];?\s*/g, "");
         script = script.replace(/export\s+(default\s+)?/g, "");
 
-        script = this.stripTemplateRefDeclarations(script, Object.keys(context.refs));
+        script = this.stripTemplateRefDeclarations(script, Object.keys(baseContext.refs));
 
         // Only convert top-level declarations (no indentation)
         script = script.replace(
@@ -177,11 +207,12 @@ export class DomCodeExecutor {
         `;
 
         const executor = new Function(wrappedCode);
-        executor.call(context);
+        // Execution uses scriptContext so ref assignments work
+        executor.call(scriptContext);
 
         if (this.sandboxRoot) {
-          this.bindEvents(this.sandboxRoot, context);
-          this.setupBindings(this.sandboxRoot, context, this.bindings);
+          this.bindEvents(this.sandboxRoot, scriptContext);
+          this.setupBindings(this.sandboxRoot, templateContext, this.bindings);
           this.updateBindings();
         }
       }
@@ -305,7 +336,6 @@ export class DomCodeExecutor {
     if (root.tagName) allElements.unshift(root);
 
     allElements.forEach((el) => {
-      // If element has v-for, its events will be bound by v-for logic for clones
       if (el.hasAttribute("v-for")) return;
 
       Array.from(el.attributes).forEach((attr) => {
@@ -411,17 +441,13 @@ export class DomCodeExecutor {
 
       const rootKey = m[1];
       const rest = m[2] ? m[2].split(".").filter(Boolean) : [];
-      let target = context[rootKey];
-      if (target && typeof target === "object" && "value" in target) {
-        if (rest.length === 0) {
-          const prev = target.value;
-          target.value = value;
-          if (context.__notifyRefChange) context.__notifyRefChange(target, value, prev);
-          return;
-        }
-        target = target.value;
+      
+      if (rest.length === 0) {
+        context[rootKey] = value;
+        return;
       }
 
+      let target = context[rootKey];
       if (!target || typeof target !== "object") return;
       let obj = target;
       for (let i = 0; i < rest.length - 1; i++) {
@@ -440,9 +466,7 @@ export class DomCodeExecutor {
       });
     };
 
-    // Handle v-for
     const vForElements = Array.from(root.querySelectorAll("[v-for]"));
-    // If root itself has v-for, handle it
     if (root.hasAttribute && root.hasAttribute("v-for")) {
       vForElements.unshift(root);
     }
@@ -472,7 +496,6 @@ export class DomCodeExecutor {
         const list = evalInContext(listExp);
         if (!Array.isArray(list)) return;
 
-        // Cleanup previous items and their bindings
         renderedItems.forEach((ri) => {
           ri.element.remove();
           ri.bindings.forEach((b) => {
@@ -492,10 +515,7 @@ export class DomCodeExecutor {
           this.bindEvents(clone, childContext);
           this.setupBindings(clone, childContext, itemBindings);
 
-          // Add item bindings to main bindings list
           this.bindings.push(...itemBindings);
-
-          // Execute new bindings once
           itemBindings.forEach((b) => b());
 
           parent.insertBefore(clone, placeholder);
@@ -504,7 +524,6 @@ export class DomCodeExecutor {
       });
     });
 
-    // Handle interpolation in text nodes
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const textNodes = [];
     while (walker.nextNode()) {
@@ -517,13 +536,10 @@ export class DomCodeExecutor {
       bindingsArray.push(() => updateTextNode(node, raw));
     });
 
-    // Handle other attributes
     const elements = Array.from(root.querySelectorAll("*"));
-    // If root itself is an element, process it
     if (root.tagName) elements.unshift(root);
 
     elements.forEach((el) => {
-      // Skip if this element is inside a v-for template we just processed
       if (vForElements.includes(el) || vForElements.some((v) => v.contains(el))) {
         return;
       }
