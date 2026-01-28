@@ -6,24 +6,15 @@
       <div class="toolbar">
         <div class="toolbar-title">地图绘制工具</div>
         <div class="toolbar-group">
-          <button
-            v-for="tool in drawingTools"
-            :key="tool.type"
-            class="tool-btn"
-            :class="{ active: currentTool === tool.type }"
-            @click="activateTool(tool.type)"
-          >
+          <button v-for="tool in drawingTools" :key="tool.type" class="tool-btn"
+            :class="{ active: currentTool === tool.type }" @click="activateTool(tool.type)">
             <span class="tool-icon">{{ tool.icon }}</span>
             <span class="tool-label">{{ tool.label }}</span>
           </button>
         </div>
 
         <div class="toolbar-group">
-          <button
-            class="tool-btn"
-            @click="activateModify"
-            :class="{ active: modifyActive }"
-          >
+          <button class="tool-btn" @click="activateModify" :class="{ active: modifyActive }">
             <span class="tool-icon">✏️</span>
             <span class="tool-label">修改要素</span>
           </button>
@@ -37,77 +28,12 @@
           </button>
         </div>
       </div>
-
-      <div class="info-panel">
-        <div class="info-header">
-          <h3>要素信息</h3>
-          <button class="export-btn" @click="exportGeoJSON">导出GeoJSON</button>
-        </div>
-
-        <div class="stats">
-          <div class="stat-item">
-            <div class="stat-label">点要素:</div>
-            <div class="stat-value">{{ featureCount.point }}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">线要素:</div>
-            <div class="stat-value">{{ featureCount.line }}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">面要素:</div>
-            <div class="stat-value">{{ featureCount.polygon }}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">其他要素:</div>
-            <div class="stat-value">{{ featureCount.other }}</div>
-          </div>
-        </div>
-
-        <div class="feature-list">
-          <div
-            v-for="(feature, index) in features"
-            :key="feature.getId() || index"
-            class="feature-item"
-            :class="{ selected: selectedFeature === feature }"
-            @click="selectFeature(feature)"
-          >
-            <div class="feature-icon">{{ getFeatureIcon(feature) }}</div>
-            <div class="feature-info">
-              <div class="feature-type">{{ getFeatureType(feature) }}</div>
-              <div class="feature-id">
-                ID: {{ feature.getId() || "未命名" }}
-              </div>
-            </div>
-          </div>
-
-          <div v-if="features.length === 0" class="empty-list">
-            尚未绘制任何要素
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="status-bar">
-      <div class="status-item">
-        <span class="status-label">当前工具:</span>
-        <span class="status-value">{{ currentToolLabel }}</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">要素总数:</span>
-        <span class="status-value">{{ features.length }}</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">选择状态:</span>
-        <span class="status-value">{{
-          selectedFeature ? "已选择" : "未选择"
-        }}</span>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import Map from "ol/Map";
 import View from "ol/View";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
@@ -145,14 +71,6 @@ const featureCount = ref({
   line: 0,
   polygon: 0,
   other: 0,
-});
-
-// 计算当前工具标签
-const currentToolLabel = computed(() => {
-  if (modifyActive.value) return "修改要素";
-  if (!currentTool.value) return "未选择工具";
-  const tool = drawingTools.value.find((t) => t.type === currentTool.value);
-  return tool ? tool.label : "未选择工具";
 });
 
 // 初始化地图
@@ -295,80 +213,6 @@ function deleteSelected() {
 function clearAll() {
   vectorSource.value.clear();
   selectedFeature.value = null;
-}
-
-// 选择要素
-function selectFeature(feature) {
-  selectInteraction.value.getFeatures().clear();
-  selectInteraction.value.getFeatures().push(feature);
-  selectedFeature.value = feature;
-}
-
-// 导出为GeoJSON
-function exportGeoJSON() {
-  if (features.value.length === 0) {
-    alert("没有要素可导出");
-    return;
-  }
-
-  const geoJSON = {
-    type: "FeatureCollection",
-    features: [],
-  };
-
-  features.value.forEach((feature) => {
-    const geometry = feature.getGeometry();
-    const type = geometry.getType();
-
-    let geom;
-    if (type === "Circle") {
-      // 将圆形转换为多边形
-      const center = geometry.getCenter();
-      const radius = geometry.getRadius();
-      const points = 32;
-      const coords = [];
-
-      for (let i = 0; i < points; i++) {
-        const angle = (i * 2 * Math.PI) / points;
-        const x = center[0] + radius * Math.cos(angle);
-        const y = center[1] + radius * Math.sin(angle);
-        coords.push([x, y]);
-      }
-      coords.push(coords[0]); // 闭合多边形
-
-      geom = {
-        type: "Polygon",
-        coordinates: [coords],
-      };
-    } else {
-      geom = {
-        type: type,
-        coordinates: geometry.getCoordinates(),
-      };
-    }
-
-    geoJSON.features.push({
-      type: "Feature",
-      geometry: geom,
-      properties: {
-        id: feature.getId() || "未命名",
-        type: type,
-      },
-    });
-  });
-
-  const dataStr = JSON.stringify(geoJSON, null, 2);
-  const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(
-    dataStr
-  )}`;
-
-  const link = document.createElement("a");
-  link.setAttribute("href", dataUri);
-  link.setAttribute(
-    "download",
-    `map-features-${new Date().toISOString().slice(0, 10)}.geojson`
-  );
-  link.click();
 }
 
 // 创建要素样式
@@ -516,30 +360,6 @@ function createModifyStyle() {
     }),
   });
 }
-
-// 获取要素图标
-function getFeatureIcon(feature) {
-  const type = feature.getGeometry().getType();
-  if (type === "Point") return "📍";
-  if (type === "LineString") return "📏";
-  if (type === "Polygon") return "⬢";
-  if (type === "Circle") return "⭕";
-  return "❓";
-}
-
-// 获取要素类型
-function getFeatureType(feature) {
-  const type = feature.getGeometry().getType();
-  if (type === "Circle") return "圆形";
-  return type;
-}
-
-// 组件卸载时清理
-onUnmounted(() => {
-  if (map.value) {
-    map.value.dispose();
-  }
-});
 </script>
 
 <style scoped>
@@ -618,11 +438,6 @@ onUnmounted(() => {
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.tool-btn.active {
-  background: #2c3e50;
-  box-shadow: 0 0 0 3px #3498db;
-}
-
 .tool-icon {
   font-size: 1.8rem;
   margin-bottom: 5px;
@@ -630,171 +445,5 @@ onUnmounted(() => {
 
 .tool-label {
   font-size: 0.85rem;
-}
-
-.info-panel {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  max-height: 300px;
-  display: flex;
-  flex-direction: column;
-}
-
-.info-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.info-header h3 {
-  margin: 0;
-  color: #2c3e50;
-}
-
-.export-btn {
-  padding: 8px 12px;
-  background: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.export-btn:hover {
-  background: #219653;
-  transform: translateY(-2px);
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 15px;
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 8px;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-}
-
-.stat-label {
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-.stat-value {
-  font-weight: 700;
-  color: #3498db;
-}
-
-.feature-list {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 150px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 5px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 5px;
-  border-radius: 6px;
-  background: #f8f9fa;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.feature-item:hover {
-  background: #e3f2fd;
-}
-
-.feature-item.selected {
-  background: #bbdefb;
-  border-left: 3px solid #3498db;
-}
-
-.feature-icon {
-  font-size: 1.8rem;
-  margin-right: 12px;
-  width: 40px;
-  text-align: center;
-}
-
-.feature-info {
-  flex: 1;
-}
-
-.feature-type {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.feature-id {
-  font-size: 0.8rem;
-  color: #7f8c8d;
-}
-
-.empty-list {
-  text-align: center;
-  padding: 20px;
-  color: #7f8c8d;
-  font-style: italic;
-}
-
-.coords-value {
-  font-family: "Courier New", monospace;
-  font-size: 1.1rem;
-  color: #2c3e50;
-  font-weight: bold;
-}
-
-.zoom-level {
-  font-family: "Courier New", monospace;
-  font-size: 1rem;
-  color: #e74c3c;
-  font-weight: bold;
-}
-
-.status-bar {
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 20px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  z-index: 1;
-}
-
-.status-item {
-  display: flex;
-  gap: 8px;
-}
-
-.status-label {
-  color: #bdc3c7;
-}
-
-.status-value {
-  font-weight: 600;
 }
 </style>

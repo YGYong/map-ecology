@@ -13,8 +13,11 @@
   },
   "dependencies": {
     "@vue/compiler-sfc": "^3.5.27",
+    "chaikin-smooth": "^1.0.4",
     "codemirror": "^5.65.20",
+    "echarts": "^6.0.0",
     "element-plus": "^2.13.1",
+    "gifler": "^0.1.0",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "leaflet-image": "^0.4.0",
@@ -22,6 +25,8 @@
     "leaflet.heat": "^0.2.0",
     "leaflet.markercluster": "^1.5.3",
     "ol": "^10.0.0",
+    "ol-echarts": "^4.0.1",
+    "ol-wind": "^1.1.9",
     "vue": "^3.5.13",
     "vue-router": "^4.6.4"
   },

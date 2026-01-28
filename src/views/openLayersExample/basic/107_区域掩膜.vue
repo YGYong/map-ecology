@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import Map from "ol/Map.js";
 import XYZ from "ol/source/XYZ.js";
 import TileLayer from "ol/layer/Tile.js";
@@ -24,6 +24,13 @@ const view = new View({
   projection: "EPSG:4326",
 });
 
+onUnmounted(() => {
+  if (map) {
+    map.setTarget(null);
+    map = null;
+  }
+});
+
 onMounted(async () => {
   map = new Map({
     target: mapContainer.value,
@@ -38,7 +45,9 @@ onMounted(async () => {
   });
 
   // 创建canvas
-  const { offsetWidth, offsetHeight } = map.getViewport();
+  const viewport = map.getViewport();
+  const offsetWidth = viewport.offsetWidth;
+  const offsetHeight = viewport.offsetHeight;
   canvas = document.createElement("canvas");
   canvas.width = offsetWidth;
   canvas.height = offsetHeight;
@@ -47,7 +56,7 @@ onMounted(async () => {
   canvas.style.left = "0px";
   canvas.style.zIndex = "1";
   ctx = canvas.getContext("2d");
-  map.getViewport().appendChild(canvas);
+  viewport.appendChild(canvas);
 
   // 注册map事件
   map.on("postrender", () => {

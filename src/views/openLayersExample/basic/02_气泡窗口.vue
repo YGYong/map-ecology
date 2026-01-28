@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapContainer" id="map"></div>
+  <div ref="mapContainer" class="map-container"></div>
   <div ref="overlay" class="overlay">这是overlay1</div>
   <div ref="overlay2" class="overlay">这是overlay2</div>
 </template>
@@ -62,12 +62,11 @@ const initMap = () => {
 };
 </script>
 <style scoped>
-#map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
+.map-container {
   width: 100%;
+  height: 100%;
 }
+
 .overlay {
   width: 200px;
   height: 100px;

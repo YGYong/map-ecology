@@ -37,12 +37,6 @@ export const openLayersExamples = [
     category: 3001,
   },
   {
-    id: "112_官方hcl",
-    name: "官方hcl",
-    fileName: "openLayersExample/basic/112_官方hcl.vue",
-    category: 3001,
-  },
-  {
     id: "113_底图颜色调节",
     name: "底图颜色调节",
     fileName: "openLayersExample/basic/113_底图颜色调节.vue",
@@ -61,15 +55,15 @@ export const openLayersExamples = [
     category: 3001,
   },
   {
-    id: "07_overlay",
-    name: "overlay",
-    fileName: "openLayersExample/basic/07_overlay.vue",
+    id: "02_气泡窗口",
+    name: "气泡窗口",
+    fileName: "openLayersExample/basic/02_气泡窗口.vue",
     category: 3002,
   },
   {
-    id: "14_Select",
-    name: "Select",
-    fileName: "openLayersExample/basic/14_Select.vue",
+    id: "03_Geojson",
+    name: "Geojson",
+    fileName: "openLayersExample/basic/03_Geojson.vue",
     category: 3002,
   },
   {
@@ -151,12 +145,6 @@ export const openLayersExamples = [
     category: 3003,
   },
   {
-    id: "105_信息弹窗",
-    name: "信息弹窗",
-    fileName: "openLayersExample/basic/105_信息弹窗.vue",
-    category: 3003,
-  },
-  {
     id: "119_动态数据",
     name: "动态数据",
     fileName: "openLayersExample/basic/119_动态数据.vue",
@@ -184,12 +172,6 @@ export const openLayersExamples = [
     id: "130_自定义形状",
     name: "自定义形状",
     fileName: "openLayersExample/basic/130_自定义形状.vue",
-    category: 3003,
-  },
-  {
-    id: "120_Style属性调试",
-    name: "Style属性调试",
-    fileName: "openLayersExample/basic/120_Style属性调试.vue",
     category: 3003,
   },
   {
@@ -247,12 +229,6 @@ export const openLayersExamples = [
     category: 3006,
   },
   {
-    id: "138_风箭",
-    name: "风箭",
-    fileName: "openLayersExample/basic/138_风箭.vue",
-    category: 3006,
-  },
-  {
     id: "114_模拟台风风场",
     name: "模拟台风风场",
     fileName: "openLayersExample/basic/114_模拟台风风场.vue",
@@ -271,4 +247,3 @@ export const openLayersExamples = [
     category: 3007,
   },
 ];
-

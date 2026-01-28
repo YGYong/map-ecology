@@ -1,27 +1,29 @@
 <template>
-  <div>
-    <div id="map" class="map"></div>
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import ImageLayer from "ol/layer/Image";
 import Map from "ol/Map";
 import View from "ol/View";
 import XYZ from "ol/source/XYZ";
 import "ol/ol.css";
 import { Raster as RasterSource } from "ol/source";
+
+const mapContainer = ref(null);
+let map = null;
+
 onMounted(() => {
   //定义颜色转换方法
-  let reverseFunc = function (pixelsTemp) {
+  const reverseFunc = function (pixelsTemp) {
     //蓝色
-    for (var i = 0; i < pixelsTemp.length; i += 4) {
-      var r = pixelsTemp[i];
-      var g = pixelsTemp[i + 1];
-      var b = pixelsTemp[i + 2];
+    for (let i = 0; i < pixelsTemp.length; i += 4) {
+      const r = pixelsTemp[i];
+      const g = pixelsTemp[i + 1];
+      const b = pixelsTemp[i + 2];
       //运用图像学公式，设置灰度值
-      var grey = r * 0.3 + g * 0.59 + b * 0.11;
+      const grey = r * 0.3 + g * 0.59 + b * 0.11;
       //将rgb的值替换为灰度值
       pixelsTemp[i] = grey;
       pixelsTemp[i + 1] = grey;
@@ -57,8 +59,8 @@ onMounted(() => {
   });
 
   //设置地图
-  new Map({
-    target: "map",
+  map = new Map({
+    target: mapContainer.value,
     layers: [
       new ImageLayer({
         source: raster,
@@ -71,10 +73,17 @@ onMounted(() => {
     }),
   });
 });
+
+onUnmounted(() => {
+  if (map) {
+    map.setTarget(null);
+    map = null;
+  }
+});
 </script>
 
 <style scoped>
-.map {
+.map-container {
   width: 100vw;
   height: 100vh;
 }

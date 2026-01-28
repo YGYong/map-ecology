@@ -14,7 +14,7 @@
 
 ```html
 <!-- 通过 CDN 引入 gifler 库 -->
-<script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
+src="https://unpkg.com/gifler@0.1.0/gifler.min.js"
 ```
  */
 import { ref, onMounted } from "vue";
@@ -29,6 +29,7 @@ import VectorLayer from "ol/layer/Vector.js";
 import Style from "ol/style/Style.js";
 import Icon from "ol/style/Icon.js";
 import "ol/ol.css";
+import gifler from "gifler";
 // 引入gif动图
 import gifUrl from "./imgs/globe.gif";
 const mapContainer = ref(null);

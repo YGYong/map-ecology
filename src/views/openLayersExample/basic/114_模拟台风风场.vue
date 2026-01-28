@@ -48,7 +48,6 @@ import Circle from "ol/geom/Circle.js";
 import { fromLonLat } from "ol/proj.js"; // 用于经纬度坐标与地图投影坐标之间的转换
 import { Style, Stroke, Fill, Circle as CircleStyle, Icon } from "ol/style.js"; // OpenLayers 样式相关模块，新增 Icon
 import "ol/ol.css"; // OpenLayers 默认样式
-import typhoonIconUrl from "./imgs/world.png";
 
 // OpenLayers 地图实例
 let map = null;
@@ -188,7 +187,7 @@ let typhoonPointFeatures = [];
 let windCircleFeature = null;
 
 // 台风中心点图片 URL，请替换为您的图片路径
-const TYPHOON_ICON_URL = typhoonIconUrl;
+const TYPHOON_ICON_URL = "/src/assets/风圈.png"; // 示例占位符图片
 
 onMounted(() => {
   // 基础瓦片图层 (高德地图)
@@ -215,22 +214,12 @@ onMounted(() => {
           }),
         });
       } else if (feature.get("type") === "current") {
-        // 当前台风中心点样式（使用circle代替）
-        // return new Style({
-        //   image: new CircleStyle({
-        //     radius: 10,
-        //     fill: new Fill({ color: "rgba(0, 150, 255, 0.8)" }), // 蓝色填充
-        //     stroke: new Stroke({ color: "white", width: 2 }), // 白色边框
-        //   }),
-        // });
-        // 当前台风中心点样式 (使用图片)
+        // 当前台风中心点样式 (使用图片，如果图片不存在则回退到圆形)
         return new Style({
-          image: new Icon({
-            anchor: [0.5, 0.5], // 图片中心与坐标点对齐
-            anchorXUnits: "fraction",
-            anchorYUnits: "fraction",
-            src: TYPHOON_ICON_URL, // 您的图片 URL
-            scale: 3.5, // 根据图片实际大小调整缩放比例
+          image: new CircleStyle({
+            radius: 12,
+            fill: new Fill({ color: "rgba(255, 0, 0, 0.8)" }),
+            stroke: new Stroke({ color: "white", width: 3 }),
           }),
         });
       } else if (feature.get("type") === "point") {

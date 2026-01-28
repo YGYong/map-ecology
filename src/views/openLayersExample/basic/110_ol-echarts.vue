@@ -1,39 +1,54 @@
 <template>
-  <div ref="mapContainer" id="map"></div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
 /**
  * 插件地址：[ol-echarts](https://github.com/sakitam-fdd/ol3Echarts?tab=readme-ov-file)
-
-`tips`:我这里是 openlayers10+,所以下载`ol-echarts`
-
-![ol-echarts](./assets/ol-echarts.png)
-
-## 实现思路
-
-案例参考：[来源](https://blog.csdn.net/treasurecp/article/details/122221087)
-
-```bash
-# 安装依赖
-npm install ol-echarts --save
-
-npm install echarts --save
-```
-
+ *
+ * `tips`:我这里是 openlayers10+,所以下载`ol-echarts`
+ *
+ * ![ol-echarts](./assets/ol-echarts.png)
+ *
+ * ## 实现思路
+ *
+ * 案例参考：[来源](https://blog.csdn.net/treasurecp/article/details/122221087)
+ *
+ * ```bash
+ * # 安装依赖
+ * npm install ol-echarts --save
+ *
+ * npm install echarts --save
+ * ```
+ *
  */
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import Map from "ol/Map.js";
 import XYZ from "ol/source/XYZ.js";
 import TileLayer from "ol/layer/Tile.js";
 import View from "ol/View.js";
 import "ol/ol.css";
-import EChartsLayer from 'ol-echarts'
+import EChartsLayer from "ol-echarts";
+
 const mapContainer = ref(null);
 let map = null;
+let echartslayer = null;
+
 onMounted(() => {
   initMap();
 });
+
+onUnmounted(() => {
+  if (map) {
+    map.setTarget(null);
+    map = null;
+  }
+  if (echartslayer) {
+    echartslayer.remove();
+    echartslayer = null;
+  }
+});
+
 const initMap = () => {
   map = new Map({
     target: mapContainer.value,
@@ -41,26 +56,8 @@ const initMap = () => {
     layers: [
       new TileLayer({
         source: new XYZ({
-          // 高德地图瓦片服务地址
-          // url: "https://webst01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}",
-          // 设置路网图层
-          // url: "https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
-
-          // 矢量图（含路网、含注记）
-          // url: "http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7 ",
-          // 矢量图（含路网、不含注记）
-          // url: 'http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=7 '
           // 影像地图（不含路网、不含注记）
-          // url: 'http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=6 '
-          // 影像地图（不含路网、不含注记）
-          url: 'http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=6 '
-          // 影像路网（含路网、含注记）
-          // url: 'http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8 '
-          // 影像路网（含路网、不含注记）
-          // url:'http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=8 '
-
-          // 设置天地图图层
-          // url: "http://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=token", // token替换为你的天地图API Key
+          url: "http://wprd0{1-4}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=2&style=6 ",
         }),
       }),
     ],
@@ -70,14 +67,16 @@ const initMap = () => {
       projection: "EPSG:4326", // 默认使用球面墨卡托投影(EPSG:3857)，需要设置为WGS 84(EPSG:4326)经纬度
     }),
   });
+
   //迁徙图图层初始化
-  var echartslayer = new EChartsLayer(getOption());
+  echartslayer = new EChartsLayer(getOption());
   echartslayer.appendTo(map);
 };
+
 //Echarts生成
 function getOption() {
   //每个点
-  var geoCoordMap = {
+  const geoCoordMap = {
     上海: [121.4648, 31.2891],
     北京: [116.4551, 40.2539],
     南宁: [108.479, 23.1152],
@@ -86,7 +85,7 @@ function getOption() {
     广州: [113.5107, 23.2196],
   };
   //对应关系
-  var BJData = [
+  const BJData = [
     [{ name: "北京" }, { name: "上海", value: 95 }],
     [{ name: "北京" }, { name: "广州", value: 90 }],
     [{ name: "北京" }, { name: "大连", value: 80 }],
@@ -94,12 +93,12 @@ function getOption() {
     [{ name: "北京" }, { name: "南昌", value: 60 }],
   ];
   //数据处理
-  var convertData = function (data) {
-    var res = [];
-    for (var i = 0; i < data.length; i++) {
-      var dataItem = data[i];
-      var fromCoord = geoCoordMap[dataItem[1].name];
-      var toCoord = geoCoordMap[dataItem[0].name];
+  const convertData = (data) => {
+    const res = [];
+    for (let i = 0; i < data.length; i++) {
+      const dataItem = data[i];
+      const fromCoord = geoCoordMap[dataItem[1].name];
+      const toCoord = geoCoordMap[dataItem[0].name];
       if (fromCoord && toCoord) {
         res.push({
           toName: dataItem[0].name,
@@ -112,7 +111,7 @@ function getOption() {
     return res;
   };
   //颜色数组
-  var color = [
+  const color = [
     "#a6c84c",
     "#ffa022",
     "#46bee9",
@@ -123,7 +122,7 @@ function getOption() {
     "#880015",
   ];
   //echarts所有配置
-  var series = [];
+  const series = [];
   series.push(
     {
       type: "lines", //添加连接线
@@ -137,7 +136,7 @@ function getOption() {
       },
       lineStyle: {
         normal: {
-          color: function (params) {
+          color: (params) => {
             console.log(params.value, params.data.fromName);
             return color[parseInt((params.value - 60) / 5)];
           },
@@ -165,12 +164,12 @@ function getOption() {
       symbolSize: 15,
       itemStyle: {
         normal: {
-          color: function (params) {
+          color: (params) => {
             return color[parseInt((params.value[2] - 60) / 5)]; //根据value值计算颜色
           },
         },
       },
-      data: BJData.map(function (dataItem) {
+      data: BJData.map((dataItem) => {
         return {
           name: dataItem[1].name,
           value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value]),
@@ -186,8 +185,9 @@ function getOption() {
   };
 }
 </script>
+
 <style scoped>
-#map {
+.map-container {
   position: absolute;
   top: 0;
   bottom: 0;

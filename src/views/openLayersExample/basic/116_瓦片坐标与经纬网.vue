@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
@@ -57,6 +57,13 @@ const toggleGraticule = () => {
     graticuleLayer.value.setVisible(isGraticuleVisible.value);
   }
 };
+
+onUnmounted(() => {
+  if (map) {
+    map.setTarget(null);
+    map = null;
+  }
+});
 
 onMounted(async () => {
   // 创建高德地图底图层

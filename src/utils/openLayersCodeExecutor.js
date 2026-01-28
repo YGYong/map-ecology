@@ -24,6 +24,9 @@ import Static from "ol/source/ImageStatic.js";
 import RasterSource from "ol/source/Raster.js";
 import Cluster from "ol/source/Cluster.js";
 import TileDebug from "ol/source/TileDebug.js";
+import GeoJSON from "ol/format/GeoJSON.js";
+// import EChartsLayer from "ol-echarts";
+// import WindLayer from "ol-wind";
 
 import Draw from "ol/interaction/Draw.js";
 import Modify from "ol/interaction/Modify.js";
@@ -106,6 +109,10 @@ const moduleRegistry = {
   "ol/source/Cluster.js": { default: Cluster },
   "ol/source/TileDebug": { default: TileDebug },
   "ol/source/TileDebug.js": { default: TileDebug },
+  "ol/format/GeoJSON": { default: GeoJSON },
+  "ol/format/GeoJSON.js": { default: GeoJSON },
+  // "ol-echarts": { default: EChartsLayer },
+  // "ol-wind": { default: WindLayer },
 
   "ol/interaction": { defaults: defaultInteractions, Draw, Modify, Select, Translate, Snap },
   "ol/interaction/defaults": { defaults: defaultInteractions },
@@ -214,6 +221,9 @@ const openLayersContext = {
   RasterSource,
   Cluster,
   TileDebug,
+  GeoJSON,
+  // EChartsLayer,
+  // WindLayer,
   Draw,
   Modify,
   Select,

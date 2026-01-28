@@ -36,16 +36,18 @@ export class DomCodeExecutor {
         return () => set.delete(fn);
       };
 
-      const notifyRefChange = (refObj, newVal, oldVal) => {
+      const notifyRefChange = (refObj, next, prev) => {
         const set = this.watchSubscriptions.get(refObj);
-        if (!set) return;
-        Array.from(set).forEach((fn) => {
-          try {
-            fn(newVal, oldVal);
-          } catch (e) {
-            console.error("watch callback error:", e);
-          }
-        });
+        if (set) {
+          set.forEach((fn) => {
+            try {
+              fn(next, prev);
+            } catch (e) {
+              console.error("Ref watcher error:", e);
+            }
+          });
+        }
+        this.updateBindings();
       };
 
       const createRef = (val) => {
@@ -151,6 +153,7 @@ export class DomCodeExecutor {
 
         script = this.stripTemplateRefDeclarations(script, Object.keys(context.refs));
 
+        // Only convert top-level declarations (no indentation)
         script = script.replace(
           /^(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=/gm,
           "this.$1 =",
@@ -178,7 +181,7 @@ export class DomCodeExecutor {
 
         if (this.sandboxRoot) {
           this.bindEvents(this.sandboxRoot, context);
-          this.setupBindings(this.sandboxRoot, context);
+          this.setupBindings(this.sandboxRoot, context, this.bindings);
           this.updateBindings();
         }
       }
@@ -298,8 +301,13 @@ export class DomCodeExecutor {
   }
 
   bindEvents(root, context) {
-    const allElements = root.querySelectorAll("*");
+    const allElements = Array.from(root.querySelectorAll("*"));
+    if (root.tagName) allElements.unshift(root);
+
     allElements.forEach((el) => {
+      // If element has v-for, its events will be bound by v-for logic for clones
+      if (el.hasAttribute("v-for")) return;
+
       Array.from(el.attributes).forEach((attr) => {
         if (attr.name.startsWith("@") || attr.name.startsWith("v-on:")) {
           const eventName = attr.name.startsWith("@")
@@ -353,7 +361,7 @@ export class DomCodeExecutor {
     });
   }
 
-  setupBindings(root, context) {
+  setupBindings(root, context, bindingsArray) {
     if (!root) return;
     const unwrap = (val) => {
       if (!val) return val;
@@ -432,6 +440,71 @@ export class DomCodeExecutor {
       });
     };
 
+    // Handle v-for
+    const vForElements = Array.from(root.querySelectorAll("[v-for]"));
+    // If root itself has v-for, handle it
+    if (root.hasAttribute && root.hasAttribute("v-for")) {
+      vForElements.unshift(root);
+    }
+
+    vForElements.forEach((el) => {
+      const vForExp = el.getAttribute("v-for");
+      el.removeAttribute("v-for");
+
+      const match = vForExp.match(
+        /^\s*(?:(?:\(\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*,\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\))|([a-zA-Z_$][a-zA-Z0-9_$]*))\s+in\s+(.+)$/,
+      );
+      if (!match) return;
+
+      const itemAlias = match[3] || match[1];
+      const indexAlias = match[2];
+      const listExp = match[4];
+
+      const parent = el.parentNode;
+      const placeholder = document.createComment(`v-for: ${vForExp}`);
+      parent.insertBefore(placeholder, el);
+      parent.removeChild(el);
+
+      const template = el;
+      let renderedItems = [];
+
+      bindingsArray.push(() => {
+        const list = evalInContext(listExp);
+        if (!Array.isArray(list)) return;
+
+        // Cleanup previous items and their bindings
+        renderedItems.forEach((ri) => {
+          ri.element.remove();
+          ri.bindings.forEach((b) => {
+            const idx = this.bindings.indexOf(b);
+            if (idx > -1) this.bindings.splice(idx, 1);
+          });
+        });
+        renderedItems = [];
+
+        list.forEach((item, index) => {
+          const clone = template.cloneNode(true);
+          const childContext = Object.create(context);
+          childContext[itemAlias] = item;
+          if (indexAlias) childContext[indexAlias] = index;
+
+          const itemBindings = [];
+          this.bindEvents(clone, childContext);
+          this.setupBindings(clone, childContext, itemBindings);
+
+          // Add item bindings to main bindings list
+          this.bindings.push(...itemBindings);
+
+          // Execute new bindings once
+          itemBindings.forEach((b) => b());
+
+          parent.insertBefore(clone, placeholder);
+          renderedItems.push({ element: clone, bindings: itemBindings });
+        });
+      });
+    });
+
+    // Handle interpolation in text nodes
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const textNodes = [];
     while (walker.nextNode()) {
@@ -441,11 +514,20 @@ export class DomCodeExecutor {
       }
     }
     textNodes.forEach(({ node, raw }) => {
-      this.bindings.push(() => updateTextNode(node, raw));
+      bindingsArray.push(() => updateTextNode(node, raw));
     });
 
-    const elements = root.querySelectorAll("*");
+    // Handle other attributes
+    const elements = Array.from(root.querySelectorAll("*"));
+    // If root itself is an element, process it
+    if (root.tagName) elements.unshift(root);
+
     elements.forEach((el) => {
+      // Skip if this element is inside a v-for template we just processed
+      if (vForElements.includes(el) || vForElements.some((v) => v.contains(el))) {
+        return;
+      }
+
       if (el.hasAttribute("v-model")) {
         const exp = el.getAttribute("v-model");
         const isCheckbox = el.tagName === "INPUT" && el.type === "checkbox";
@@ -478,13 +560,13 @@ export class DomCodeExecutor {
         };
 
         el.addEventListener(eventName, fromEl);
-        this.bindings.push(updateEl);
+        bindingsArray.push(updateEl);
       }
 
       if (el.hasAttribute("v-show")) {
         const exp = el.getAttribute("v-show");
         const originalDisplay = el.style.display;
-        this.bindings.push(() => {
+        bindingsArray.push(() => {
           const ok = Boolean(evalInContext(exp));
           el.style.display = ok ? originalDisplay : "none";
         });
@@ -492,10 +574,20 @@ export class DomCodeExecutor {
 
       if (el.hasAttribute("v-if")) {
         const exp = el.getAttribute("v-if");
-        const originalDisplay = el.style.display;
-        this.bindings.push(() => {
+        const placeholder = document.createComment(`v-if: ${exp}`);
+        const parent = el.parentNode;
+        let isRendered = true;
+
+        bindingsArray.push(() => {
           const ok = Boolean(evalInContext(exp));
-          el.style.display = ok ? originalDisplay : "none";
+          if (ok && !isRendered) {
+            parent.insertBefore(el, placeholder);
+            isRendered = true;
+          } else if (!ok && isRendered) {
+            parent.insertBefore(placeholder, el);
+            parent.removeChild(el);
+            isRendered = false;
+          }
         });
       }
 
@@ -506,7 +598,7 @@ export class DomCodeExecutor {
             : attr.name.slice(7);
           const exp = attr.value;
 
-          this.bindings.push(() => {
+          bindingsArray.push(() => {
             const v = evalInContext(exp);
             if (bindName === "class") {
               if (typeof v === "string") {
