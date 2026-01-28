@@ -1,18 +1,22 @@
 <template>
-  <div class="car-track-container">
-    <div ref="mapContainer" class="map"></div>
-    <div class="map-controls">
-      <h3>小车轨迹回放 🚗</h3>
-      <div class="control-group">
-        <button class="control-btn" @click="startTrack" :disabled="playing">开始</button>
-        <button class="control-btn" @click="pauseTrack" :disabled="!playing">暂停</button>
-        <button class="control-btn" @click="resumeTrack" :disabled="playing || finished">继续</button>
-        <button class="control-btn" @click="resetTrack">重置</button>
-      </div>
-      <div class="stats-section">
-        <div>进度: <span class="progress">{{ progress+1 }} / {{ trackPoints.length }}</span></div>
-        <div>状态: <span class="status">{{ statusText }}</span></div>
-      </div>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="map-controls-car">
+    <h3>小车轨迹回放 🚗</h3>
+    <div class="control-group">
+      <button class="control-btn" @click="startTrack" :disabled="playing">
+        开始
+      </button>
+      <button class="control-btn" @click="pauseTrack" :disabled="!playing">
+        暂停
+      </button>
+      <button
+        class="control-btn"
+        @click="resumeTrack"
+        :disabled="playing || finished"
+      >
+        继续
+      </button>
+      <button class="control-btn" @click="resetTrack">重置</button>
     </div>
   </div>
 </template>
@@ -29,7 +33,7 @@ import { Style, Stroke, Icon } from "ol/style";
 import { defaults as defaultControls, FullScreen, ScaleLine } from "ol/control";
 import { fromLonLat } from "ol/proj";
 import "ol/ol.css";
-import carIconUrl from "./imgs/world.png";
+import carIconUrl from "./imgs/car.png";
 
 const map = ref(null);
 const mapContainer = ref(null);
@@ -43,16 +47,16 @@ const timer = ref(null);
 
 // 预设轨迹点（经纬度）
 const trackPoints = ref([
-  [116.390, 39.900],
+  [116.39, 39.9],
   [116.392, 39.901],
   [116.395, 39.902],
   [116.398, 39.903],
-  [116.400, 39.905],
+  [116.4, 39.905],
   [116.402, 39.908],
-  [116.404, 39.910],
+  [116.404, 39.91],
   [116.406, 39.912],
   [116.408, 39.914],
-  [116.410, 39.916],
+  [116.41, 39.916],
 ]);
 
 const statusText = computed(() => {
@@ -78,20 +82,20 @@ function carStyle(angle = 0) {
       anchor: [0.5, 0.5],
       rotateWithView: true,
       rotation: -angle, // 加上这一行实现方向旋转
-    })
+    }),
   });
 }
 
 function trackLineStyle() {
   return new Style({
-    stroke: new Stroke({ color: '#1976d2', width: 4, lineDash: [8, 8] })
+    stroke: new Stroke({ color: "#1976d2", width: 4, lineDash: [8, 8] }),
   });
 }
 
 // 绘制轨迹线
 function drawTrack() {
   if (trackFeature.value) vectorSource.value.removeFeature(trackFeature.value);
-  const coords = trackPoints.value.map(pt => fromLonLat(pt));
+  const coords = trackPoints.value.map((pt) => fromLonLat(pt));
   trackFeature.value = new Feature({ geometry: new LineString(coords) });
   trackFeature.value.setStyle(trackLineStyle());
   vectorSource.value.addFeature(trackFeature.value);
@@ -160,7 +164,10 @@ function resetTrack() {
 
 onMounted(() => {
   vectorSource.value = new VectorSource();
-  const vectorLayer = new VectorLayer({ source: vectorSource.value, zIndex: 10 });
+  const vectorLayer = new VectorLayer({
+    source: vectorSource.value,
+    zIndex: 10,
+  });
   const baseLayer = new TileLayer({
     source: new XYZ({
       url: "https://webrd04.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
@@ -186,20 +193,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.car-track-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: linear-gradient(135deg, #1a237e, #4a148c);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-.map {
+.map-container {
   width: 100%;
   height: 100%;
-  background: #0d47a1;
 }
-.map-controls {
+.map-controls-car {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -212,7 +210,7 @@ onUnmounted(() => {
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
-.map-controls h3 {
+.map-controls-car h3 {
   margin-top: 0;
   margin-bottom: 15px;
   color: #1a237e;
@@ -256,7 +254,7 @@ onUnmounted(() => {
 }
 .progress {
   font-weight: bold;
-  color: #FFC107;
+  color: #ffc107;
 }
 .status {
   font-weight: bold;

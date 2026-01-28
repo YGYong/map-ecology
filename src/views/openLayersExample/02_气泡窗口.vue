@@ -74,5 +74,6 @@ const initMap = () => {
   padding: 10px;
   border: 1px solid aqua;
   border-radius: 4px;
+  color: #fff;
 }
 </style>

@@ -1,32 +1,39 @@
 <template>
-  <div class="drawing-map-container">
-    <div ref="mapContainer" class="map"></div>
+  <div ref="mapContainer" class="map-container"></div>
 
-    <div class="map-controls">
-      <div class="toolbar">
-        <div class="toolbar-title">地图绘制工具</div>
-        <div class="toolbar-group">
-          <button v-for="tool in drawingTools" :key="tool.type" class="tool-btn"
-            :class="{ active: currentTool === tool.type }" @click="activateTool(tool.type)">
-            <span class="tool-icon">{{ tool.icon }}</span>
-            <span class="tool-label">{{ tool.label }}</span>
-          </button>
-        </div>
+  <div class="map-controls">
+    <div class="toolbar">
+      <div class="toolbar-title">地图绘制工具</div>
+      <div class="toolbar-group">
+        <button
+          v-for="tool in drawingTools"
+          :key="tool.type"
+          class="tool-btn"
+          :class="{ active: currentTool === tool.type }"
+          @click="activateTool(tool.type)"
+        >
+          <span class="tool-icon">{{ tool.icon }}</span>
+          <span class="tool-label">{{ tool.label }}</span>
+        </button>
+      </div>
 
-        <div class="toolbar-group">
-          <button class="tool-btn" @click="activateModify" :class="{ active: modifyActive }">
-            <span class="tool-icon">✏️</span>
-            <span class="tool-label">修改要素</span>
-          </button>
-          <button class="tool-btn" @click="deleteSelected">
-            <span class="tool-icon">🗑️</span>
-            <span class="tool-label">删除选中</span>
-          </button>
-          <button class="tool-btn" @click="clearAll">
-            <span class="tool-icon">♻️</span>
-            <span class="tool-label">清空所有</span>
-          </button>
-        </div>
+      <div class="toolbar-group">
+        <button
+          class="tool-btn"
+          @click="activateModify"
+          :class="{ active: modifyActive }"
+        >
+          <span class="tool-icon">✏️</span>
+          <span class="tool-label">修改要素</span>
+        </button>
+        <button class="tool-btn" @click="deleteSelected">
+          <span class="tool-icon">🗑️</span>
+          <span class="tool-label">删除选中</span>
+        </button>
+        <button class="tool-btn" @click="clearAll">
+          <span class="tool-icon">♻️</span>
+          <span class="tool-label">清空所有</span>
+        </button>
       </div>
     </div>
   </div>
@@ -363,19 +370,9 @@ function createModifyStyle() {
 </script>
 
 <style scoped>
-.drawing-map-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1a2a6c, #2c3e50);
-}
-
-.map {
+.map-container {
   width: 100%;
   height: 100%;
-  background: #0d47a1;
 }
 
 .map-controls {
@@ -393,9 +390,6 @@ function createModifyStyle() {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   padding: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .toolbar-title {

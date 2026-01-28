@@ -1,108 +1,89 @@
 <template>
-  <div class="heatmap-container">
-    <div ref="mapContainer" class="map"></div>
+  <div ref="mapContainer" class="map-container"></div>
 
-    <div class="control-panel">
-      <div class="panel-section">
-        <h3>热力图控制</h3>
+  <div class="control-panel-heat">
+    <div class="panel-section">
+      <h3>热力图控制</h3>
 
-        <div class="control-group">
-          <div class="control-item">
-            <label for="radius">点半径: {{ pointRadius }}</label>
-            <input
-              type="range"
-              id="radius"
-              min="1"
-              max="30"
-              v-model="pointRadius"
-              @input="updateHeatmapStyle"
-            />
-          </div>
-
-          <div class="control-item">
-            <label for="blur">模糊度: {{ blurSize }}</label>
-            <input
-              type="range"
-              id="blur"
-              min="1"
-              max="30"
-              v-model="blurSize"
-              @input="updateHeatmapStyle"
-            />
-          </div>
+      <div class="control-group">
+        <div class="control-item">
+          <label for="radius">点半径: {{ pointRadius }}</label>
+          <input
+            type="range"
+            id="radius"
+            min="1"
+            max="30"
+            v-model="pointRadius"
+            @input="updateHeatmapStyle"
+          />
         </div>
 
-        <div class="control-group">
-          <div class="control-item">
-            <label for="gradient">颜色渐变</label>
-            <select
-              id="gradient"
-              v-model="selectedGradient"
-              @change="updateHeatmapStyle"
-            >
-              <option
-                v-for="(grad, name) in gradients"
-                :key="name"
-                :value="name"
-              >
-                {{ name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="control-item">
-            <label for="opacity">不透明度: {{ opacity }}</label>
-            <input
-              type="range"
-              id="opacity"
-              min="0"
-              max="1"
-              step="0.1"
-              v-model="opacity"
-              @input="updateHeatmapStyle"
-            />
-          </div>
+        <div class="control-item">
+          <label for="blur">模糊度: {{ blurSize }}</label>
+          <input
+            type="range"
+            id="blur"
+            min="1"
+            max="30"
+            v-model="blurSize"
+            @input="updateHeatmapStyle"
+          />
         </div>
       </div>
 
-      <div class="panel-section">
-        <h3>数据生成</h3>
-
-        <div class="data-controls">
-          <button
-            v-for="btn in dataButtons"
-            :key="btn.count"
-            class="data-btn"
-            @click="generateData(btn.count)"
-          >
-            {{ btn.label }}
-          </button>
-
-          <button class="clear-btn" @click="clearData">
-            <i class="fas fa-trash-alt"></i> 清除数据
-          </button>
-        </div>
-
-        <div class="data-info">
-          <div class="info-item">
-            <span class="label">数据点数:</span>
-            <span class="value">{{ pointCount }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">最大权重:</span>
-            <span class="value">{{ maxWeight }}</span>
-          </div>
+      <div class="control-group">
+        <div class="control-item">
+          <label for="opacity">不透明度: {{ opacity }}</label>
+          <input
+            type="range"
+            id="opacity"
+            min="0"
+            max="1"
+            step="0.1"
+            v-model="opacity"
+            @input="updateHeatmapStyle"
+          />
         </div>
       </div>
+    </div>
 
-      <div class="panel-section">
-        <h3>热力分布说明</h3>
-        <div class="gradient-preview" :style="gradientStyle"></div>
-        <div class="legend">
-          <span>低密度</span>
-          <span>中密度</span>
-          <span>高密度</span>
+    <div class="panel-section">
+      <h3>数据生成</h3>
+
+      <div class="data-controls">
+        <button
+          v-for="btn in dataButtons"
+          :key="btn.count"
+          class="data-btn"
+          @click="generateData(btn.count)"
+        >
+          {{ btn.label }}
+        </button>
+
+        <button class="clear-btn" @click="clearData">
+          <i class="fas fa-trash-alt"></i> 清除数据
+        </button>
+      </div>
+
+      <div class="data-info">
+        <div class="info-item">
+          <span class="label">数据点数:</span>
+          <span class="value">{{ pointCount }}</span>
         </div>
+        <div class="info-item">
+          <span class="label">最大权重:</span>
+          <span class="value">{{ maxWeight }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h3>热力分布说明</h3>
+      <div class="gradient-preview" :style="gradientStyle"></div>
+      <div class="legend">
+        <span>低密度</span>
+        <span>中密度</span>
+        <span>高密度</span>
       </div>
     </div>
   </div>
@@ -296,22 +277,12 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.heatmap-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1a237e, #4a148c);
-}
-
-.map {
+.map-container {
   width: 100%;
   height: 100%;
-  background: #0d47a1;
 }
 
-.control-panel {
+.control-panel-heat {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -379,17 +350,6 @@ onUnmounted(() => {
   background: #3498db;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.control-item select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  color: #2c3e50;
-  background: #f8f9fa;
-  font-weight: 500;
-  cursor: pointer;
 }
 
 .data-controls {
