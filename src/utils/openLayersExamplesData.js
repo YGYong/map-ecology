@@ -55,63 +55,15 @@ export const openLayersExamples = [
     category: 3001,
   },
   {
-    id: "124_图层分辨率",
-    name: "图层分辨率",
-    fileName: "openLayersExample/basic/124_图层分辨率.vue",
-    category: 3001,
-  },
-  {
     id: "116_瓦片坐标与经纬网",
     name: "瓦片坐标与经纬网",
     fileName: "openLayersExample/basic/116_瓦片坐标与经纬网.vue",
     category: 3001,
   },
   {
-    id: "05_控件",
-    name: "控件",
-    fileName: "openLayersExample/basic/05_控件.vue",
-    category: 3002,
-  },
-  {
-    id: "06_interaction交互",
-    name: "interaction交互",
-    fileName: "openLayersExample/basic/06_interaction交互.vue",
-    category: 3002,
-  },
-  {
     id: "07_overlay",
     name: "overlay",
     fileName: "openLayersExample/basic/07_overlay.vue",
-    category: 3002,
-  },
-  {
-    id: "08_定位",
-    name: "定位",
-    fileName: "openLayersExample/basic/08_定位.vue",
-    category: 3002,
-  },
-  {
-    id: "10_DragZoom",
-    name: "DragZoom",
-    fileName: "openLayersExample/basic/10_DragZoom.vue",
-    category: 3002,
-  },
-  {
-    id: "11_Draw",
-    name: "Draw",
-    fileName: "openLayersExample/basic/11_Draw.vue",
-    category: 3002,
-  },
-  {
-    id: "12_编辑图形",
-    name: "编辑图形",
-    fileName: "openLayersExample/basic/12_编辑图形.vue",
-    category: 3002,
-  },
-  {
-    id: "13_平移",
-    name: "平移",
-    fileName: "openLayersExample/basic/13_平移.vue",
     category: 3002,
   },
   {
@@ -172,12 +124,6 @@ export const openLayersExamples = [
     id: "104_热力图",
     name: "热力图",
     fileName: "openLayersExample/basic/104_热力图.vue",
-    category: 3003,
-  },
-  {
-    id: "09_热力图",
-    name: "热力图(示例2)",
-    fileName: "openLayersExample/basic/09_热力图.vue",
     category: 3003,
   },
   {
@@ -281,24 +227,6 @@ export const openLayersExamples = [
     name: "加载gif图",
     fileName: "openLayersExample/basic/115_加载gif图.vue",
     category: 3008,
-  },
-  {
-    id: "02_静态图片_GeoJson",
-    name: "静态图片_GeoJson",
-    fileName: "openLayersExample/basic/02_静态图片_GeoJson.vue",
-    category: 3008,
-  },
-  {
-    id: "03_添加一个点图层",
-    name: "添加一个点图层",
-    fileName: "openLayersExample/basic/03_添加一个点图层.vue",
-    category: 3008,
-  },
-  {
-    id: "04_测试Select",
-    name: "测试Select",
-    fileName: "openLayersExample/basic/04_测试Select.vue",
-    category: 3002,
   },
   {
     id: "136_webgl渲染海量点位",
