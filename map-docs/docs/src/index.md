@@ -3,25 +3,27 @@
 layout: home
 
 hero:
-  name: "Cesium开发指南"
-  text: "Cesium入门教程"
-  tagline: 深入Cesium开发 | Cesium原理剖析 | 最佳实践分享
+  name: "Map Ecology"
+  text: "二三维地图开发生态库"
+  tagline: 深入Cesium.js、OpenLayers、Leaflet | 理论与实战并重 | 助力GIS开发
   image:
     src: /logistic.svg
-    alt: Cesium
+    alt: Map Ecology
   actions:
     - theme: brand
-      text: 快速进入
-      link: /Basics/00_简介
-    # - theme: alt
-    #  text: API Examples
-    #  link: /Basics/index
+      text: 开始学习
+      link: /openlayers/00_简介
+    - theme: alt
+      text: 案例演示
+      link: http://map.ygyong.cn
 
 features:
-  - title: 基础概念
-    details: 学习Cesium的基本概念，如场景（Scene）、相机（Camera）、实体（Entity）等。
-  - title: 实践出真理
-    details: 通过实际案例，逐步掌握Cesium的使用技巧，实现各种功能。
-  - title: 持续学习
-    details: 不断学习和探索，不断提升自己的技术水平。
+  - title: 三维地球 Cesium
+    details: 涵盖 3D Tiles、倾斜摄影、BIM 模型加载、漫游飞行及各种高性能空间可视化技术。
+  - title: 二维地图 OpenLayers
+    details: 深入探讨 OGC 服务标准、矢量切片、交互设计、WebGL 渲染及复杂地理空间分析。
+  - title: 轻量地图 Leaflet
+    details: 专注于移动端优先的地图开发，学习常用插件集成、热力图及简单的空间要素管理。
+  - title: 理论与实战
+    details: 提供完整的 GIS 基础知识体系，配有上百个交互式案例，支持在线代码调试。
 ---

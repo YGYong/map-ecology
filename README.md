@@ -6,8 +6,31 @@
 
 本项目旨在为 GIS 开发者提供一站式的学习资源，解决二三维地图开发中的常见痛点。通过“文档 + 案例”的双驱动模式，帮助开发者快速掌握地图底图加载、坐标转换、实体渲染、空间分析等核心技能。
 
-- **map-docs**: 基于 VitePress 构建的详细技术文档，记录了 GIS 基础知识及三大框架的详细 API 用法。
-- **map-example**: 基于 Vue 3 + Vite 构建的交互式案例展示平台，包含上百个可直接运行的地图案例，支持在线代码预览。
+- **📖 技术文档**: [http://c.ygyong.cn](http://c.ygyong.cn) (基于 VitePress)
+- **🎨 案例演示**: [http://map.ygyong.cn](http://map.ygyong.cn) (基于 Vue 3 + Vite)
+
+### 📸 效果预览
+
+<div align="center">
+  <table border="0">
+    <tr>
+      <td align="center">
+        <img src="/public/home.png" width="400" /><br />
+        <b>首页</b>
+      </td>
+      <td align="center">
+        <img src="/public/example.png" width="400" /><br />
+        <b>案例</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="/public/docs.png" width="400" /><br />
+        <b>文档</b>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -30,25 +53,30 @@ map-ecology/
 ## 🚀 快速开始
 
 ### 1. 克隆项目
+
 ```bash
 git clone https://github.com/YGYong/map-ecology.git
 cd map-ecology
 ```
 
 ### 2. 运行文档 (map-docs)
+
 ```bash
 cd map-docs
 npm install
 npm run dev
 ```
+
 访问 `http://localhost:3000` 查看技术文档。
 
 ### 3. 运行案例 (map-example)
+
 ```bash
 cd map-example
 npm install
 npm run dev
 ```
+
 访问 `http://localhost:5173` 查看交互式地图案例。
 
 ---
@@ -56,14 +84,17 @@ npm run dev
 ## 🛠️ 技术栈
 
 ### 三维引擎：Cesium.js
+
 - **核心功能**: 地形加载、3D Tiles、Entity 实体、Primitive 图元、材质系统、相机控制、CZML/KML 加载等。
 - **特色案例**: 漫游飞行、雷达扫描、海量点渲染、区域掩膜等。
 
 ### 二维引擎：OpenLayers
+
 - **核心功能**: 图层管理、Source 数据源、Interaction 交互、投影转换、矢量图形绘制等。
 - **特色案例**: 轨迹回放、热力图、点位聚合、模拟台风风场、WebGL 高性能渲染等。
 
 ### 轻量引擎：Leaflet
+
 - **核心功能**: 地图初始化、UI 图层、矢量图层、常用插件集成等。
 - **特色案例**: 热力图、绘制插件、聚合点等。
 
