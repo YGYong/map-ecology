@@ -1,33 +1,24 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <button @click="toggleAnimation">
-        {{ isAnimating ? "暂停动画" : "开始动画" }}
-      </button>
-      <button @click="resetAnimation">重置动画</button>
-      <div class="control-group">
-        <label>动画速度:</label>
-        <input
-          type="range"
-          min="0.1"
-          max="3"
-          step="0.1"
-          v-model="speedMultiplier"
-          @input="updateAnimationSpeed"
-        />
-        <span>{{ speedMultiplier }}x</span>
-      </div>
-      <div class="control-group">
-        <label>螺旋点数:</label>
-        <input type="range" min="50" max="500" step="10" v-model="pointCount" />
-        <span>{{ pointCount }}</span>
-      </div>
-      <div class="control-group">
-        <label>螺旋大小:</label>
-        <input type="range" min="0.5" max="2" step="0.1" v-model="spiralSize" />
-        <span>{{ spiralSize }}x</span>
-      </div>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-ani-spiral">
+    <button @click="toggleAnimation">
+      {{ isAnimating ? "暂停动画" : "开始动画" }}
+    </button>
+    <button @click="resetAnimation">重置动画</button>
+    <div class="control-group">
+      <label>动画速度:</label>
+      <input type="range" min="0.1" max="3" step="0.1" v-model="speedMultiplier" @input="updateAnimationSpeed" />
+      <span>{{ speedMultiplier }}x</span>
+    </div>
+    <div class="control-group">
+      <label>螺旋点数:</label>
+      <input type="range" min="50" max="500" step="10" v-model="pointCount" />
+      <span>{{ pointCount }}</span>
+    </div>
+    <div class="control-group">
+      <label>螺旋大小:</label>
+      <input type="range" min="0.5" max="2" step="0.1" v-model="spiralSize" />
+      <span>{{ spiralSize }}x</span>
     </div>
   </div>
 </template>
@@ -206,18 +197,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-ani-spiral {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -232,7 +216,7 @@ onUnmounted(() => {
   min-width: 250px;
 }
 
-.controls button {
+.controls-ani-spiral button {
   padding: 8px 16px;
   background-color: #007bff;
   color: white;
@@ -243,7 +227,7 @@ onUnmounted(() => {
   transition: background-color 0.3s ease;
 }
 
-.controls button:hover {
+.controls-ani-spiral button:hover {
   background-color: #0056b3;
 }
 

@@ -1,13 +1,11 @@
 <!-- https://openlayers.org/en/latest/examples/layer-swipe.html -->
 <template>
-  <div>
-    <div id="map" class="map"></div>
-    <input id="swipe" type="range" style="width: 100%" />
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
+  <input id="swipe" type="range" />
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import TileLayer from "ol/layer/Tile.js";
@@ -29,10 +27,12 @@ const aerial = new TileLayer({
   }),
 });
 
+const mapContainer = ref(null);
+
 onMounted(() => {
   const map = new Map({
     layers: [osm, aerial],
-    target: "map",
+    target: mapContainer.value,
     view: new View({
       center: [116.4074, 39.9042], // 北京市中心经纬度
       zoom: 10,
@@ -73,8 +73,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.map {
-  width: 100vw;
-  height: 90vh;
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+#swipe {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 100%;
 }
 </style>

@@ -1,17 +1,15 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="info">
-        <h4>图层望远镜</h4>
-        <p>🖱️ 移动鼠标查看卫星图层</p>
-        <p>⬆️⬇️ 方向键调整望远镜大小</p>
-        <p>当前半径: {{ radius }}px</p>
-      </div>
-      <button @click="toggleSpyglass">
-        {{ isSpyglassEnabled ? '关闭望远镜' : '开启望远镜' }}
-      </button>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-spyglass">
+    <div class="info">
+      <h4>图层望远镜</h4>
+      <p>🖱️ 移动鼠标查看卫星图层</p>
+      <p>⬆️⬇️ 方向键调整望远镜大小</p>
+      <p>当前半径: {{ radius }}px</p>
     </div>
+    <button @click="toggleSpyglass">
+      {{ title }}
+    </button>
   </div>
 </template>
 
@@ -25,6 +23,7 @@ import { getRenderPixel } from 'ol/render';
 import 'ol/ol.css';
 
 const mapContainer = ref(null);
+const title = ref('关闭望远镜');
 let map = null;
 let roadsLayer = null;
 let imageryLayer = null;
@@ -37,11 +36,11 @@ const isSpyglassEnabled = ref(true);
 // 预渲染事件处理函数
 const handlePrerender = (event) => {
   if (!isSpyglassEnabled.value) return;
-  
+
   const ctx = event.context;
   ctx.save();
   ctx.beginPath();
-  
+
   if (mousePosition) {
     // 只在鼠标周围显示圆形区域
     const pixel = getRenderPixel(event, mousePosition);
@@ -52,23 +51,23 @@ const handlePrerender = (event) => {
     const canvasRadius = Math.sqrt(
       Math.pow(offset[0] - pixel[0], 2) + Math.pow(offset[1] - pixel[1], 2)
     );
-    
+
     // 绘制圆形裁剪区域
     ctx.arc(pixel[0], pixel[1], canvasRadius, 0, 2 * Math.PI);
-    
+
     // 绘制边框
     ctx.lineWidth = (5 * canvasRadius) / radius.value;
     ctx.strokeStyle = 'rgba(0,0,0,0.5)';
     ctx.stroke();
   }
-  
+
   ctx.clip();
 };
 
 // 后渲染事件处理函数
 const handlePostrender = (event) => {
   if (!isSpyglassEnabled.value) return;
-  
+
   const ctx = event.context;
   ctx.restore();
 };
@@ -76,7 +75,7 @@ const handlePostrender = (event) => {
 // 鼠标移动事件处理
 const handleMouseMove = (event) => {
   if (!isSpyglassEnabled.value) return;
-  
+
   mousePosition = map.getEventPixel(event);
   map.render();
 };
@@ -90,7 +89,7 @@ const handleMouseOut = () => {
 // 键盘事件处理
 const handleKeyDown = (event) => {
   if (!isSpyglassEnabled.value) return;
-  
+
   if (event.key === 'ArrowUp') {
     radius.value = Math.min(radius.value + 5, 150);
     map.render();
@@ -105,11 +104,12 @@ const handleKeyDown = (event) => {
 // 切换望远镜功能
 const toggleSpyglass = () => {
   isSpyglassEnabled.value = !isSpyglassEnabled.value;
-  
+  title.value = isSpyglassEnabled.value ? '关闭望远镜' : '开启望远镜';
+
   // 先清除所有事件监听器
   imageryLayer.un('prerender', handlePrerender);
   imageryLayer.un('postrender', handlePostrender);
-  
+
   if (isSpyglassEnabled.value) {
     // 重新添加事件监听器
     imageryLayer.on('prerender', handlePrerender);
@@ -117,7 +117,7 @@ const toggleSpyglass = () => {
   } else {
     mousePosition = null;
   }
-  
+
   map.render();
 };
 
@@ -170,13 +170,13 @@ onUnmounted(() => {
     mapContainer.value.removeEventListener('mouseout', handleMouseOut);
   }
   document.removeEventListener('keydown', handleKeyDown);
-  
+
   // 清理图层事件
   if (imageryLayer) {
     imageryLayer.un('prerender', handlePrerender);
     imageryLayer.un('postrender', handlePostrender);
   }
-  
+
   if (map) {
     map.setTarget(undefined);
     map = null;
@@ -186,19 +186,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
-  cursor: crosshair;
 }
 
-.controls {
+.controls-spyglass {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -222,7 +214,7 @@ onUnmounted(() => {
   color: #666;
 }
 
-.controls button {
+.controls-spyglass button {
   width: 100%;
   padding: 8px 16px;
   background-color: #007bff;
@@ -235,7 +227,7 @@ onUnmounted(() => {
   margin-top: 10px;
 }
 
-.controls button:hover {
+.controls-spyglass button:hover {
   background-color: #0056b3;
 }
 </style>

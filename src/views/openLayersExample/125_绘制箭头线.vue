@@ -1,7 +1,6 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
+    <div ref="mapContainer" class="map-container"></div>
+    <div class="controls-lines">
       <div class="info">
         <p>点击地图开始绘制带箭头的线条</p>
         <p>双击结束绘制</p>
@@ -23,7 +22,6 @@
         <span>{{ lineWidth }}px</span>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -164,18 +162,10 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
-
-.controls {
+.controls-lines {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -228,7 +218,7 @@ onUnmounted(() => {
   color: #007bff;
 }
 
-.controls button {
+.controls-lines button {
   padding: 8px 16px;
   background-color: #dc3545;
   color: white;
@@ -239,7 +229,7 @@ onUnmounted(() => {
   transition: background-color 0.3s ease;
 }
 
-.controls button:hover {
+.controls-lines button:hover {
   background-color: #c82333;
 }
 </style>

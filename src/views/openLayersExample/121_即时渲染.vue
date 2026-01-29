@@ -1,7 +1,6 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
+    <div ref="mapContainer" class="map-container"></div>
+    <div class="controls-anim">
       <button @click="toggleAnimation">
         {{ isAnimating ? '暂停动画' : '开始动画' }}
       </button>
@@ -52,7 +51,6 @@
         />
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -235,18 +233,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-anim {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -261,7 +252,7 @@ onUnmounted(() => {
   min-width: 280px;
 }
 
-.controls button {
+.controls-anim button {
   padding: 8px 16px;
   background-color: #007bff;
   color: white;
@@ -272,7 +263,7 @@ onUnmounted(() => {
   transition: background-color 0.3s ease;
 }
 
-.controls button:hover {
+.controls-anim button:hover {
   background-color: #0056b3;
 }
 

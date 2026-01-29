@@ -1,14 +1,12 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <button @click="toggleDrawInteraction">
-        {{ isDrawing ? '停止绘制五角星' : '开始绘制五角星' }}
-      </button>
-      <button @click="clearFeatures" :disabled="!vectorSource || vectorSource.getFeatures().length === 0">
-        清除所有五角星
-      </button>
-    </div>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-stars">
+    <button @click="toggleDrawInteraction">
+      {{ title }}
+    </button>
+    <button @click="clearFeatures" :disabled="!vectorSource || vectorSource.getFeatures().length === 0">
+      清除所有五角星
+    </button>
   </div>
 </template>
 
@@ -27,6 +25,7 @@ import 'ol/ol.css';
 
 const mapContainer = ref(null);
 let map = null;
+const title = ref('开始绘制五角星');
 let drawInteraction;
 const vectorSource = new VectorSource();
 const isDrawing = ref(false);
@@ -49,7 +48,7 @@ const starGeometryFunction = function (coordinates, geometry) {
     const angle = rotation + (i * Math.PI * 2) / numPoints;
     // 根据点的索引决定使用外圆半径还是内圆半径
     const currentRadius = (i % 2 === 0 ? 1 : innerRadiusFraction) * outerRadius;
-    
+
     const offsetX = currentRadius * Math.cos(angle);
     const offsetY = currentRadius * Math.sin(angle);
     newCoordinates.push([center[0] + offsetX, center[1] + offsetY]);
@@ -89,12 +88,14 @@ const toggleDrawInteraction = () => {
   if (isDrawing.value) {
     map.removeInteraction(drawInteraction);
     isDrawing.value = false;
+    title.value = '开始绘制五角星';
   } else {
     if (!drawInteraction) {
       setupDrawInteraction(); // 如果尚未初始化，则进行初始化
     }
     map.addInteraction(drawInteraction);
     isDrawing.value = true;
+    title.value = '停止绘制五角星';
   }
 };
 
@@ -157,23 +158,16 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
-  background: #f0f0f0; /* 地图背景色 */
 }
 
-.controls {
+.controls-stars {
   position: absolute;
   top: 10px;
   left: 10px;
-  z-index: 1000; /* 确保控件在地图之上 */
+  z-index: 1000;
+  /* 确保控件在地图之上 */
   display: flex;
   gap: 10px;
   background-color: rgba(255, 255, 255, 0.8);
@@ -182,7 +176,7 @@ onUnmounted(() => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.controls button {
+.controls-stars button {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -193,11 +187,11 @@ onUnmounted(() => {
   transition: background-color 0.3s ease;
 }
 
-.controls button:hover {
+.controls-stars button:hover {
   background-color: #0056b3;
 }
 
-.controls button:disabled {
+.controls-stars button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }

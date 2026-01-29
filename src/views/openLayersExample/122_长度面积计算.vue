@@ -1,22 +1,20 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="control-group">
-        <label for="type">测量类型:</label>
-        <select v-model="measureType" @change="changeMeasureType">
-          <option value="LineString">长度测量</option>
-          <option value="Polygon">面积测量</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label>
-          <input type="checkbox" v-model="showSegments" @change="toggleSegments" />
-          显示分段长度
-        </label>
-      </div>
-      <button @click="clearMeasurements">清除测量</button>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-measure">
+    <div class="control-group">
+      <label for="type">测量类型:</label>
+      <select v-model="measureType" @change="changeMeasureType">
+        <option value="LineString">长度测量</option>
+        <option value="Polygon">面积测量</option>
+      </select>
     </div>
+    <div class="control-group">
+      <label>
+        <input type="checkbox" v-model="showSegments" @change="toggleSegments" />
+        显示分段长度
+      </label>
+    </div>
+    <button @click="clearMeasurements">清除测量</button>
   </div>
 </template>
 
@@ -165,16 +163,16 @@ const segmentStyles = [segmentStyle];
 const formatLength = (line) => {
   // 对于EPSG:4326坐标系，需要将坐标转换为适合长度计算的投影
   const coordinates = line.getCoordinates();
-  
+
   // 将EPSG:4326坐标转换为Web Mercator (EPSG:3857) 进行长度计算
-  const transformedCoords = coordinates.map(coord => 
+  const transformedCoords = coordinates.map(coord =>
     transform(coord, 'EPSG:4326', 'EPSG:3857')
   );
-  
+
   // 创建转换后的线条用于长度计算
   const transformedLine = new LineString(transformedCoords);
   const length = getLength(transformedLine);
-  
+
   let output;
   if (length > 100) {
     output = Math.round((length / 1000) * 100) / 100 + ' km';
@@ -188,16 +186,16 @@ const formatLength = (line) => {
 const formatArea = (polygon) => {
   // 对于EPSG:4326坐标系，需要将坐标转换为适合面积计算的投影
   const coordinates = polygon.getCoordinates()[0];
-  
+
   // 将EPSG:4326坐标转换为Web Mercator (EPSG:3857) 进行面积计算
-  const transformedCoords = coordinates.map(coord => 
+  const transformedCoords = coordinates.map(coord =>
     transform(coord, 'EPSG:4326', 'EPSG:3857')
   );
-  
+
   // 创建转换后的多边形用于面积计算
   const transformedPolygon = new Polygon([transformedCoords]);
   const area = getArea(transformedPolygon);
-  
+
   let output;
   if (area > 10000) {
     output = Math.round((area / 1000000) * 100) / 100 + ' km²';
@@ -365,18 +363,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-measure {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -415,7 +406,7 @@ onUnmounted(() => {
   transform: scale(1.2);
 }
 
-.controls button {
+.controls-measure button {
   padding: 8px 16px;
   background-color: #dc3545;
   color: white;
@@ -426,7 +417,7 @@ onUnmounted(() => {
   transition: background-color 0.3s ease;
 }
 
-.controls button:hover {
+.controls-measure button:hover {
   background-color: #c82333;
 }
 </style>

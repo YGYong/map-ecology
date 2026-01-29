@@ -1,12 +1,10 @@
 <!-- [官网地址](https://openlayers.org/en/latest/examples/webgl-points-layer.html)，**不属于稳定版本，使用时需注意**
  -->
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
+    <div ref="mapContainer" class="map-container"></div>
+    <div class="controls-webgl">
       <div class="info">
         <h4>WebGL大数据点位渲染</h4>
-        <p>当前渲染{{ currentPointCount.toLocaleString() }}个点位</p>
         <p>生成点位耗时：{{ generateTime }}ms</p>
         <p>渲染耗时：{{ renderTime }}ms</p>
       </div>
@@ -26,7 +24,6 @@
         重新生成点位
       </button>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -164,18 +161,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-webgl {
   position: absolute;
   top: 10px;
   left: 10px;

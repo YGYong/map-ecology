@@ -1,40 +1,9 @@
 <template>
-  <div class="container">
-    <div id="map" class="map"></div>
-    <!-- 控制面板 -->
-    <div class="controls-panel">
-      <h2 class="panel-title">图层控制</h2>
-      <!-- 台风路径不再有开关，始终显示 -->
-      <label class="checkbox-label">
-        <!-- 仅作显示，无实际控制功能 -->
-        <input type="checkbox" checked disabled class="checkbox-input" />
-        <span class="checkbox-text">台风路径 (始终显示)</span>
-      </label>
-    </div>
-    <!-- 台风信息卡片 -->
-    <div v-if="selectedTyphoon" class="info-card">
-      <h3 class="card-title">
-        {{ selectedTyphoon.name }} - {{ selectedTyphoon.time }}
-      </h3>
-      <div class="card-content">
-        <p>
-          <strong>中心位置:</strong> 东经{{ selectedTyphoon.lon }}° 北纬{{
-            selectedTyphoon.lat
-          }}°
-        </p>
-        <p><strong>中心气压:</strong> {{ selectedTyphoon.pressure }}百帕</p>
-        <p>
-          <strong>风速风力:</strong> {{ selectedTyphoon.windSpeed }}米/秒,
-          {{ selectedTyphoon.windForce }}级({{ selectedTyphoon.windType }})
-        </p>
-        <p><strong>当前位置:</strong> {{ selectedTyphoon.currentLocation }}</p>
-      </div>
-    </div>
-  </div>
+  <div id="map" class="map-container"></div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
 import TileLayer from "ol/layer/Tile.js";
@@ -46,7 +15,7 @@ import Point from "ol/geom/Point.js";
 import LineString from "ol/geom/LineString.js";
 import Circle from "ol/geom/Circle.js";
 import { fromLonLat } from "ol/proj.js"; // 用于经纬度坐标与地图投影坐标之间的转换
-import { Style, Stroke, Fill, Circle as CircleStyle, Icon } from "ol/style.js"; // OpenLayers 样式相关模块，新增 Icon
+import { Style, Stroke, Fill, Circle as CircleStyle } from "ol/style.js"; // OpenLayers 样式相关模块，新增 Icon
 import "ol/ol.css"; // OpenLayers 默认样式
 
 // OpenLayers 地图实例
@@ -186,9 +155,6 @@ const DRAG_FACTOR = 0.97; // 阻尼/拖曳因子，防止无限加速（略微�
 let typhoonPointFeatures = [];
 let windCircleFeature = null;
 
-// 台风中心点图片 URL，请替换为您的图片路径
-const TYPHOON_ICON_URL = "/src/assets/风圈.png"; // 示例占位符图片
-
 onMounted(() => {
   // 基础瓦片图层 (高德地图)
   const gaodeLayer = new TileLayer({
@@ -323,35 +289,11 @@ onMounted(() => {
     }),
   });
 
-  // 鼠标按下时停止定时器，抬起时启用定时器
-  map.on("pointerdown", () => {
-    if (typhoonAnimationIntervalId) {
-      clearInterval(typhoonAnimationIntervalId);
-      typhoonAnimationIntervalId = null;
-    }
-  });
-  map.on("pointerup", () => {
-    if (!typhoonAnimationIntervalId) {
-      startTyphoonAnimation(); // 恢复台风路径动画
-    }
-  });
-
   // 初始状态下，启动风场动画
   startWindAnimation();
   // 启动台风路径动画
   startTyphoonAnimation();
 });
-
-// 组件卸载时清理资源，防止内存泄漏
-onUnmounted(() => {
-  if (map) {
-    map.setTarget(null); // 解除地图与DOM元素的绑定
-    map = null;
-  }
-  stopWindAnimation(); // 停止风场动画
-  stopTyphoonAnimation(); // 停止台风路径动画
-});
-
 /**
  * 重置单个风场粒子位置
  * 当粒子超出范围或需要重新生成时调用
@@ -516,16 +458,6 @@ function startWindAnimation() {
 }
 
 /**
- * 停止风场动画
- */
-function stopWindAnimation() {
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId); // 取消当前的动画帧请求
-    animationFrameId = null;
-  }
-}
-
-/**
  * 启动台风路径动画
  * 使用 setInterval 定时器模拟台风的移动
  */
@@ -572,11 +504,11 @@ function startTyphoonAnimation() {
       const oldCenter = fromLonLat([
         typhoonData.path[
           (typhoonPathIndex.value - 1 + typhoonData.path.length) %
-            typhoonData.path.length
+          typhoonData.path.length
         ].lon,
         typhoonData.path[
           (typhoonPathIndex.value - 1 + typhoonData.path.length) %
-            typhoonData.path.length
+          typhoonData.path.length
         ].lat,
       ]);
 
@@ -608,133 +540,11 @@ function startTyphoonAnimation() {
     windFieldSource.changed(); // 强制重绘风场图层
   }, 1000); // 每1秒更新一次台风位置
 }
-
-/**
- * 停止台风路径动画
- */
-function stopTyphoonAnimation() {
-  if (typhoonAnimationIntervalId) {
-    clearInterval(typhoonAnimationIntervalId); // 清除定时器
-    typhoonAnimationIntervalId = null;
-  }
-}
 </script>
 
 <style scoped>
-/* 容器样式 */
-.container {
-  position: relative;
-  width: 100vw; /* 视口宽度 */
-  height: 100vh; /* 视口高度 */
-  overflow: hidden; /* 隐藏溢出内容 */
-}
-
-/* 地图容器样式 */
-.map {
+.map-container {
   width: 100%;
   height: 100%;
-  background-color: #e0f2f7; /* 浅蓝色背景，模拟海洋区域 */
-}
-
-/* 控制面板样式 */
-.controls-panel {
-  position: absolute;
-  top: 16px; /* 距离顶部16px */
-  right: 16px; /* 距离右侧16px */
-  background-color: rgba(255, 255, 255, 0.9); /* 半透明白色背景 */
-  padding: 16px; /* 内边距 */
-  border-radius: 8px; /* 圆角 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-  z-index: 10; /* 确保在地图上方 */
-  display: flex;
-  flex-direction: column; /* 垂直布局 */
-  gap: 12px; /* 元素间距 */
-}
-
-/* 面板标题样式 */
-.panel-title {
-  font-size: 1.125rem; /* 字体大小 */
-  font-weight: 600; /* 字体粗细 */
-  color: #2d3748; /* 深灰色字体 */
-  margin-bottom: 8px; /* 底部外边距 */
-}
-
-/* 复选框标签样式 */
-.checkbox-label {
-  display: flex;
-  align-items: center; /* 垂直居中对齐 */
-  cursor: pointer; /* 鼠标指针变为手型 */
-}
-
-/* 复选框输入框样式 */
-.checkbox-input {
-  height: 20px;
-  width: 20px;
-  accent-color: #2563eb; /* 改变复选框的颜色 */
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  appearance: none; /* 隐藏默认复选框样式 */
-  -webkit-appearance: none; /* 兼容WebKit浏览器 */
-  outline: none; /* 移除焦点轮廓 */
-  cursor: pointer;
-  position: relative;
-}
-
-/* 复选框选中时的样式 */
-.checkbox-input:checked {
-  background-color: #2563eb; /* 选中时背景色 */
-  border-color: #2563eb; /* 选中时边框色 */
-}
-
-/* 复选框选中时显示对勾 */
-.checkbox-input:checked::before {
-  content: "✔"; /* 对勾符号 */
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* 居中对勾 */
-  font-size: 14px;
-  color: white; /* 对勾颜色 */
-}
-
-/* 复选框文本样式 */
-.checkbox-text {
-  margin-left: 8px; /* 左侧外边距 */
-  color: #4a5568; /* 灰色字体 */
-}
-
-/* 信息卡片样式 */
-.info-card {
-  position: absolute;
-  bottom: 16px; /* 距离底部16px */
-  left: 16px; /* 距离左侧16px */
-  background-color: rgba(255, 255, 255, 0.9); /* 半透明白色背景 */
-  padding: 24px; /* 内边距 */
-  border-radius: 8px; /* 圆角 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-  z-index: 10; /* 确保在地图上方 */
-  width: 384px; /* 固定宽度 */
-}
-
-/* 卡片标题样式 */
-.card-title {
-  font-size: 1.25rem; /* 字体大小 */
-  font-weight: 700; /* 字体粗细 */
-  color: #1d4ed8; /* 蓝色字体 */
-  margin-bottom: 12px; /* 底部外边距 */
-}
-
-/* 卡片内容样式 */
-.card-content {
-  display: flex;
-  flex-direction: column; /* 垂直布局 */
-  gap: 8px; /* 元素间距 */
-  color: #4a5568; /* 灰色字体 */
-}
-
-/* 卡片内容中加粗文本的样式 */
-.card-content strong {
-  font-weight: bold;
 }
 </style>

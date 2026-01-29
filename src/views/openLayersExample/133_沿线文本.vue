@@ -1,21 +1,15 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="info">
-        <h4>街道文本标注</h4>
-        <p>文本沿着街道线条显示</p>
-      </div>
-      <div class="control-group">
-        <label>
-          <input 
-            type="checkbox" 
-            v-model="showStreetNames" 
-            @change="toggleStreetNames"
-          />
-          显示街道名称
-        </label>
-      </div>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-text">
+    <div class="info">
+      <h4>街道文本标注</h4>
+      <p>文本沿着街道线条显示</p>
+    </div>
+    <div class="control-group">
+      <label>
+        <input type="checkbox" v-model="showStreetNames" @change="toggleStreetNames" />
+        显示沿线文本
+      </label>
     </div>
   </div>
 </template>
@@ -60,7 +54,7 @@ const streetTextStyle = new Style({
 });
 
 // 样式函数
-const styleFunction = (feature) => {  
+const styleFunction = (feature) => {
   console.log(showStreetNames.value)
   const streetName = feature.get('name');
   streetTextStyle.getText().setText(streetName);
@@ -176,18 +170,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-text {
   position: absolute;
   top: 10px;
   left: 10px;

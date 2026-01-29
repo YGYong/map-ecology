@@ -162,24 +162,8 @@ const initMap = () => {
     maximumLevel: 18,
     credit: new Cesium.Credit("天地图影像"),
   });
-
-  // 添加地理标注
-  const labelProvider = new Cesium.WebMapTileServiceImageryProvider({
-    url:
-      "http://{s}.tianditu.gov.cn/cia_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=w&tileMatrix={TileMatrix}&tileRow={TileRow}&tileCol={TileCol}&style=default&format=tiles&tk=" +
-      token,
-    layer: "img",
-    style: "default",
-    format: "tiles",
-    tileMatrixSetID: "w",
-    subdomains: ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"], // 子域名轮询
-    maximumLevel: 18,
-    credit: new Cesium.Credit("天地图影像"),
-  });
   // 天地图影像添加到viewer实例的影像图层集合中
   viewer.imageryLayers.addImageryProvider(tiandituProvider);
-  // 天地图地理标注（后添加的会覆盖前面的）
-  viewer.imageryLayers.addImageryProvider(labelProvider);
 };
 </script>
 <style scoped>

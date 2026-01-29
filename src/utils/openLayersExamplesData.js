@@ -261,6 +261,7 @@ export const openLayersExamples = [
     name: "模拟台风风场",
     fileName: "openLayersExample/114_模拟台风风场.vue",
     category: 3006,
+    preview: "@/assets/openlayersImg/114_模拟台风风场.png",
   },
   {
     id: "107_区域掩膜",

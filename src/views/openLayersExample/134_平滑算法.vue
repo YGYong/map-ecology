@@ -1,37 +1,27 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="info">
-        <h4>平滑曲线绘制</h4>
-        <p>绘制线条后自动应用平滑算法</p>
-      </div>
-      
-      <div class="control-group">
-        <label>
-          <input 
-            type="checkbox" 
-            v-model="enableSmooth" 
-          />
-          启用平滑处理
-        </label>
-      </div>
-      
-      <div class="control-group">
-        <label>平滑迭代次数:</label>
-        <input 
-          type="range" 
-          min="1" 
-          max="10" 
-          v-model="iterations"
-        />
-        <span>{{ iterations }}</span>
-      </div>
-      
-      <button @click="clearLines" class="clear-btn">
-        清除所有线条
-      </button>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-smooth">
+    <div class="info">
+      <h4>平滑曲线绘制</h4>
+      <p>绘制线条后自动应用平滑算法</p>
     </div>
+
+    <div class="control-group">
+      <label>
+        <input type="checkbox" v-model="enableSmooth" />
+        启用平滑处理
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>平滑迭代次数:</label>
+      <input type="range" min="1" max="10" v-model="iterations" />
+      <span>{{ iterations }}</span>
+    </div>
+
+    <button @click="clearLines" class="clear-btn">
+      清除所有线条
+    </button>
   </div>
 </template>
 
@@ -122,11 +112,11 @@ onMounted(() => {
     if (!enableSmooth.value) {
       return;
     }
-    
+
     const feature = event.feature;
     const geometry = feature.getGeometry();
     const coords = geometry.getCoordinates();
-    
+
     // 应用平滑算法
     const smoothened = makeSmooth(coords, parseInt(iterations.value, 10));
     geometry.setCoordinates(smoothened);
@@ -146,18 +136,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-smooth {
   position: absolute;
   top: 10px;
   left: 10px;

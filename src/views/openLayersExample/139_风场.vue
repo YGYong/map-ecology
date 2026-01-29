@@ -1,34 +1,18 @@
 <template>
-  <div class="wind-map-container">
-    <div ref="mapRef" class="map">
-      <div class="controls">
-        <button @click="toggleWindLayer" class="control-btn">
-          {{ windLayerVisible ? "隐藏风场" : "显示风场" }}
-        </button>
-        <div class="slider-control">
-          <label for="windSpeed">风速: {{ windSpeed }}m/s</label>
-          <input
-            type="range"
-            id="windSpeed"
-            min="1"
-            max="20"
-            v-model="windSpeed"
-            @input="updateWindSpeed"
-          />
-        </div>
-        <div class="slider-control">
-          <label for="particleCount">粒子数量: {{ particleCount }}</label>
-          <input
-            type="range"
-            id="particleCount"
-            min="500"
-            max="5000"
-            step="500"
-            v-model="particleCount"
-            @input="updateParticleCount"
-          />
-        </div>
-      </div>
+  <div ref="mapRef" class="map-container">
+  </div>
+  <div class="controls-wind">
+    <button @click="toggleWindLayer" class="control-btn">
+      {{ title }}
+    </button>
+    <div class="slider-control">
+      <label for="windSpeed">风速: {{ windSpeed }}m/s</label>
+      <input type="range" id="windSpeed" min="1" max="20" v-model="windSpeed" @input="updateWindSpeed" />
+    </div>
+    <div class="slider-control">
+      <label for="particleCount">粒子数量: {{ particleCount }}</label>
+      <input type="range" id="particleCount" min="500" max="5000" step="500" v-model="particleCount"
+        @input="updateParticleCount" />
     </div>
   </div>
 </template>
@@ -58,6 +42,8 @@ import { WindLayer } from "ol-wind";
 
 // 地图容器引用
 const mapRef = ref(null);
+// 标题
+const title = ref("显示风场");
 // 地图实例
 let map = null;
 // 风场图层实例
@@ -78,6 +64,8 @@ const toggleWindLayer = () => {
   if (windLayer) {
     windLayer.setVisible(!windLayerVisible.value);
     windLayerVisible.value = !windLayerVisible.value;
+    // 切换标题
+    title.value = windLayerVisible.value ? "显示风场" : "隐藏风场";
   }
 };
 
@@ -182,18 +170,12 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.wind-map-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-}
-
-.map {
+.map-container {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-wind {
   position: absolute;
   top: 10px;
   right: 10px;

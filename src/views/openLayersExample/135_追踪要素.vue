@@ -1,7 +1,6 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
+    <div ref="mapContainer" class="map-container"></div>
+    <div class="controls-trace">
       <div class="info">
         <h4>面追踪绘制</h4>
         <p>沿着江苏省边界进行追踪绘制</p>
@@ -31,7 +30,6 @@
         清除绘制
       </button>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -198,18 +196,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-trace {
   position: absolute;
   top: 10px;
   left: 10px;

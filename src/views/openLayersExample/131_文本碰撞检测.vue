@@ -1,21 +1,14 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="control-group">
-        <label>
-          <input 
-            type="checkbox" 
-            v-model="declutterEnabled" 
-            @change="toggleDeclutter"
-          />
-          启用标签碰撞检测
-        </label>
-      </div>
-      <div class="info">
-        <p>缩放地图查看碰撞检测效果</p>
-        <p>当前状态: {{ declutterEnabled ? '已启用' : '已禁用' }}</p>
-      </div>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-declutter">
+    <div class="control-group">
+      <label>
+        <input type="checkbox" v-model="declutterEnabled" @change="toggleDeclutter" />
+        启用标签碰撞检测
+      </label>
+    </div>
+    <div class="info">
+      <p>缩放地图查看碰撞检测效果</p>
     </div>
   </div>
 </template>
@@ -44,16 +37,16 @@ const declutterEnabled = ref(false);
 const toggleDeclutter = () => {
   // 重新创建图层以确保declutter设置生效
   const source = vectorLayer.getSource();
-  
+
   // 移除旧图层
   map.removeLayer(vectorLayer);
-  
+
   // 创建新图层
   vectorLayer = new VectorLayer({
     source: source,
     declutter: declutterEnabled.value,
   });
-  
+
   // 添加新图层
   map.addLayer(vectorLayer);
 };
@@ -68,7 +61,7 @@ onMounted(() => {
 
   // 创建密集的点要素 - 增加更多点来测试碰撞
   const features = [];
-  
+
   // 在北京周围创建密集的点
   const baseCoord = [116.4074, 39.9042];
   const cities = [
@@ -81,12 +74,12 @@ onMounted(() => {
     // 在北京周围随机分布
     const offsetX = (Math.random() - 0.5) * 8; // 经度偏移
     const offsetY = (Math.random() - 0.5) * 6; // 纬度偏移
-    
+
     const feature = new Feature({
       geometry: new Point([baseCoord[0] + offsetX, baseCoord[1] + offsetY]),
       name: cityName
     });
-    
+
     // 创建样式
     const style = new Style({
       image: new Circle({
@@ -104,7 +97,7 @@ onMounted(() => {
         textBaseline: 'middle',
       }),
     });
-    
+
     feature.setStyle(style);
     features.push(feature);
   });
@@ -121,7 +114,7 @@ onMounted(() => {
     layers: [baseLayer, vectorLayer],
     view: new View({
       center: [116.4074, 39.9042],
-      zoom: 8,
+      zoom: 6,
       projection: "EPSG:4326",
     }),
   });
@@ -137,18 +130,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-declutter {
   position: absolute;
   top: 10px;
   left: 10px;

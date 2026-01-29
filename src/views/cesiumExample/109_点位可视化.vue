@@ -1,37 +1,34 @@
 <template>
-    <div class="cesium-wrapper">
-        <div ref="cesiumContainer" class="container"></div>
+    <div ref="cesiumContainer" class="container"></div>
 
-        <!-- 点位信息弹窗 -->
-        <div v-if="popupVisible" class="point-popup"
-            :style="{ left: popupPosition.x + 'px', top: popupPosition.y + 'px' }">
-            <div class="popup-close" @click="closePopup">×</div>
-            <div class="popup-header">
-                <div class="popup-title">
-                    <span class="point-name">{{ popupData.name }}</span>
-                    <span class="point-type">{{ popupData.type }}</span>
-                </div>
+    <!-- 点位信息弹窗 -->
+    <div v-if="popupVisible" class="point-popup" :style="{ left: popupPosition.x + 'px', top: popupPosition.y + 'px' }">
+        <div class="popup-close" @click="closePopup">×</div>
+        <div class="popup-header">
+            <div class="popup-title">
+                <span class="point-name">{{ popupData.name }}</span>
+                <span class="point-type">{{ popupData.type }}</span>
             </div>
-            <div class="popup-content">
-                <div class="info-row">
-                    <span class="info-label">编号：</span>
-                    <span class="info-value">{{ popupData.id }}</span>
-                </div>
-                <div class="info-divider" />
-                <div class="info-row">
-                    <span class="info-label">经度：</span>
-                    <span class="info-value">{{ popupData.longitude }}°</span>
-                    <span class="info-label ml-20">纬度：</span>
-                    <span class="info-value">{{ popupData.latitude }}°</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">状态：</span>
-                    <span class="info-value" :style="{ color: popupData.statusColor }">{{ popupData.status }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">描述：</span>
-                    <span class="info-value">{{ popupData.description }}</span>
-                </div>
+        </div>
+        <div class="popup-content">
+            <div class="info-row">
+                <span class="info-label">编号：</span>
+                <span class="info-value">{{ popupData.id }}</span>
+            </div>
+            <div class="info-divider" />
+            <div class="info-row">
+                <span class="info-label">经度：</span>
+                <span class="info-value">{{ popupData.longitude }}°</span>
+                <span class="info-label ml-20">纬度：</span>
+                <span class="info-value">{{ popupData.latitude }}°</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">状态：</span>
+                <span class="info-value" :style="{ color: popupData.statusColor }">{{ popupData.status }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">描述：</span>
+                <span class="info-value">{{ popupData.description }}</span>
             </div>
         </div>
     </div>
@@ -299,12 +296,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.cesium-wrapper {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-}
-
 .container {
     width: 100%;
     height: 100%;

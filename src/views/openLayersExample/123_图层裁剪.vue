@@ -1,36 +1,27 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="control-group">
-        <label>裁剪形状:</label>
-        <select v-model="clipShape" @change="updateClipShape">
-          <option value="heart">❤️ 心形</option>
-          <option value="circle">⭕ 圆形</option>
-          <option value="star">⭐ 星形</option>
-          <option value="rectangle">⬜ 矩形</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label>裁剪大小:</label>
-        <input 
-          type="range" 
-          min="0.5" 
-          max="3" 
-          step="0.1" 
-          v-model="clipSize"
-          @input="updateClipSize"
-        />
-        <span>{{ clipSize }}x</span>
-      </div>
-      <div class="control-group">
-        <label>
-          <input type="checkbox" v-model="enableClip" @change="toggleClip" />
-          启用裁剪
-        </label>
-      </div>
-      <button @click="resetView">重置视图</button>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-container-group">
+    <div class="control-group">
+      <label>裁剪形状:</label>
+      <select v-model="clipShape" @change="updateClipShape">
+        <option value="heart">❤️ 心形</option>
+        <option value="circle">⭕ 圆形</option>
+        <option value="star">⭐ 星形</option>
+        <option value="rectangle">⬜ 矩形</option>
+      </select>
     </div>
+    <div class="control-group">
+      <label>裁剪大小:</label>
+      <input type="range" min="0.5" max="3" step="0.1" v-model="clipSize" @input="updateClipSize" />
+      <span>{{ clipSize }}x</span>
+    </div>
+    <div class="control-group">
+      <label>
+        <input type="checkbox" v-model="enableClip" @change="toggleClip" />
+        启用裁剪
+      </label>
+    </div>
+    <button @click="resetView">重置视图</button>
   </div>
 </template>
 
@@ -81,13 +72,13 @@ const drawStar = (ctx, scale) => {
   const spikes = 5;
   const outerRadius = 100;
   const innerRadius = 40;
-  
+
   for (let i = 0; i < spikes * 2; i++) {
     const angle = (i * Math.PI) / spikes;
     const radius = i % 2 === 0 ? outerRadius : innerRadius;
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
-    
+
     if (i === 0) {
       ctx.moveTo(x, y);
     } else {
@@ -124,26 +115,26 @@ const getClipFunction = (shape) => {
 // 预渲染事件处理
 const handlePrerender = (event) => {
   if (!enableClip.value) return;
-  
+
   const ctx = event.context;
   const matrix = event.inversePixelTransform;
   const canvasPixelRatio = Math.sqrt(
     matrix[0] * matrix[0] + matrix[1] * matrix[1]
   );
   const canvasRotation = -Math.atan2(matrix[1], matrix[0]);
-  
+
   ctx.save();
-  
+
   // 居中画布并移除旋转以定位裁剪
   ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
   ctx.rotate(-canvasRotation);
-  
+
   // 绘制裁剪路径
   const clipFunction = getClipFunction(clipShape.value);
   clipFunction(ctx, canvasPixelRatio * clipSize.value);
-  
+
   ctx.clip();
-  
+
   // 恢复变换
   if (clipShape.value === 'heart') {
     ctx.translate(75, 80);
@@ -151,7 +142,7 @@ const handlePrerender = (event) => {
   } else {
     ctx.scale(1 / canvasPixelRatio / clipSize.value, 1 / canvasPixelRatio / clipSize.value);
   }
-  
+
   // 重新应用画布旋转和位置
   ctx.rotate(canvasRotation);
   ctx.translate(-ctx.canvas.width / 2, -ctx.canvas.height / 2);
@@ -160,7 +151,7 @@ const handlePrerender = (event) => {
 // 后渲染事件处理
 const handlePostrender = (event) => {
   if (!enableClip.value) return;
-  
+
   const ctx = event.context;
   ctx.restore();
 };
@@ -170,7 +161,7 @@ const setupLayerEvents = () => {
   if (osmLayer) {
     osmLayer.un('prerender', handlePrerender);
     osmLayer.un('postrender', handlePostrender);
-    
+
     if (enableClip.value) {
       osmLayer.on('prerender', handlePrerender);
       osmLayer.on('postrender', handlePostrender);
@@ -244,7 +235,7 @@ onUnmounted(() => {
     osmLayer.un('prerender', handlePrerender);
     osmLayer.un('postrender', handlePostrender);
   }
-  
+
   if (map) {
     map.setTarget(undefined);
     map = null;
@@ -254,19 +245,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
-  background: #000; /* 黑色背景突出裁剪效果 */
 }
 
-.controls {
+.controls-container-group {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -318,7 +301,7 @@ onUnmounted(() => {
   color: #007bff;
 }
 
-.controls button {
+.controls-container-group button {
   padding: 8px 16px;
   background-color: #007bff;
   color: white;
@@ -329,7 +312,7 @@ onUnmounted(() => {
   transition: background-color 0.3s ease;
 }
 
-.controls button:hover {
+.controls-container-group button:hover {
   background-color: #0056b3;
 }
 </style>

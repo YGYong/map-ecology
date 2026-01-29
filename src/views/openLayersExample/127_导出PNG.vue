@@ -1,16 +1,14 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <button @click="exportToPng" :disabled="isExporting">
-        {{ isExporting ? '导出中...' : '导出为PNG' }}
-      </button>
-      <p class="info">点击按钮将当前地图导出为PNG图片</p>
-    </div>
-    
-    <!-- 隐藏的下载链接 -->
-    <a ref="downloadLink" style="display: none;">下载</a>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-png">
+    <button @click="exportToPng">
+      导出为PNG
+    </button>
+    <p class="info">点击按钮将当前地图导出为PNG图片</p>
   </div>
+
+  <!-- 隐藏的下载链接 -->
+  <a ref="downloadLink" style="display: none;">下载</a>
 </template>
 
 <script setup>
@@ -37,9 +35,9 @@ const isExporting = ref(false);
 // 导出为PNG的核心函数
 const exportToPng = () => {
   if (!map || isExporting.value) return;
-  
+
   isExporting.value = true;
-  
+
   // 等待地图渲染完成
   map.once('rendercomplete', () => {
     try {
@@ -49,25 +47,25 @@ const exportToPng = () => {
       mapCanvas.width = size[0];
       mapCanvas.height = size[1];
       const mapContext = mapCanvas.getContext('2d');
-      
+
       // 设置白色背景
       mapContext.fillStyle = '#ffffff';
       mapContext.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
-      
+
       // 获取所有图层的canvas元素
       const canvases = map.getViewport().querySelectorAll('.ol-layer canvas, canvas.ol-layer');
-      
+
       if (canvases.length === 0) {
         throw new Error('没有找到可导出的图层');
       }
-      
+
       // 将所有图层绘制到导出画布上
       Array.prototype.forEach.call(canvases, (canvas) => {
         if (canvas.width > 0 && canvas.height > 0) {
           try {
             const opacity = canvas.parentNode.style.opacity || canvas.style.opacity;
             mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-            
+
             // 简化变换处理
             const transform = canvas.style.transform;
             if (transform && transform !== 'none') {
@@ -81,34 +79,34 @@ const exportToPng = () => {
               // 重置变换
               mapContext.setTransform(1, 0, 0, 1, 0, 0);
             }
-            
+
             // 绘制图层
             mapContext.drawImage(canvas, 0, 0);
-            
+
           } catch (canvasError) {
             console.warn('绘制图层时出错:', canvasError);
             // 继续处理其他图层
           }
         }
       });
-      
+
       // 重置画布状态
       mapContext.globalAlpha = 1;
       mapContext.setTransform(1, 0, 0, 1, 0, 0);
-      
+
       // 创建下载链接并触发下载
       const dataURL = mapCanvas.toDataURL('image/png', 1.0);
-      
+
       if (dataURL === 'data:,') {
         throw new Error('画布为空，无法生成图片');
       }
-      
+
       downloadLink.value.href = dataURL;
       downloadLink.value.download = `map-${new Date().getTime()}.png`;
       downloadLink.value.click();
-      
+
       console.log('导出成功');
-      
+
     } catch (error) {
       console.error('导出失败:', error);
       alert(`导出失败: ${error.message}`);
@@ -116,7 +114,7 @@ const exportToPng = () => {
       isExporting.value = false;
     }
   });
-  
+
   // 触发地图重新渲染
   map.renderSync();
 };
@@ -211,18 +209,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }
 
-.controls {
+.controls-png {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -233,7 +224,7 @@ onUnmounted(() => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.controls button {
+.controls-png button {
   padding: 10px 20px;
   background-color: #28a745;
   color: white;
@@ -245,11 +236,11 @@ onUnmounted(() => {
   margin-bottom: 10px;
 }
 
-.controls button:hover:not(:disabled) {
+.controls-png button:hover:not(:disabled) {
   background-color: #218838;
 }
 
-.controls button:disabled {
+.controls-png button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
 }

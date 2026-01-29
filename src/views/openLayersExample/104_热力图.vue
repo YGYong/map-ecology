@@ -251,7 +251,7 @@ function generateData(count) {
     point.set("weight", weight);
 
     totalWeight += weight;
-    if (weight > maxWeight.value) maxWeight.value = weight;
+    if (weight > maxWeight.value) maxWeight.value = weight.toFixed(2);
   }
   heatmapSource.value.addFeatures(points);
 

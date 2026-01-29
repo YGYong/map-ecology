@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapContainer" id="map"></div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
@@ -141,8 +141,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-#map {
-  width: 100vw;
-  height: 100vh;
+.map-container {
+  width: 100%;
+  height: 100%;
 }
 </style>

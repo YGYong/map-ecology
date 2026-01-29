@@ -1,17 +1,15 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-    <div class="controls">
-      <div class="info">
-        <h4>地图放大镜</h4>
-        <p>🖱️ 移动鼠标查看放大效果</p>
-        <p>⬆️⬇️ 方向键调整放大镜大小</p>
-        <p>当前半径: {{ radius }}px</p>
-      </div>
-      <button @click="toggleMagnify">
-        {{ isMagnifyEnabled ? "关闭放大镜" : "开启放大镜" }}
-      </button>
+  <div ref="mapContainer" class="map-container"></div>
+  <div class="controls-magnify">
+    <div class="info">
+      <h4>地图放大镜</h4>
+      <p>🖱️ 移动鼠标查看放大效果</p>
+      <p>⬆️⬇️ 方向键调整放大镜大小</p>
+      <p>当前半径: {{ radius }}px</p>
     </div>
+    <button @click="toggleMagnify">
+      {{ title }}
+    </button>
   </div>
 </template>
 
@@ -25,6 +23,7 @@ import { getRenderPixel } from "ol/render";
 import "ol/ol.css";
 
 const mapContainer = ref(null);
+const title = ref('关闭放大镜');
 let map = null;
 let imageryLayer = null;
 let mousePosition = null;
@@ -131,6 +130,7 @@ const handleKeyDown = (event) => {
 // 切换放大镜功能
 const toggleMagnify = () => {
   isMagnifyEnabled.value = !isMagnifyEnabled.value;
+  title.value = isMagnifyEnabled.value ? '关闭放大镜' : '开启放大镜';
 
   // 清除事件监听器
   imageryLayer.un("postrender", handlePostrender);
@@ -202,19 +202,11 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
-  cursor: crosshair;
 }
 
-.controls {
+.controls-magnify {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -238,7 +230,7 @@ onUnmounted(() => {
   color: #666;
 }
 
-.controls button {
+.controls-magnify button {
   width: 100%;
   padding: 8px 16px;
   background-color: #28a745;
@@ -251,7 +243,7 @@ onUnmounted(() => {
   margin-top: 10px;
 }
 
-.controls button:hover {
+.controls-magnify button:hover {
   background-color: #218838;
 }
 </style>

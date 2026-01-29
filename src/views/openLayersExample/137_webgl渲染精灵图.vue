@@ -1,7 +1,5 @@
 <template>
-  <div class="map-container">
-    <div ref="mapContainer" id="map"></div>
-  </div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
@@ -119,13 +117,6 @@ onUnmounted(() => {
 
 <style scoped>
 .map-container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  font-family: sans-serif;
-}
-
-#map {
   width: 100%;
   height: 100%;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapContainer" id="map"></div>
+  <div ref="mapContainer" class="map-container"></div>
 </template>
 
 <script setup>
@@ -21,7 +21,7 @@ import "ol/ol.css";
 const mapContainer = ref(null);
 let map = null;
 const view = new View({
-  center: [116.4074, 39.9042], // 北京市中心经纬度
+  center: [116.5074, 39.9042], // 北京市中心经纬度
   zoom: 12.5,
   projection: "EPSG:4326", // 默认使用Web Mercator投影，需要设置为EPSG:4326经纬度
 });
@@ -113,7 +113,7 @@ const polygonStyle = () => {
 };
 </script>
 <style scoped>
-#map {
+.map-container {
   width: 100vw;
   height: 100vh;
 }
