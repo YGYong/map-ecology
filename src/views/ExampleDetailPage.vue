@@ -63,7 +63,7 @@ import ErrorPanel from '../components/ErrorPanel.vue'
 import { getExampleById, loadExampleCode } from '../utils/examplesData'
 import { getFrameworkExampleById } from '@/utils/frameworkExamples'
 import { parseSFC } from '../utils/sfcParser'
-import { CodeExecutor } from '../utils/codeExecutor'
+import { CesiumCodeExecutor } from '@/utils/cesiumCodeExecutor'
 import { LeafletCodeExecutor } from '@/utils/leafletCodeExecutor'
 import { OpenLayersCodeExecutor } from '@/utils/openLayersCodeExecutor'
 import { useErrorHandler } from '../composables/useErrorHandler'
@@ -204,6 +204,7 @@ async function runCode() {
       }
       
       const viewerInstance = cesiumViewer.value.getViewer()
+      const hostElement = cesiumViewer.value.getHostElement ? cesiumViewer.value.getHostElement() : null
       
       if (!viewerInstance) {
         addError({
@@ -212,9 +213,18 @@ async function runCode() {
         })
         return
       }
+
+      if (!hostElement) {
+        addError({
+          type: 'cesium',
+          message: 'Cesium 宿主容器不可用'
+        })
+        return
+      }
       
-      if (!codeExecutor) {
-        codeExecutor = new CodeExecutor(viewerInstance)
+      if (!codeExecutor || codeExecutor.__engine !== 'cesium') {
+        codeExecutor = new CesiumCodeExecutor(viewerInstance, hostElement)
+        codeExecutor.__engine = 'cesium'
       }
       
       if (cesiumViewer.value.clearScene) {

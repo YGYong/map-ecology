@@ -1,6 +1,7 @@
 <template>
-  <div class="cesium-viewer">
+  <div ref="cesiumRoot" class="cesium-viewer">
     <div id="cesiumContainer" ref="cesiumContainer" class="w-full h-full"></div>
+    <div ref="sandboxHost" class="cesium-sandbox-host"></div>
   </div>
 </template>
 
@@ -8,7 +9,7 @@
 import { ref, onMounted } from 'vue'
 import * as Cesium from 'cesium'
 import { useViewerManager } from '@/composables/useViewerManager'
-import { CodeExecutor } from '@/utils/codeExecutor'
+import { CesiumCodeExecutor } from '@/utils/cesiumCodeExecutor'
 import { parseSFC } from '@/utils/sfcParser'
 
 /**
@@ -16,7 +17,7 @@ import { parseSFC } from '@/utils/sfcParser'
  * 
  * Responsibilities:
  * - Initialize and manage Cesium Viewer instance
- * - Execute user code safely using CodeExecutor
+ * - Execute user code safely using CesiumCodeExecutor
  * - Clear scene before running new code
  * - Handle errors during code execution
  * 
@@ -33,7 +34,9 @@ const props = defineProps({
 })
 
 // Template refs
+const cesiumRoot = ref(null)
 const cesiumContainer = ref(null)
+const sandboxHost = ref(null)
 
 // Use ViewerManager composable for lifecycle management
 const { viewer, initViewer, clearScene, resetCamera, destroyViewer } = useViewerManager()
@@ -49,9 +52,9 @@ onMounted(() => {
   if (cesiumContainer.value) {
     initViewer(cesiumContainer.value)
     
-    // Create CodeExecutor with the viewer instance
+    // Create CesiumCodeExecutor with the viewer instance and root element
     if (viewer.value) {
-      codeExecutor = new CodeExecutor(viewer.value)
+      codeExecutor = new CesiumCodeExecutor(viewer.value, cesiumRoot.value)
     }
   }
 })
@@ -94,11 +97,11 @@ async function runCode(code) {
       return parseError
     }
     
-    // Execute the parsed code using CodeExecutor
+    // Execute the parsed code using CesiumCodeExecutor
     if (!codeExecutor) {
       // Recreate executor if needed
       if (viewer.value) {
-        codeExecutor = new CodeExecutor(viewer.value)
+        codeExecutor = new CesiumCodeExecutor(viewer.value, cesiumRoot.value)
       } else {
         const error = {
           success: false,
@@ -161,13 +164,18 @@ function getViewer() {
   return viewer.value
 }
 
+function getHostElement() {
+  return sandboxHost.value
+}
+
 // Expose methods to parent component
 defineExpose({
   runCode,
   reset,
   clearScene,
   resetCamera,
-  getViewer
+  getViewer,
+  getHostElement
 })
 </script>
 
@@ -175,10 +183,16 @@ defineExpose({
 .cesium-viewer {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 #cesiumContainer {
   width: 100%;
   height: 100%;
+}
+
+.cesium-sandbox-host {
+  position: absolute;
+  inset: 0;
 }
 </style>

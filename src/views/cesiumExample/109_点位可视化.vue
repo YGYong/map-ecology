@@ -181,7 +181,8 @@ const createPointMarkers = () => {
                 color: Cesium.Color.fromCssColorString(getStatusColor(point.status)),
                 outlineColor: Cesium.Color.WHITE,
                 outlineWidth: 2,
-                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                disableDepthTestDistance: Number.POSITIVE_INFINITY // 防止被地形遮挡
             },
             label: {
                 text: point.name,
@@ -191,7 +192,8 @@ const createPointMarkers = () => {
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 pixelOffset: new Cesium.Cartesian2(0, -15),
-                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                disableDepthTestDistance: Number.POSITIVE_INFINITY // 防止被地形遮挡
             },
             properties: {
                 id: point.id,

@@ -89,7 +89,7 @@ onMounted(() => {
     ), // 设置模型朝向
     model: {
       // uri: "/src/cesium/models/baby/scene.gltf", // 替换为实际模型路径
-      uri: new URL("./models//baby/scene.gltf", import.meta.url).href,
+      uri: new URL("/models//baby/scene.gltf", window.location.href).href,
       minimumPixelSize: 128, // 最小像素大小
       maximumScale: 20000, // 最大缩放比例
     },

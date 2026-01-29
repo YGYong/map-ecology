@@ -1,42 +1,34 @@
 <template>
-  <div>
-    <div id="map" class="map"></div>
-    <table class="controls">
-      <tr>
-        <td><label for="red">Red</label></td>
-        <td>
-          <input id="red" type="range" min="0" max="500" v-model="redValue" />
-        </td>
-        <td>
-          <span>{{ redValue }}</span> %
-        </td>
-      </tr>
-      <tr>
-        <td><label for="green">Green</label></td>
-        <td>
-          <input
-            id="green"
-            type="range"
-            min="0"
-            max="500"
-            v-model="greenValue"
-          />
-        </td>
-        <td>
-          <span>{{ greenValue }}</span> %
-        </td>
-      </tr>
-      <tr>
-        <td><label for="blue">Blue</label></td>
-        <td>
-          <input id="blue" type="range" min="0" max="500" v-model="blueValue" />
-        </td>
-        <td>
-          <span>{{ blueValue }}</span> %
-        </td>
-      </tr>
-    </table>
-  </div>
+  <div id="map" class="map-container"></div>
+  <table class="controls">
+    <tr>
+      <td><label for="red">Red</label></td>
+      <td>
+        <input id="red" type="range" min="0" max="500" v-model="redValue" />
+      </td>
+      <td>
+        <span>{{ redValue }}</span> %
+      </td>
+    </tr>
+    <tr>
+      <td><label for="green">Green</label></td>
+      <td>
+        <input id="green" type="range" min="0" max="500" v-model="greenValue" />
+      </td>
+      <td>
+        <span>{{ greenValue }}</span> %
+      </td>
+    </tr>
+    <tr>
+      <td><label for="blue">Blue</label></td>
+      <td>
+        <input id="blue" type="range" min="0" max="500" v-model="blueValue" />
+      </td>
+      <td>
+        <span>{{ blueValue }}</span> %
+      </td>
+    </tr>
+  </table>
 </template>
 
 <script setup>
@@ -135,10 +127,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.map {
-  width: 100vw;
-  height: 100vh;
+.map-container {
+  width: 100%;
+  height: 100%;
 }
+
 table.controls {
   position: absolute;
   top: 10px;
@@ -149,31 +142,39 @@ table.controls {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
+
 table.controls td {
   padding: 2px 5px;
 }
+
 table.controls td:nth-child(3) {
   text-align: right;
   min-width: 4.5em;
 }
+
 table.controls label {
   font-weight: bold;
   color: #333;
 }
+
 table.controls input[type="range"] {
   width: 150px;
 }
+
 table.controls span {
   color: #666;
   font-family: monospace;
 }
+
 /* 为不同的滑块添加颜色提示 */
 table.controls tr:nth-child(1) input[type="range"] {
   accent-color: #ff4444;
 }
+
 table.controls tr:nth-child(2) input[type="range"] {
   accent-color: #44ff44;
 }
+
 table.controls tr:nth-child(3) input[type="range"] {
   accent-color: #4444ff;
 }

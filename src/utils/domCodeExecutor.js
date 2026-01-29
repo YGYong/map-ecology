@@ -116,7 +116,7 @@ export class DomCodeExecutor {
         onMounted: (fn) => {
           setTimeout(() => {
             try {
-              fn();
+              fn.call(context);
             } catch (error) {
               console.error("onMounted error:", error);
             }
@@ -145,7 +145,7 @@ export class DomCodeExecutor {
       });
 
       if (script) {
-        this.applyModuleImports(script, context);
+        const importedNames = this.applyModuleImports(script, context);
         script = this.transformAssetImports(script);
         script = script.replace(/import\s+.*?from\s+['"].*?['"];?\s*/g, "");
         script = script.replace(/import\s+['"].*?['"];?\s*/g, "");
@@ -153,18 +153,23 @@ export class DomCodeExecutor {
 
         script = this.stripTemplateRefDeclarations(script, Object.keys(context.refs));
 
+        // Prepend imported names as local variables for async callback support
+        const importVars = importedNames.map(name => `var ${name} = this.${name};`).join("\n");
+
         // Only convert top-level declarations (no indentation)
+        // Keep them as local variables while also exporting to this for template access
         script = script.replace(
           /^(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=/gm,
-          "this.$1 =",
+          "var $1 = this.$1 =",
         );
         script = script.replace(
           /^function\s+([a-zA-Z0-9_$]+)\s*\(/gm,
-          "this.$1 = function $1(",
+          "var $1 = this.$1 = function $1(",
         );
 
         const wrappedCode = `
           (function() {
+            ${importVars}
             with(this) {
               try {
                 ${script}
@@ -213,45 +218,61 @@ export class DomCodeExecutor {
   }
 
   applyModuleImports(script, context) {
-    if (!this.moduleRegistry) return;
+    if (!this.moduleRegistry) return [];
+    const importedNames = [];
 
-    const defaultImportRe =
-      /^\s*import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"]\s*;?\s*$/gm;
-    const namedImportRe =
-      /^\s*import\s*\{\s*([^}]+)\s*\}\s*from\s+['"]([^'"]+)['"]\s*;?\s*$/gm;
+    // Use more flexible regexes that don't rely on line starts/ends as strictly
+    const defaultImportRe = /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"]/g;
+    const namedImportRe = /import\s*\{\s*([^}]+)\s*\}\s*from\s+['"]([^'"]+)['"]/g;
+    const namespaceImportRe = /import\s*\*\s*as\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s+['"]([^'"]+)['"]/g;
 
     const resolveModule = (specifier) => {
       return this.moduleRegistry?.[specifier] || null;
     };
 
-    script.replace(defaultImportRe, (full, localName, specifier) => {
+    let match;
+
+    // Handle namespace imports: import * as dat from 'dat.gui'
+    while ((match = namespaceImportRe.exec(script)) !== null) {
+      const [_, localName, specifier] = match;
       const mod = resolveModule(specifier);
-      if (!mod) return full;
-      context[localName] = mod.default ?? mod;
-      return full;
-    });
+      if (mod) {
+        context[localName] = mod;
+        importedNames.push(localName);
+      }
+    }
 
-    script.replace(namedImportRe, (full, importsRaw, specifier) => {
+    // Handle default imports: import CesiumNavigation from 'cesium-navigation-es6'
+    while ((match = defaultImportRe.exec(script)) !== null) {
+      const [_, localName, specifier] = match;
       const mod = resolveModule(specifier);
-      if (!mod) return full;
+      if (mod) {
+        context[localName] = mod.default !== undefined ? mod.default : mod;
+        importedNames.push(localName);
+      }
+    }
 
-      const parts = importsRaw
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+    // Handle named imports: import { a, b as c } from 'module'
+    while ((match = namedImportRe.exec(script)) !== null) {
+      const [_, importsRaw, specifier] = match;
+      const mod = resolveModule(specifier);
+      if (mod) {
+        const parts = importsRaw.split(",").map(s => s.trim()).filter(Boolean);
+        parts.forEach(part => {
+          const m = part.match(/^([a-zA-Z_$][a-zA-Z0-9_$]*)(?:\s+as\s+([a-zA-Z_$][a-zA-Z0-9_$]*))?$/);
+          if (m) {
+            const imported = m[1];
+            const local = m[2] || imported;
+            if (mod[imported] !== undefined) {
+              context[local] = mod[imported];
+              importedNames.push(local);
+            }
+          }
+        });
+      }
+    }
 
-      parts.forEach((part) => {
-        const m = part.match(/^([a-zA-Z_$][a-zA-Z0-9_$]*)(?:\s+as\s+([a-zA-Z_$][a-zA-Z0-9_$]*))?$/);
-        if (!m) return;
-        const imported = m[1];
-        const local = m[2] || imported;
-        if (mod[imported] !== undefined) {
-          context[local] = mod[imported];
-        }
-      });
-
-      return full;
-    });
+    return importedNames;
   }
 
   stripTemplateRefDeclarations(script, refNames) {
@@ -637,7 +658,8 @@ export class DomCodeExecutor {
   }
 
   updateBindings() {
-    this.bindings.forEach((fn) => {
+    const currentBindings = [...this.bindings];
+    currentBindings.forEach((fn) => {
       try {
         fn();
       } catch (e) {

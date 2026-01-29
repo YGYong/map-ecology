@@ -438,10 +438,10 @@ export const examples = [
   },
   {
     id: 103,
-    name: "加载控件",
-    fileName: "cesiumExample/103_加载控件.vue",
+    name: "比例尺指南针",
+    fileName: "cesiumExample/103_比例尺指南针.vue",
     category: 21,
-    preview: "@/assets/cesiumImg/103_加载控件.png",
+    preview: "@/assets/cesiumImg/103_比例尺指南针.png",
   },
   {
     id: 104,
@@ -449,13 +449,6 @@ export const examples = [
     fileName: "cesiumExample/104_GUI调试.vue",
     category: 21,
     preview: "@/assets/cesiumImg/104_GUI调试.png",
-  },
-  {
-    id: 106,
-    name: "沿线标注",
-    fileName: "cesiumExample/106_沿线标注.vue",
-    category: 21,
-    preview: "@/assets/cesiumImg/106_沿线标注.png",
   },
   {
     id: 107,
