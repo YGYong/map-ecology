@@ -15,19 +15,19 @@
   <table border="0">
     <tr>
       <td align="center">
-        <img src="/public/home.png" width="400" /><br />
+        <img src="/public/home.png"/><br />
         <b>首页</b>
       </td>
     </tr>
     <tr>
       <td align="center">
-        <img src="/public/example.png" width="400" /><br />
+        <img src="/public/example.png"/><br /> 
         <b>案例</b>
       </td>
     </tr>
     <tr>
       <td align="center">
-        <img src="/public/docs.png" width="400" /><br />
+        <img src="/public/docs.png"/><br />
         <b>文档</b>
       </td>
     </tr>
@@ -112,11 +112,11 @@ npm run dev
   <table border="0">
     <tr>
       <td align="center">
-        <img src="map-example/public/me/card.jpg" width="200" /><br />
+        <img src="map-example/public/me/card.jpg" width="300" /><br />
         <b>个人微信</b>
       </td>
       <td align="center">
-        <img src="map-example/public/me/gzh.jpg" width="200" /><br />
+        <img src="map-example/public/me/gzh.jpg" width="300" /><br />
         <b>微信公众号</b>
       </td>
     </tr>
