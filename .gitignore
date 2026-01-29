@@ -1,22 +1,47 @@
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
-.eslintcache
-report.html
-vite.config.*.timestamp*
-
-yarn.lock
+# Logs
+logs
+*.log
 npm-debug.log*
-.pnpm-error.log*
-.pnpm-debug.log
-tests/**/coverage/
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Editor directories and files
-.idea
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# OS and Editors
+.DS_Store
+.vscode/
+!.vscode/extensions.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+*.sw?
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
+# VitePress cache
+docs/.vitepress/cache/
+.vitepress/dist/
+
+# Test coverage
+tests/**/coverage/
+
+# Misc
+.eslintcache
+report.html
+vite.config.*.timestamp*
 tsconfig.tsbuildinfo
+
+# Project specific
+map-docs/node_modules/
+map-example/node_modules/
+map-docs/dist/
+map-example/dist/
