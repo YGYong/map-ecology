@@ -18,6 +18,8 @@
         <img src="/public/home.png" width="400" /><br />
         <b>首页</b>
       </td>
+    </tr>
+    <tr>
       <td align="center">
         <img src="/public/example.png" width="400" /><br />
         <b>案例</b>

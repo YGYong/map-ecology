@@ -14,10 +14,15 @@
             <span class="gradient-text">更简单，更高效</span>
           </h1>
           <p class="hero-subtitle">
-            集成 Cesium, OpenLayers, Leaflet 与 Three.js 的综合开发生态，从理论到实战，助力构建新一代 Web GIS 应用。
+            集成 Cesium, OpenLayers, Leaflet 与 Three.js
+            的综合开发生态，从理论到实战，助力构建新一代 Web GIS 应用。
           </p>
           <div class="hero-actions">
-            <a href="http://c.ygyong.cn" target="_blank" class="btn btn-primary">
+            <a
+              href="http://c.ygyong.cn"
+              target="_blank"
+              class="btn btn-primary"
+            >
               <span class="btn-icon">�</span> 查看文档
             </a>
             <button @click="scrollToShowcase" class="btn btn-secondary">
@@ -40,7 +45,10 @@
             <div class="card-glass"></div>
             <div class="card-icon">🌍</div>
             <h3>Cesium.js</h3>
-            <p>世界级 3D 地球引擎。支持海量 3D Tiles、倾斜摄影、BIM 模型加载，构建数字孪生底座。</p>
+            <p>
+              世界级 3D 地球引擎。支持海量 3D Tiles、倾斜摄影、BIM
+              模型加载，构建数字孪生底座。
+            </p>
             <div class="card-footer">
               <span class="tag">3D Tiles</span>
               <span class="tag">Digital Twin</span>
@@ -52,7 +60,10 @@
             <div class="card-glass"></div>
             <div class="card-icon">🗺️</div>
             <h3>OpenLayers</h3>
-            <p>企业级二维地图引擎。支持 OGC 标准服务，提供强大的矢量渲染与空间分析能力。</p>
+            <p>
+              企业级二维地图引擎。支持 OGC
+              标准服务，提供强大的矢量渲染与空间分析能力。
+            </p>
             <div class="card-footer">
               <span class="tag">OGC</span>
               <span class="tag">WebGL</span>
@@ -64,7 +75,10 @@
             <div class="card-glass"></div>
             <div class="card-icon">🍃</div>
             <h3>Leaflet</h3>
-            <p>轻量级移动端优先。体积小巧，插件生态丰富，现代移动 Web GIS 的首选方案。</p>
+            <p>
+              轻量级移动端优先。体积小巧，插件生态丰富，现代移动 Web GIS
+              的首选方案。
+            </p>
             <div class="card-footer">
               <span class="tag">Lightweight</span>
               <span class="tag">Mobile</span>
@@ -76,7 +90,9 @@
             <div class="card-glass"></div>
             <div class="card-icon">🧊</div>
             <h3>Three.js</h3>
-            <p>WebGL 图形渲染库。打造高保真虚拟仿真，支持自定义着色器与物理引擎。</p>
+            <p>
+              WebGL 图形渲染库。打造高保真虚拟仿真，支持自定义着色器与物理引擎。
+            </p>
             <div class="card-footer">
               <span class="tag">WebGL</span>
               <span class="tag">Visualization</span>
@@ -90,13 +106,15 @@
         <div class="connect-container">
           <div class="connect-info">
             <h2 class="section-title">保持联系</h2>
-            <p class="section-desc">如果您有任何问题、建议或商务合作意向，欢迎随时联系我。</p>
+            <p class="section-desc">
+              如果您有任何问题、建议或商务合作意向，欢迎随时联系我。
+            </p>
             <div class="contact-methods">
               <div class="method-item">
                 <span class="method-icon">📧</span>
                 <div class="method-text">
                   <label>邮箱</label>
-                  <span>ygyong@foxmail.com</span>
+                  <span>1669482541@qq.com</span>
                 </div>
               </div>
               <div class="method-item">
@@ -108,7 +126,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="qr-grid">
             <div class="qr-item">
               <div class="qr-frame">
@@ -130,7 +148,7 @@
       <footer class="main-footer">
         <div class="footer-content">
           <div class="footer-logo">Map Ecology</div>
-          <p>© 2024-2025 Map Ecology. Built with ❤️ for GIS Developers.</p>
+          <p>© 2025-2026 Map Ecology. Built with ❤️ for GIS Developers.</p>
         </div>
       </footer>
     </div>
@@ -141,9 +159,9 @@
 import TopNavbar from "../components/TopNavbar.vue";
 
 const scrollToShowcase = () => {
-  const el = document.getElementById('showcase');
+  const el = document.getElementById("showcase");
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth' });
+    el.scrollIntoView({ behavior: "smooth" });
   }
 };
 </script>
@@ -165,7 +183,11 @@ const scrollToShowcase = () => {
   background-color: #fff;
   color: var(--text-main);
   overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 .scroll-container {
@@ -191,7 +213,11 @@ const scrollToShowcase = () => {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15), transparent 70%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(59, 130, 246, 0.15),
+    transparent 70%
+  );
 }
 
 .hero-content {
@@ -267,14 +293,15 @@ const scrollToShowcase = () => {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(111 92 237 / 88%);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgb(111 92 237 / 88%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
 }
 
 /* 框架展示区域 */
@@ -319,7 +346,7 @@ const scrollToShowcase = () => {
 
 .tech-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
   border-color: var(--primary-color);
 }
 
@@ -419,12 +446,12 @@ const scrollToShowcase = () => {
 }
 
 .qr-frame {
-  width: 180px;
-  height: 180px;
+  width: 240px;
+  height: 240px;
   padding: 12px;
   background: #fff;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   margin-bottom: 16px;
   border: 1px solid #f1f5f9;
 }
@@ -463,19 +490,19 @@ const scrollToShowcase = () => {
     gap: 60px;
     text-align: center;
   }
-  
+
   .connect-info .section-title {
     text-align: center;
   }
-  
+
   .contact-methods {
     align-items: center;
   }
-  
+
   .qr-grid {
     gap: 24px;
   }
-  
+
   .qr-frame {
     width: 150px;
     height: 150px;
@@ -486,7 +513,7 @@ const scrollToShowcase = () => {
   .hero-actions {
     flex-direction: column;
   }
-  
+
   .qr-grid {
     flex-direction: column;
     align-items: center;

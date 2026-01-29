@@ -1,4 +1,6 @@
 {
+  "name": "map-ecology-docs",
+  "author": "YGYong",
   "devDependencies": {
     "cesium": "^1.133.1",
     "vite-plugin-cesium": "^1.2.23",

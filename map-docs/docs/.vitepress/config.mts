@@ -5,18 +5,20 @@ import { VueReplMdPlugin } from "vitepress-plugin-vue-repl";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Cesium快速入门",
+  title: "地图生态",
   sitemap: {
     hostname: "http://c.ygyong.cn",
   },
-  description: "Cesium快速入门、Cesium中文网、Cesium案例集合",
+  description:
+    "地图生态、地图案例集合、Webgis入门、cesium中文、openlayers中文、leaflet中文",
   head: [
     ["link", { rel: "icon", href: "/favicon.ico" }],
     [
       "meta",
       {
         name: "description",
-        content: "Cesium快速入门、Cesium中文网、Cesium案例集合、Webgis入门",
+        content:
+          "地图生态、地图案例集合、Webgis入门、cesium中文、openlayers中文、leaflet中文",
       },
     ],
   ],
@@ -48,48 +50,12 @@ export default defineConfig({
             link: "https://sandcastle.cesium.com/",
           },
           {
-            text: "3D模型",
-            link: "https://sketchfab.com/feed",
-          },
-          {
-            text: "GeoJson数据",
-            link: "https://geojson.cn/data/atlas/china",
-          },
-          {
-            text: "GeoJson数据（含区县）",
-            link: "https://datav.aliyun.com/portal/school/atlas/area_selector",
-          },
-          {
-            text: "GeoJSON边界数据",
-            link: "https://geojson.hxkj.vip/",
-          },
-          {
-            text: "Cesium-Examples",
-            link: "https://github.com/jiawanlong/Cesium-Examples",
-          },
-          {
-            text: "cesium.xin",
-            link: "http://cesium.xin/",
-          },
-          {
-            text: "vue for cesium",
-            link: "https://zouyaoji.top/vue-cesium/#/zh-CN",
-          },
-          {
             text: "Openlayers 官网",
             link: "https://openlayers.org/",
           },
           {
-            text: "地图坐标拾取",
-            link: "https://api.map.baidu.com/lbsapi/getpoint/index.html",
-          },
-          {
-            text: "turf.js",
-            link: "https://turfjs.fenxianglu.cn/docs/api/along",
-          },
-          {
-            text: "MyUI Map",
-            link: "https://myui.vtj.pro/my/ui/map/",
+            text: "Leaflet 官网",
+            link: "https://leafletjs.cn",
           },
         ],
       },
@@ -152,9 +118,9 @@ export default defineConfig({
             { text: "Map对象", link: "/leaflet/02_map对象" },
             { text: "UI图层", link: "/leaflet/03_UI图层" },
             { text: "栅格图层", link: "/leaflet/04_栅格图层" },
-            { text: "矢量图层", link: "/leaflet/05_矢量图层" },
-            { text: "图层补充", link: "/leaflet/06_图层补充" },
-            { text: "控件", link: "/leaflet/07_控件" },
+            // { text: "矢量图层", link: "/leaflet/05_矢量图层" },
+            // { text: "图层补充", link: "/leaflet/06_图层补充" },
+            // { text: "控件", link: "/leaflet/07_控件" },
           ],
         },
       ],
@@ -174,7 +140,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/YGYong/cesium-start" },
+      { icon: "github", link: "https://github.com/YGYong/map-ecology" },
     ],
     docFooter: {
       prev: "上一页",

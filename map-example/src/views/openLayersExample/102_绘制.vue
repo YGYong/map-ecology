@@ -1,7 +1,7 @@
 <template>
   <div ref="mapContainer" class="map-container"></div>
 
-  <div class="map-controls">
+  <div class="map-controls-draw">
     <div class="toolbar">
       <div class="toolbar-title">地图绘制工具</div>
       <div class="toolbar-group">
@@ -375,7 +375,7 @@ function createModifyStyle() {
   height: 100%;
 }
 
-.map-controls {
+.map-controls-draw {
   position: absolute;
   top: 40px;
   left: 20px;

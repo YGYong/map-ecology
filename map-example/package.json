@@ -1,5 +1,7 @@
 {
-  "name": "cesium-start-demo",
+  "name": "map-ecology-example",
+  "author": "YGYong",
+  "description": "cesium、openlayers、leaflet、three.js 地图生态系统示例",
   "private": true,
   "version": "0.0.0",
   "type": "module",

@@ -28,7 +28,7 @@ dist-ssr/
 *.local
 
 # VitePress cache
-docs/.vitepress/cache/
+map-docs/docs/.vitepress/cache/
 .vitepress/dist/
 
 # Test coverage
