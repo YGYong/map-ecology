@@ -34,7 +34,11 @@
           </div>
         </div>
         <div class="editor-content-wrapper">
-          <code-editor v-model="code" @run="runCode" :show-header="false" />
+          <div v-if="isLoadingCode" class="loading-overlay">
+            <div class="loader"></div>
+            <span>正在加载示例代码...</span>
+          </div>
+          <code-editor v-else v-model="code" @run="runCode" :show-header="false" />
         </div>
       </div>
 
@@ -84,6 +88,7 @@ const currentExample = ref(null)
 const code = ref('')
 const originalCode = ref('')
 const isRunning = ref(false)
+const isLoadingCode = ref(false)
 const codePanelWidth = ref(45)
 const isResizing = ref(false)
 
@@ -115,11 +120,13 @@ async function loadExample() {
   
   if (example) {
     currentExample.value = example
+    isLoadingCode.value = true
     
     try {
       const exampleCode = await loadExampleCode(example.fileName)
       code.value = exampleCode
       originalCode.value = exampleCode
+      isLoadingCode.value = false
       
       nextTick(async () => {
         await waitForViewer()
@@ -127,6 +134,7 @@ async function loadExample() {
       })
     } catch (error) {
       console.error('加载示例失败:', error)
+      isLoadingCode.value = false
       addError({
         type: 'load',
         message: `加载示例失败: ${error.message}`
@@ -472,6 +480,36 @@ async function waitForViewer(maxWaitTime = 5000, checkInterval = 100) {
   overflow: hidden;
   min-height: 0;
   position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #969696;
+  gap: 16px;
+  z-index: 10;
+}
+
+.loader {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .resize-handle {

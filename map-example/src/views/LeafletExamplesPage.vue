@@ -59,7 +59,11 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, onActivated } from "vue";
+
+defineOptions({
+  name: "LeafletExamples",
+});
 import { useRouter } from "vue-router";
 import TopNavbar from "../components/TopNavbar.vue";
 import placeholder from "@/assets/example-placeholder.svg";
@@ -71,16 +75,24 @@ const router = useRouter();
 const examplesContainer = ref(null);
 const SCROLL_POS_KEY = "leaflet_examples_scroll_pos";
 
-// 生命周期
-onMounted(() => {
-  // 恢复滚动位置
+// 恢复滚动位置的函数
+function restoreScrollPosition() {
   const savedPos = sessionStorage.getItem(SCROLL_POS_KEY);
   if (savedPos && examplesContainer.value) {
-    // 使用 setTimeout 确保 DOM 渲染完成
     setTimeout(() => {
       examplesContainer.value.scrollTop = parseInt(savedPos);
     }, 0);
   }
+}
+
+// 生命周期
+onMounted(() => {
+  restoreScrollPosition();
+});
+
+// keep-alive 激活时恢复
+onActivated(() => {
+  restoreScrollPosition();
 });
 
 const keyword = ref("");
