@@ -79,9 +79,10 @@
                 >
                   <div class="example-preview">
                     <img
-                      :src="getPreviewImage(example)"
+                      class="lazy-image"
+                      :data-src="getPreviewImage(example)"
+                      src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                       :alt="example.name"
-                      loading="lazy"
                     />
                   </div>
                   <div class="example-info">{{ example.name }}</div>
@@ -96,7 +97,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onActivated } from "vue";
+import { computed, ref, onMounted, onActivated, nextTick } from "vue";
 
 defineOptions({
   name: "OpenLayersExamples",
@@ -112,6 +113,9 @@ const router = useRouter();
 const examplesContainer = ref(null);
 const SCROLL_POS_KEY = "ol_examples_scroll_pos";
 
+// Intersection Observer
+let observer = null;
+
 // 恢复滚动位置的函数
 function restoreScrollPosition() {
   const savedPos = sessionStorage.getItem(SCROLL_POS_KEY);
@@ -122,14 +126,46 @@ function restoreScrollPosition() {
   }
 }
 
+function setupIntersectionObserver() {
+  if (observer) observer.disconnect();
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.getAttribute("data-src");
+          if (src) {
+            img.src = src;
+            img.removeAttribute("data-src");
+            observer.unobserve(img);
+          }
+        }
+      });
+    },
+    {
+      root: examplesContainer.value,
+      rootMargin: "100px 0px",
+      threshold: 0.01,
+    }
+  );
+
+  nextTick(() => {
+    const lazyImages = document.querySelectorAll(".lazy-image");
+    lazyImages.forEach((img) => observer.observe(img));
+  });
+}
+
 // 生命周期
 onMounted(() => {
   restoreScrollPosition();
+  setupIntersectionObserver();
 });
 
 // keep-alive 激活时恢复
 onActivated(() => {
   restoreScrollPosition();
+  setupIntersectionObserver();
 });
 
 const keyword = ref("");

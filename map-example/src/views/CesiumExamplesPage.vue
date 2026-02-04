@@ -50,7 +50,7 @@
                 <div v-for="example in getExamplesBySubcategory(subcategory.id)" :key="example.id" class="example-card"
                   @click="goToExample(example.id)">
                   <div class="example-preview">
-                    <img :src="getPreviewImage(example.preview)" :alt="example.name" loading="lazy" />
+                    <img class="lazy-image" :data-src="getPreviewImage(example.preview)" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" :alt="example.name" />
                     <!-- <div class="example-overlay">
                       <el-button type="primary" circle icon="el-icon-video-camera" size="large" />
                     </div> -->
@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onActivated } from 'vue'
+import { ref, computed, onMounted, onActivated, nextTick } from 'vue'
 
 defineOptions({
   name: 'CesiumExamples'
@@ -87,6 +87,9 @@ const router = useRouter()
 const examplesContainer = ref(null)
 const SCROLL_POS_KEY = 'cesium_examples_scroll_pos'
 
+// Intersection Observer for Lazy Loading
+let observer = null
+
 // 恢复滚动位置的函数
 function restoreScrollPosition() {
   const savedPos = sessionStorage.getItem(SCROLL_POS_KEY)
@@ -97,14 +100,49 @@ function restoreScrollPosition() {
   }
 }
 
+// Setup Intersection Observer
+function setupIntersectionObserver() {
+  if (observer) {
+    observer.disconnect()
+  }
+
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target
+        const src = img.getAttribute('data-src')
+        if (src) {
+          img.src = src
+          img.removeAttribute('data-src')
+          observer.unobserve(img)
+        }
+      }
+    })
+  }, {
+    root: examplesContainer.value,
+    rootMargin: '100px 0px', // Preload images 100px before they come into view
+    threshold: 0.01
+  })
+
+  // Observe all lazy images
+  nextTick(() => {
+    const lazyImages = document.querySelectorAll('.lazy-image')
+    lazyImages.forEach(img => {
+      observer.observe(img)
+    })
+  })
+}
+
 // 生命周期
 onMounted(() => {
   restoreScrollPosition()
+  setupIntersectionObserver()
 })
 
 // keep-alive 激活时恢复
 onActivated(() => {
   restoreScrollPosition()
+  setupIntersectionObserver() // Re-setup observer as DOM might have changed or needs re-observation
 })
 
 // 导入所有预览图
