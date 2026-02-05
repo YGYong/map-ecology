@@ -478,6 +478,13 @@ export const examples = [
     category: 21,
     preview: "@/assets/cesiumImg/110_雷达扫描.png",
   },
+  {
+    id: 112,
+    name: "智慧城市",
+    fileName: "cesiumExample/112_智慧城市.vue",
+    category: 21,
+    preview: "@/assets/cesiumImg/112_智慧城市.png",
+  },
 ];
 
 // 计算分类数量
