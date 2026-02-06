@@ -8,6 +8,7 @@ import LeafletExamplesPage from '@/views/LeafletExamplesPage.vue'
 import OpenLayersExamplesPage from '@/views/OpenLayersExamplesPage.vue'
 import OpenLayersDocsPage from '@/views/OpenLayersDocsPage.vue'
 import CesiumDocsPage from '@/views/CesiumDocsPage.vue'
+import NotFoundPage from '@/views/NotFoundPage.vue'
 
 const routes = [
   {
@@ -78,6 +79,12 @@ const routes = [
     path: '/community',
     name: 'Community',
     component: BlankPage
+  },
+  // 404 页面配置
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFoundPage
   }
 ]
 
