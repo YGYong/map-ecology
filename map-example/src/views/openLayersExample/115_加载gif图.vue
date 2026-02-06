@@ -4,7 +4,7 @@
 
 <script setup>
 /**
- * 案例参考[官方示例 Animated GIF](https://openlayers.org/en/latest/examples/animated-gif.html)
+ * 官方示例：(https://openlayers.org/en/latest/examples/animated-gif.html)
  * 
  * 1. 需要使用到 `gifler` 库来加载 gif 图像。
  * 2. `gifler` 不支持 ES6 模块导入，通过 CDN 引入。

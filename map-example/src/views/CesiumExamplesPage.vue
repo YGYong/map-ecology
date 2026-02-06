@@ -8,11 +8,16 @@
       <!-- 左侧分类导航 -->
       <aside class="sidebar">
         <div class="search-box">
-          <el-input placeholder="请输入关键字搜索" size="small" />
+          <el-input 
+            v-model="searchQuery"
+            placeholder="请输入关键字搜索" 
+            size="small" 
+            clearable
+          />
         </div>
 
         <el-menu :default-openeds="['1']" class="category-menu" :collapse-transition="false">
-          <el-sub-menu v-for="category in categoriesData" :key="category.id" :index="category.id.toString()">
+          <el-sub-menu v-for="category in filteredCategories" :key="category.id" :index="category.id.toString()">
             <template #title>
               <span class="category-icon">{{ category.icon }}</span>
               <span class="category-name">{{ category.name }}</span>
@@ -39,7 +44,7 @@
 
         <div class="examples-container" ref="examplesContainer">
           <!-- 按小专栏分组显示示例 -->
-          <div v-for="category in categoriesData" :key="category.id" class="category-section">
+          <div v-for="category in filteredCategories" :key="category.id" class="category-section">
             <div v-for="subcategory in category.subcategories" :key="subcategory.id" class="subcategory-section"
               :id="`subcategory-${subcategory.id}`">
               <h3 class="subcategory-title">
@@ -164,6 +169,7 @@ function getPreviewImage(path) {
 // 状态管理
 const selectedCategory = ref(1) // 默认选中"快速开始"分类
 const selectedSubcategory = ref(11) // 默认选中"快速开始示例"子分类
+const searchQuery = ref('') // 搜索关键字
 
 // 分类数据
 const categoriesData = categories
@@ -172,17 +178,53 @@ const categoriesData = categories
 const examplesData = examples
 
 // 计算属性
+const filteredCategories = computed(() => {
+  if (!searchQuery.value) return categoriesData
+
+  const query = searchQuery.value.toLowerCase()
+  return categoriesData.map(category => {
+    const matchingSubcategories = category.subcategories.filter(sub => {
+      // 检查子分类名是否匹配
+      const subMatch = sub.name.toLowerCase().includes(query)
+      // 检查子分类下的示例是否匹配
+      const examplesMatch = getExamplesBySubcategory(sub.id).some(ex => 
+        ex.name.toLowerCase().includes(query)
+      )
+      return subMatch || examplesMatch
+    })
+
+    if (matchingSubcategories.length > 0) {
+      return {
+        ...category,
+        subcategories: matchingSubcategories
+      }
+    }
+    return null
+  }).filter(Boolean)
+})
+
+// 监听搜索结果变化，重新初始化 IntersectionObserver
+import { watch } from 'vue'
+watch(filteredCategories, () => {
+  nextTick(() => {
+    setupIntersectionObserver()
+  })
+})
+
 const currentCategoryName = computed(() => {
+  if (searchQuery.value) return '搜索结果'
   const category = categoriesData.find(cat => cat.id === selectedCategory.value)
   return category ? category.name : '所有示例'
 })
 
 const currentCategoryIcon = computed(() => {
+  if (searchQuery.value) return '🔍'
   const category = categoriesData.find(cat => cat.id === selectedCategory.value)
   return category ? category.icon : '📂'
 })
 
 const currentSubcategoryName = computed(() => {
+  if (searchQuery.value) return searchQuery.value
   let subcategoryName = '所有示例'
   categoriesData.forEach(category => {
     const subcategory = category.subcategories.find(sub => sub.id === selectedSubcategory.value)
@@ -195,7 +237,14 @@ const currentSubcategoryName = computed(() => {
 
 // 方法
 function getExamplesBySubcategory(subcategoryId) {
-  return examplesData.filter(ex => ex.category === subcategoryId)
+  let filtered = examplesData.filter(ex => ex.category === subcategoryId)
+  
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(ex => ex.name.toLowerCase().includes(query))
+  }
+  
+  return filtered
 }
 
 function selectSubcategory(subcategory, category) {

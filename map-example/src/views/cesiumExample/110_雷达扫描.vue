@@ -3,6 +3,7 @@
 </template>
 
 <script setup>
+// 参考：https://jiawanlong.github.io/Cesium-Examples/examples/cesiumEx/editor.html#5.3.11%E3%80%81%E9%9B%B7%E8%BE%BE%E9%81%AE%E7%BD%A9%E6%89%AB%E6%8F%8F
 import { ref, onMounted } from "vue";
 import * as Cesium from "cesium";
 const cesiumContainer = ref(null);

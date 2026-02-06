@@ -9,7 +9,7 @@
         </div>
 
         <el-menu :default-openeds="defaultOpeneds" class="category-menu" :collapse-transition="false">
-          <el-sub-menu v-for="category in categoriesData" :key="category.id" :index="category.id.toString()">
+          <el-sub-menu v-for="category in filteredCategories" :key="category.id" :index="category.id.toString()">
             <template #title>
               <span class="category-icon">{{ category.icon }}</span>
               <span class="category-name">{{ category.name }}</span>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="examples-container">
-          <div v-for="category in categoriesData" :key="category.id" class="category-section">
+          <div v-for="category in filteredCategories" :key="category.id" class="category-section">
             <div v-for="subcategory in category.subcategories" :key="subcategory.id" class="subcategory-section"
               :id="`subcategory-${subcategory.id}`">
               <h3 class="subcategory-title">
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onActivated, nextTick } from "vue";
+import { computed, ref, onMounted, onActivated, nextTick, watch } from "vue";
 
 defineOptions({
   name: "LeafletExamples",
@@ -152,6 +152,36 @@ const examplesData = computed(() => {
   return examples.filter((ex) => ex.name.toLowerCase().includes(kw) || ex.id.toLowerCase().includes(kw));
 });
 
+function getExamplesBySubcategory(subcategoryId) {
+  return examplesData.value.filter((ex) => ex.category === subcategoryId);
+}
+
+const filteredCategories = computed(() => {
+  if (!keyword.value) return categoriesData;
+
+  return categoriesData
+    .map((category) => {
+      const matchingSubcategories = category.subcategories.filter((sub) => {
+        return getExamplesBySubcategory(sub.id).length > 0;
+      });
+
+      if (matchingSubcategories.length > 0) {
+        return {
+          ...category,
+          subcategories: matchingSubcategories,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+});
+
+watch(filteredCategories, () => {
+  nextTick(() => {
+    setupIntersectionObserver();
+  });
+});
+
 const defaultOpeneds = computed(() => categoriesData.map((c) => c.id.toString()));
 
 const selectedCategory = ref(categoriesData[0]?.id ?? 0);
@@ -175,10 +205,6 @@ const currentSubcategoryName = computed(() => {
   });
   return subcategoryName;
 });
-
-function getExamplesBySubcategory(subcategoryId) {
-  return examplesData.value.filter((ex) => ex.category === subcategoryId);
-}
 
 function selectSubcategory(subcategory, category) {
   selectedSubcategory.value = subcategory.id;

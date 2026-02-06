@@ -19,7 +19,7 @@
           :collapse-transition="false"
         >
           <el-sub-menu
-            v-for="category in categoriesData"
+            v-for="category in filteredCategories"
             :key="category.id"
             :index="category.id.toString()"
           >
@@ -54,7 +54,7 @@
 
         <div class="examples-container">
           <div
-            v-for="category in categoriesData"
+            v-for="category in filteredCategories"
             :key="category.id"
             class="category-section"
           >
@@ -97,7 +97,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onActivated, nextTick } from "vue";
+import { computed, ref, onMounted, onActivated, nextTick, watch } from "vue";
 
 defineOptions({
   name: "OpenLayersExamples",
@@ -199,6 +199,36 @@ const examplesData = computed(() => {
   );
 });
 
+function getExamplesBySubcategory(subcategoryId) {
+  return examplesData.value.filter((ex) => ex.category === subcategoryId);
+}
+
+const filteredCategories = computed(() => {
+  if (!keyword.value) return categoriesData;
+
+  return categoriesData
+    .map((category) => {
+      const matchingSubcategories = category.subcategories.filter((sub) => {
+        return getExamplesBySubcategory(sub.id).length > 0;
+      });
+
+      if (matchingSubcategories.length > 0) {
+        return {
+          ...category,
+          subcategories: matchingSubcategories,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+});
+
+watch(filteredCategories, () => {
+  nextTick(() => {
+    setupIntersectionObserver();
+  });
+});
+
 const defaultOpeneds = computed(() =>
   categoriesData.map((c) => c.id.toString()),
 );
@@ -230,10 +260,6 @@ const currentSubcategoryName = computed(() => {
   });
   return subcategoryName;
 });
-
-function getExamplesBySubcategory(subcategoryId) {
-  return examplesData.value.filter((ex) => ex.category === subcategoryId);
-}
 
 function selectSubcategory(subcategory, category) {
   selectedSubcategory.value = subcategory.id;

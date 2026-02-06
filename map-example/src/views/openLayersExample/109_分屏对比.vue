@@ -1,4 +1,4 @@
-<!-- https://openlayers.org/en/latest/examples/layer-swipe.html -->
+<!-- 官方：https://openlayers.org/en/latest/examples/layer-swipe.html -->
 <template>
   <div ref="mapContainer" class="map-container"></div>
   <input id="swipe" type="range" />
