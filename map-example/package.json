@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "verify-cesium": "node verify-cesium-config.js",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "optimize-images": "node optimize-assets.js"
   },
   "dependencies": {
     "@vue/compiler-sfc": "^3.5.27",
