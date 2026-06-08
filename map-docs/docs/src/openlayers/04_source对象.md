@@ -37,7 +37,7 @@
 
 Source 类型很多，常用的下图中的几种我们在 Layer 中已经介绍完
 
-![Source 类型](./imgs/Source.png)
+![Source 类型](./imgs/source.png)
 
 ## 补充介绍聚类（Cluster）
 
