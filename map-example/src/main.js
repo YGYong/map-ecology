@@ -5,16 +5,9 @@ import App from "./App.vue";
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import router from "./router";
+import { syncMapTokens } from "./utils/mapTokens";
 
-// 导入 Cesium
-import * as Cesium from "cesium";
-import "cesium/Build/Cesium/Widgets/widgets.css";
-import { getCesiumIonAccessToken, getTiandituToken } from "./config/tokens";
-
-// 配置 Cesium
-window.Cesium = Cesium;
-window.CESIUM_ION_TOKEN = getCesiumIonAccessToken();
-window.TIANDITU_TOKEN = getTiandituToken();
+syncMapTokens();
 
 const app = createApp(App);
 app.use(ElementPlus);

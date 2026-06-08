@@ -3,7 +3,6 @@
   "author": "YGYong",
   "devDependencies": {
     "cesium": "^1.133.1",
-    "vite-plugin-cesium": "^1.2.23",
     "vitepress": "^1.6.3",
     "vitepress-plugin-vue-repl": "^0.0.9"
   },

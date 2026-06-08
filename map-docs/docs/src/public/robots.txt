@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /map-ecology/
+
+Sitemap: https://ygyong.github.io/map-ecology/sitemap.xml

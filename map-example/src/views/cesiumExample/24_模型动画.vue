@@ -32,7 +32,7 @@ onMounted(() => {
   const modelEntity = viewer.entities.add({
     position: Cesium.Cartesian3.fromDegrees(116.397, 39.907, 100),
     model: {
-      uri: new URL("/models/Cesium_Air.glb", window.location.href).href,
+      uri: publicAsset("models/Cesium_Air.glb"),
       scale: 10.0,
       minimumPixelSize: 128, // 最小像素尺寸
       maximumScale: 20000, // 最大缩放比例

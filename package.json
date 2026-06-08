@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "audit:size": "node scripts/audit-size.mjs"
+  },
   "devDependencies": {
     "sharp": "^0.34.5",
     "svgo": "^4.0.0",

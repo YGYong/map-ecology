@@ -546,7 +546,7 @@ function normalizeExampleTokens(code) {
 
   result = result.replace(
     /Cesium\.Ion\.defaultAccessToken\s*=\s*(?:\s*['"][^'"]+['"]\s*;?|\s*[\s\S]*?\s*;)/g,
-    "Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN;",
+    "if (window.CESIUM_ION_TOKEN) Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN;",
   );
 
   return result;

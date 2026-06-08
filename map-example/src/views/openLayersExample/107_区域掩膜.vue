@@ -75,7 +75,7 @@ const addMask = async (params) => {
 
   if (!jiangsuPolygons) {
     if (!loadJiangsuPromise) {
-      loadJiangsuPromise = fetch("/models/jiangsu.json")
+      loadJiangsuPromise = fetch(publicAsset("models/jiangsu.json"))
         .then((res) => res.json())
         .then((json) => {
           jiangsuPolygons = json?.features?.[0]?.geometry?.coordinates || null;

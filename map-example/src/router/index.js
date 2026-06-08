@@ -1,14 +1,15 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomePage from '@/views/HomePage.vue'
-import ExampleDetailPage from '@/views/ExampleDetailPage.vue'
-import ErrorPanelDemo from '@/components/ErrorPanelDemo.vue'
-import BlankPage from '@/views/BlankPage.vue'
-import CesiumExamplesPage from '@/views/CesiumExamplesPage.vue'
-import LeafletExamplesPage from '@/views/LeafletExamplesPage.vue'
-import OpenLayersExamplesPage from '@/views/OpenLayersExamplesPage.vue'
-import OpenLayersDocsPage from '@/views/OpenLayersDocsPage.vue'
-import CesiumDocsPage from '@/views/CesiumDocsPage.vue'
-import NotFoundPage from '@/views/NotFoundPage.vue'
+
+const HomePage = () => import('@/views/HomePage.vue')
+const ExampleDetailPage = () => import('@/views/ExampleDetailPage.vue')
+const ErrorPanelDemo = () => import('@/components/ErrorPanelDemo.vue')
+const BlankPage = () => import('@/views/BlankPage.vue')
+const CesiumExamplesPage = () => import('@/views/CesiumExamplesPage.vue')
+const LeafletExamplesPage = () => import('@/views/LeafletExamplesPage.vue')
+const OpenLayersExamplesPage = () => import('@/views/OpenLayersExamplesPage.vue')
+const OpenLayersDocsPage = () => import('@/views/OpenLayersDocsPage.vue')
+const CesiumDocsPage = () => import('@/views/CesiumDocsPage.vue')
+const NotFoundPage = () => import('@/views/NotFoundPage.vue')
 
 const routes = [
   {

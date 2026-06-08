@@ -1,3 +1,5 @@
+import { getPublicBaseUrl } from "../config/tokens";
+
 const viewImgModules = import.meta.glob("/src/views/**/imgs/**/*", {
   eager: true,
   query: "?url",
@@ -51,5 +53,10 @@ export function resolveRuntimeAsset(fileName, importPath) {
   }
 
   return raw;
+}
+
+export function publicAsset(path) {
+  const normalized = String(path || "").replace(/^\/+/, "");
+  return new URL(normalized, window.location.origin + getPublicBaseUrl()).href;
 }
 

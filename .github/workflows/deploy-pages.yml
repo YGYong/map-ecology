@@ -46,6 +46,8 @@ jobs:
 
       - name: Build example
         working-directory: map-example
+        env:
+          VITE_CESIUM_ION_ACCESS_TOKEN: ${{ secrets.VITE_CESIUM_ION_ACCESS_TOKEN }}
         run: npm run build
 
       - name: Compose Pages artifact

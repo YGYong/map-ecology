@@ -50,7 +50,7 @@ onUnmounted(() => {
 const loadTileset = async () => {
   try {
     const tileset = await Cesium.Cesium3DTileset.fromUrl(
-      "/models/nanjjing/tileset.json"
+      publicAsset("models/nanjjing/tileset.json")
     );
 
     viewer.scene.primitives.add(tileset);

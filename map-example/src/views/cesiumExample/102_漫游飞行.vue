@@ -70,7 +70,7 @@ onMounted(() => {
     ]),
     position: path,
     model: {
-      uri: new URL("/models/Cesium_Air.glb", window.location.href).href,
+      uri: publicAsset("models/Cesium_Air.glb"),
       minimumPixelSize: 128,
       silhouetteSize: 3, // 设置轮廓大小
       scale: 10.0, // 设置模型缩放比例

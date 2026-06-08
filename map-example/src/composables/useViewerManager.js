@@ -1,5 +1,6 @@
 import { ref, onUnmounted } from "vue";
 import * as Cesium from "cesium";
+import { configureCesium } from "@/utils/mapTokens";
 
 /**
  * Composable for managing Cesium Viewer lifecycle
@@ -36,6 +37,7 @@ export function useViewerManager() {
       destroyViewer();
     }
 
+    configureCesium(Cesium);
     viewer.value = new Cesium.Viewer(container, {});
 
     // Hide Cesium logo/credit container
@@ -52,7 +54,12 @@ export function useViewerManager() {
   function clearScene() {
     if (viewer.value) {
       viewer.value.entities.removeAll();
-      viewer.value.dataSources.removeAll();
+      viewer.value.dataSources.removeAll(true);
+
+      const scene = viewer.value.scene;
+      scene.primitives?.removeAll();
+      scene.groundPrimitives?.removeAll();
+      scene.postProcessStages?.removeAll();
     }
   }
 

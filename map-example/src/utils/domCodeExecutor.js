@@ -1,4 +1,5 @@
-import { resolveRuntimeAsset } from "./runtimeAssetMap";
+import { getPublicBaseUrl } from "../config/tokens";
+import { publicAsset, resolveRuntimeAsset } from "./runtimeAssetMap";
 
 export class DomCodeExecutor {
   constructor(hostElement, contextFactory, moduleRegistry = null) {
@@ -71,6 +72,8 @@ export class DomCodeExecutor {
         console: window.console,
         document: window.document,
         window: window,
+        PUBLIC_BASE_URL: getPublicBaseUrl(),
+        publicAsset,
         __resolveAsset: (importPath) => resolveRuntimeAsset(fileName, importPath),
         ref: (val) => createRef(val),
         reactive: (obj) => obj,

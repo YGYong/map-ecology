@@ -9,10 +9,7 @@ export function getPublicBaseUrl() {
 }
 
 export function getCesiumIonAccessToken() {
-  return String(
-    import.meta.env.VITE_CESIUM_ION_ACCESS_TOKEN ||
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwZTEwODgwMS1iYTY0LTRhNmYtYWFhMS03MDEzMjlhYWNjOTciLCJpZCI6MzAwMTM5LCJpYXQiOjE3NDY1ODI5MTR9.P4bdCMYyoubNMaQ_-ZkU99mM8Da3o8HIo4A57stHRAg",
-  ).trim();
+  return String(import.meta.env.VITE_CESIUM_ION_ACCESS_TOKEN || "").trim();
 }
 
 export function getTiandituToken() {

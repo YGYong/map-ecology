@@ -1,33 +1,60 @@
 import { defineConfig } from "vitepress";
-import cesium from "vite-plugin-cesium";
 import { resolve } from "path";
 import { VueReplMdPlugin } from "vitepress-plugin-vue-repl";
 
+const siteUrl = "https://ygyong.github.io/map-ecology/";
+const siteName = "地图生态";
+const siteDescription =
+  "地图生态是面向 WebGIS 开发者的 Cesium、OpenLayers、Leaflet 中文文档与地图案例集合，覆盖二三维地图开发、底图加载、坐标转换、实体渲染、3D Tiles 与空间数据可视化。";
+const siteKeywords =
+  "地图生态,WebGIS,Cesium中文,OpenLayers中文,Leaflet中文,二三维地图,地图开发,3D Tiles,GIS案例";
+
+function pageToUrl(page: string) {
+  const cleanPage = page
+    .replace(/(^|\/)index\.md$/, "")
+    .replace(/\.md$/, ".html");
+  return new URL(cleanPage, siteUrl).href;
+}
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  lang: "zh-CN",
   base: "/map-ecology/",
-  title: "地图生态",
+  title: siteName,
   sitemap: {
-    hostname: "https://ygyong.github.io/map-ecology/",
+    hostname: siteUrl,
   },
-  description:
-    "地图生态、地图案例集合、Webgis入门、cesium中文、openlayers中文、leaflet中文",
+  description: siteDescription,
   head: [
     ["link", { rel: "icon", href: "/map-ecology/favicon.ico" }],
-    [
-      "meta",
-      {
-        name: "description",
-        content:
-          "地图生态、地图案例集合、Webgis入门、cesium中文、openlayers中文、leaflet中文",
-      },
-    ],
+    ["meta", { name: "description", content: siteDescription }],
+    ["meta", { name: "keywords", content: siteKeywords }],
+    ["meta", { name: "author", content: "YGYong" }],
+    ["meta", { name: "robots", content: "index,follow" }],
+    ["meta", { name: "theme-color", content: "#0f172a" }],
+    ["meta", { property: "og:site_name", content: siteName }],
+    ["meta", { property: "og:type", content: "website" }],
+    ["meta", { property: "og:locale", content: "zh_CN" }],
+    ["meta", { name: "twitter:card", content: "summary" }],
   ],
+  transformHead({ page, title, description }) {
+    const url = pageToUrl(page);
+    const pageDescription = description || siteDescription;
+
+    return [
+      ["link", { rel: "canonical", href: url }],
+      ["meta", { property: "og:title", content: title || siteName }],
+      ["meta", { property: "og:description", content: pageDescription }],
+      ["meta", { property: "og:url", content: url }],
+      ["meta", { name: "twitter:title", content: title || siteName }],
+      ["meta", { name: "twitter:description", content: pageDescription }],
+    ];
+  },
   srcDir: "src",
   // lastUpdated: true,
   themeConfig: {
     // aside: false,
-    logo: "/map-ecology/favicon.ico",
+    logo: "/favicon.ico",
     outline: {
       level: "deep",
       label: "目录",
@@ -158,7 +185,6 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [cesium()],
     resolve: {
       alias: {
         "@": resolve(__dirname, ".", "../src/"),

@@ -11,6 +11,7 @@ import * as Cesium from 'cesium'
 import { useViewerManager } from '@/composables/useViewerManager'
 import { CesiumCodeExecutor } from '@/utils/cesiumCodeExecutor'
 import { parseSFC } from '@/utils/sfcParser'
+import { configureCesium } from '@/utils/mapTokens'
 
 /**
  * CesiumViewer Component
@@ -44,8 +45,7 @@ const { viewer, initViewer, clearScene, resetCamera, destroyViewer } = useViewer
 // CodeExecutor instance (will be created after viewer is initialized)
 let codeExecutor = null
 
-// Expose Cesium to global scope for sandbox access
-window.Cesium = Cesium
+configureCesium(Cesium)
 
 // Initialize viewer on mount
 onMounted(() => {
