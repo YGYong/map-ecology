@@ -463,7 +463,7 @@ for (let i = 0; i < 10000; i++) {
 }
 ```
 
-![广告牌集合](./imgs/billboardCollection.png)
+![广告牌集合](./imgs/BillboardCollection.png)
 
 #### 加载模型
 

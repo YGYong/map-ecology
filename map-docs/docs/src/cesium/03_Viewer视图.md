@@ -2,7 +2,7 @@
 
 [Viewer](https://cesium.com/learn/cesiumjs/ref-doc/Viewer.html?classFilter=viewer) 是 Cesium 的核心容器，作为 Cesium 应用入口，封装了场景渲染、相机控制、用户交互、数据管理等核心功能，是构建 Cesium 应用的基础。
 
-![viewer](./imgs/viewer.png)
+![viewer](./imgs/Viewer.png)
 
 ## Viewer 与 Scene 和 Camera 的关系
 
@@ -233,7 +233,7 @@ const viewer = new Cesium.Viewer(cesiumContainer.value, {
 viewer.scene.backgroundColor = Cesium.Color.SKYBLUE;
 ```
 
-![天空蓝背景](./imgs/skyBlueBg.png)
+![天空蓝背景](./imgs/skyblueBg.png)
 
 ##### 自定义天空盒
 
