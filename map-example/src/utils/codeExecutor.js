@@ -8,19 +8,13 @@ export class CodeExecutor extends DomCodeExecutor {
     this.initialTerrainProvider = viewer?.terrainProvider ?? null;
     this.originalViewerParent = null;
     this.originalViewerNextSibling = null;
+    this.trackedSceneItems = [];
+    this.collectionProxyCache = new WeakMap();
+    this.sceneProxy = null;
 
     // Set contextFactory to include Cesium and viewer
     this.contextFactory = async () => {
-      const viewerProxy = new Proxy(this.viewer, {
-        get(target, prop) {
-          if (prop === "value") return target;
-          return Reflect.get(target, prop);
-        },
-        set(target, prop, value) {
-          if (prop === "value") return true;
-          return Reflect.set(target, prop, value);
-        },
-      });
+      const viewerProxy = this.createViewerProxy();
 
       const self = this;
       const MockCesium = {};
@@ -39,6 +33,107 @@ export class CodeExecutor extends DomCodeExecutor {
         viewer: viewerProxy,
       };
     };
+  }
+
+  createViewerProxy() {
+    const sceneProxy = this.createSceneProxy();
+
+    return new Proxy(this.viewer, {
+      get(target, prop) {
+        if (prop === "value") return target;
+        if (prop === "scene") return sceneProxy;
+        return Reflect.get(target, prop);
+      },
+      set(target, prop, value) {
+        if (prop === "value") return true;
+        return Reflect.set(target, prop, value);
+      },
+    });
+  }
+
+  createSceneProxy() {
+    if (this.sceneProxy || !this.viewer?.scene) return this.sceneProxy;
+
+    this.sceneProxy = new Proxy(this.viewer.scene, {
+      get: (target, prop) => {
+        const value = Reflect.get(target, prop);
+        if (
+          prop === "primitives" ||
+          prop === "groundPrimitives" ||
+          prop === "postProcessStages"
+        ) {
+          return this.createTrackedCollectionProxy(value);
+        }
+        return value;
+      },
+    });
+
+    return this.sceneProxy;
+  }
+
+  createTrackedCollectionProxy(collection) {
+    if (!collection || typeof collection !== "object") return collection;
+    const cached = this.collectionProxyCache.get(collection);
+    if (cached) return cached;
+
+    const proxy = new Proxy(collection, {
+      get: (target, prop) => {
+        const value = Reflect.get(target, prop);
+
+        if (prop === "add" && typeof value === "function") {
+          return (...args) => {
+            const item = value.apply(target, args);
+            this.trackedSceneItems.push({ collection: target, item });
+            return item;
+          };
+        }
+
+        if (prop === "remove" && typeof value === "function") {
+          return (item, ...args) => {
+            this.untrackSceneItem(target, item);
+            return value.apply(target, [item, ...args]);
+          };
+        }
+
+        if (prop === "removeAll" && typeof value === "function") {
+          return (...args) => {
+            this.trackedSceneItems = this.trackedSceneItems.filter(
+              (entry) => entry.collection !== target,
+            );
+            return value.apply(target, args);
+          };
+        }
+
+        if (typeof value === "function") {
+          return value.bind(target);
+        }
+
+        return value;
+      },
+    });
+
+    this.collectionProxyCache.set(collection, proxy);
+    return proxy;
+  }
+
+  untrackSceneItem(collection, item) {
+    this.trackedSceneItems = this.trackedSceneItems.filter(
+      (entry) => entry.collection !== collection || entry.item !== item,
+    );
+  }
+
+  cleanupTrackedSceneItems() {
+    for (let i = this.trackedSceneItems.length - 1; i >= 0; i -= 1) {
+      const { collection, item } = this.trackedSceneItems[i];
+      try {
+        if (collection && item && typeof collection.remove === "function") {
+          collection.remove(item);
+        }
+      } catch (e) {
+        console.warn("Failed to remove tracked Cesium item:", e);
+      }
+    }
+    this.trackedSceneItems = [];
   }
 
   renderTemplate(template, context) {
@@ -84,6 +179,7 @@ export class CodeExecutor extends DomCodeExecutor {
 
   cleanup() {
     super.cleanup();
+    this.cleanupTrackedSceneItems();
 
     if (this.viewer && this.originalViewerParent) {
       if (this.viewer.container.parentNode !== this.originalViewerParent) {
@@ -124,6 +220,7 @@ export class CodeExecutor extends DomCodeExecutor {
     if (!this.viewer || !this.viewer.container) return;
 
     this.applyTerrainToViewer(config);
+    this.applyImageryToViewer(config);
 
     const selectorMap = this.getWidgetSelectorMap();
     const findElement = (selectors) => {
@@ -148,9 +245,36 @@ export class CodeExecutor extends DomCodeExecutor {
       el.style.display = config[key] === false ? "none" : "";
     });
 
+  }
+
+  applyImageryToViewer(config) {
+    if (!this.viewer || !this.viewer.imageryLayers) return;
+
     if (config.baseLayer === false) {
       this.viewer.imageryLayers.removeAll();
+      return;
     }
+
+    if (Object.prototype.hasOwnProperty.call(config, "baseLayer")) {
+      return;
+    }
+
+    this.viewer.imageryLayers.removeAll();
+    const token = window.TIANDITU_TOKEN || "";
+    const provider = new Cesium.WebMapTileServiceImageryProvider({
+      url:
+        "https://{s}.tianditu.gov.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" +
+        token,
+      layer: "img",
+      style: "default",
+      format: "tiles",
+      tileMatrixSetID: "w",
+      subdomains: ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"],
+      maximumLevel: 18,
+      credit: new Cesium.Credit("天地图影像"),
+    });
+
+    this.viewer.imageryLayers.addImageryProvider(provider);
   }
 
   applyTerrainToViewer(config) {

@@ -38,7 +38,9 @@ export function useViewerManager() {
     }
 
     configureCesium(Cesium);
-    viewer.value = new Cesium.Viewer(container, {});
+    viewer.value = new Cesium.Viewer(container, {
+      baseLayer: false,
+    });
 
     // Hide Cesium logo/credit container
     viewer.value.cesiumWidget.creditContainer.style.display = "none";
@@ -55,11 +57,6 @@ export function useViewerManager() {
     if (viewer.value) {
       viewer.value.entities.removeAll();
       viewer.value.dataSources.removeAll(true);
-
-      const scene = viewer.value.scene;
-      scene.primitives?.removeAll();
-      scene.groundPrimitives?.removeAll();
-      scene.postProcessStages?.removeAll();
     }
   }
 

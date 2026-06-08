@@ -549,5 +549,11 @@ function normalizeExampleTokens(code) {
     "if (window.CESIUM_ION_TOKEN) Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN;",
   );
 
+  result = result
+    .replace(/http:\/\/(\{s\}\.)?tianditu\.gov\.cn/g, "https://$1tianditu.gov.cn")
+    .replace(/http:\/\/wprd0/g, "https://wprd0")
+    .replace(/http:\/\/webst0/g, "https://webst0")
+    .replace(/http:\/\/webrd0/g, "https://webrd0");
+
   return result;
 }
