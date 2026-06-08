@@ -1,0 +1,71 @@
+<template>
+    <div ref="cesiumContainer" class="container"></div>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import * as Cesium from "cesium";
+import img from "./imgs/qidian.png"
+const cesiumContainer = ref(null);
+let viewer = null;
+
+// 天地图TOKEN
+const token = window.TIANDITU_TOKEN;
+
+onMounted(() => {
+    // 初始化Viewer
+    viewer = new Cesium.Viewer(cesiumContainer.value, {
+        geocoder: false, // 关闭地理编码搜索
+        homeButton: false, // 关闭主页按钮
+        sceneModePicker: false, // 关闭场景模式选择器
+        baseLayerPicker: false, // 关闭底图选择器
+        navigationHelpButton: false, // 关闭导航帮助
+        animation: false, // 关闭动画控件
+        timeline: false, // 关闭时间轴
+        fullscreenButton: false, // 关闭全屏按钮
+        baseLayer: false, // 关闭默认地图
+    });
+    // 清空logo
+    viewer.cesiumWidget.creditContainer.style.display = "none";
+    initMap();
+
+    const billboard = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(116.3975, 39.9075),
+        billboard: {
+            image: img, // 图标路径
+            scale: 2,
+            color: Cesium.Color.WHITE,
+            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+            // pixelOffset: new Cesium.Cartesian2(0, -20), // 向上偏移20像素
+        },
+    });
+    billboard.billboard.pixelOffset = new Cesium.Cartesian2(0, -50); // 向下偏移 50 像素
+    viewer.zoomTo(billboard);
+});
+
+// 加载天地图
+const initMap = () => {
+    // 以下为天地图及天地图标注加载
+    const tiandituProvider = new Cesium.WebMapTileServiceImageryProvider({
+        url:
+            "http://{s}.tianditu.gov.cn/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" +
+            token,
+        layer: "img",
+        style: "default",
+        format: "tiles",
+        tileMatrixSetID: "w",
+        subdomains: ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"], // 子域名
+        maximumLevel: 18,
+        credit: new Cesium.Credit("天地图影像"),
+    });
+    // 天地图影像添加到viewer实例的影像图层集合中
+    viewer.imageryLayers.addImageryProvider(tiandituProvider);
+};
+</script>
+<style scoped>
+.container {
+    width: 100%;
+    height: 100%;
+}
+</style>

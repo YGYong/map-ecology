@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# OS and Editors
+.DS_Store
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
+# VitePress cache
+map-docs/docs/.vitepress/cache/
+.vitepress/dist/
+
+# Test coverage
+tests/**/coverage/
+
+# Misc
+.eslintcache
+report.html
+vite.config.*.timestamp*
+tsconfig.tsbuildinfo
+
+# Project specific
+map-docs/node_modules/
+map-example/node_modules/
+map-docs/dist/
+map-example/dist/
