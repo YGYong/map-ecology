@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import cesium from "vite-plugin-cesium";
 import { resolve } from "path";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +11,14 @@ export default defineConfig({
   plugins: [
     vue(), 
     cesium(), 
+    viteStaticCopy({
+      targets: [
+        {
+          src: "node_modules/cesium/Build/Cesium/*",
+          dest: "cesium",
+        },
+      ],
+    }),
     splitVendorChunkPlugin(),
     ViteImageOptimizer({
       png: {
