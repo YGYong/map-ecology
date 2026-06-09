@@ -18,6 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: github-pages
 
     steps:
       - name: Checkout
@@ -43,6 +44,15 @@ jobs:
       - name: Install example dependencies
         working-directory: map-example
         run: npm ci
+
+      - name: Verify Cesium ion token
+        env:
+          VITE_CESIUM_ION_ACCESS_TOKEN: ${{ secrets.VITE_CESIUM_ION_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$VITE_CESIUM_ION_ACCESS_TOKEN" ]; then
+            echo "VITE_CESIUM_ION_ACCESS_TOKEN is missing. Add it in GitHub repository secrets or the github-pages environment secrets."
+            exit 1
+          fi
 
       - name: Build example
         working-directory: map-example
